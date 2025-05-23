@@ -1,4 +1,6 @@
 
+import { MarkerType } from '@xyflow/react';
+
 export interface Task {
   id: string;
   title: string;
@@ -41,6 +43,6 @@ export interface FlowEdge {
   target: string;
   animated?: boolean;
   markerEnd?: {
-    type: string;
+    type: MarkerType;
   };
 }

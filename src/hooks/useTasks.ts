@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Task, FlowNode, FlowEdge } from '@/types/task';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { MarkerType } from '@xyflow/react';
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -157,7 +157,7 @@ export const useTasks = () => {
       type: task.nodeType || 'task',
       position: task.position,
       data: task,
-    }));
+    })) as FlowNode[];
   };
 
   // Create edges based on connections
@@ -175,13 +175,16 @@ export const useTasks = () => {
               source: task.id,
               target: targetId,
               animated: false,
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+              }
             });
           }
         });
       }
     });
     
-    return edges;
+    return edges as FlowEdge[];
   };
 
   return {

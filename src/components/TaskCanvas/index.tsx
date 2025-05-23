@@ -18,7 +18,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { Task } from '@/types/task';
+import { Task, FlowNode, FlowEdge } from '@/types/task';
 import { useTasks } from '@/hooks/useTasks';
 import { TaskForm } from '@/components/TaskForm';
 import NodeDetail from './NodeDetail';
@@ -42,8 +42,8 @@ const edgeTypes = {
 
 export default function TaskCanvas() {
   const { getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks } = useTasks();
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(getFlowNodes());
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(getFlowEdges());
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(getFlowNodes() as unknown as Node[]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(getFlowEdges() as unknown as Edge[]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -55,8 +55,8 @@ export default function TaskCanvas() {
   // Update nodes and edges when tasks change
   React.useEffect(() => {
     if (!loading) {
-      setNodes(getFlowNodes());
-      setEdges(getFlowEdges());
+      setNodes(getFlowNodes() as unknown as Node[]);
+      setEdges(getFlowEdges() as unknown as Edge[]);
     }
   }, [loading, getFlowNodes, getFlowEdges, setNodes, setEdges]);
 
