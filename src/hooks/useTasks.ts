@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Task } from '@/types/task';
+import { Task, FlowNode, FlowEdge } from '@/types/task';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
@@ -34,6 +34,8 @@ export const useTasks = () => {
         priority: task.priority as Task['priority'],
         dueDate: task.due_date || undefined,
         tags: task.tags || [],
+        nodeType: task.node_type || 'task',
+        connections: task.connections || [],
         position: typeof task.position === 'string' 
           ? JSON.parse(task.position) 
           : (task.position as { x: number; y: number }) || { x: 0, y: 0 },
@@ -57,6 +59,8 @@ export const useTasks = () => {
           priority: taskData.priority,
           due_date: taskData.dueDate || null,
           tags: taskData.tags,
+          node_type: taskData.nodeType,
+          connections: taskData.connections || [],
           position: JSON.stringify(taskData.position),
           user_id: user.id,
         })
@@ -78,17 +82,21 @@ export const useTasks = () => {
 
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, taskData }: { id: string; taskData: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>> }) => {
+      const updateObj: any = {};
+      
+      if (taskData.title !== undefined) updateObj.title = taskData.title;
+      if (taskData.description !== undefined) updateObj.description = taskData.description;
+      if (taskData.status !== undefined) updateObj.status = taskData.status;
+      if (taskData.priority !== undefined) updateObj.priority = taskData.priority;
+      if (taskData.dueDate !== undefined) updateObj.due_date = taskData.dueDate;
+      if (taskData.tags !== undefined) updateObj.tags = taskData.tags;
+      if (taskData.nodeType !== undefined) updateObj.node_type = taskData.nodeType;
+      if (taskData.connections !== undefined) updateObj.connections = taskData.connections;
+      if (taskData.position !== undefined) updateObj.position = JSON.stringify(taskData.position);
+      
       const { data, error } = await supabase
         .from('tasks')
-        .update({
-          ...(taskData.title && { title: taskData.title }),
-          ...(taskData.description !== undefined && { description: taskData.description }),
-          ...(taskData.status && { status: taskData.status }),
-          ...(taskData.priority && { priority: taskData.priority }),
-          ...(taskData.dueDate !== undefined && { due_date: taskData.dueDate }),
-          ...(taskData.tags && { tags: taskData.tags }),
-          ...(taskData.position && { position: JSON.stringify(taskData.position) }),
-        })
+        .update(updateObj)
         .eq('id', id)
         .select()
         .single();
@@ -106,24 +114,23 @@ export const useTasks = () => {
     },
   });
 
-  const moveTaskMutation = useMutation({
-    mutationFn: async ({ id, newStatus }: { id: string; newStatus: Task['status'] }) => {
-      const { data, error } = await supabase
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
         .from('tasks')
-        .update({ status: newStatus })
-        .eq('id', id)
-        .select()
-        .single();
+        .delete()
+        .eq('id', id);
 
       if (error) throw error;
-      return data;
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      toast.success('Task deleted successfully');
     },
     onError: (error) => {
-      console.error('Error moving task:', error);
-      toast.error('Failed to move task');
+      console.error('Error deleting task:', error);
+      toast.error('Failed to delete task');
     },
   });
 
@@ -135,20 +142,56 @@ export const useTasks = () => {
     return updateTaskMutation.mutateAsync({ id, taskData });
   };
 
-  const moveTask = (id: string, newStatus: Task['status']) => {
-    return moveTaskMutation.mutateAsync({ id, newStatus });
+  const deleteTask = (id: string) => {
+    return deleteTaskMutation.mutateAsync(id);
   };
 
   const getTasksByStatus = (status: Task['status']) => {
     return tasks.filter(task => task.status === status);
   };
 
+  // Transform tasks into React Flow nodes
+  const getFlowNodes = (): FlowNode[] => {
+    return tasks.map(task => ({
+      id: task.id,
+      type: task.nodeType || 'task',
+      position: task.position,
+      data: task,
+    }));
+  };
+
+  // Create edges based on connections
+  const getFlowEdges = (): FlowEdge[] => {
+    const edges: FlowEdge[] = [];
+    
+    tasks.forEach(task => {
+      if (task.connections && task.connections.length > 0) {
+        task.connections.forEach(targetId => {
+          // Make sure the target task exists
+          const targetTask = tasks.find(t => t.id === targetId);
+          if (targetTask) {
+            edges.push({
+              id: `e-${task.id}-${targetId}`,
+              source: task.id,
+              target: targetId,
+              animated: false,
+            });
+          }
+        });
+      }
+    });
+    
+    return edges;
+  };
+
   return {
     tasks,
     addTask,
     updateTask,
-    moveTask,
+    deleteTask,
     getTasksByStatus,
+    getFlowNodes,
+    getFlowEdges,
     loading,
     refreshTasks,
   };

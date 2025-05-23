@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { X, Plus } from 'lucide-react';
 import { Task } from '@/types/task';
+import { DialogDescription } from '@radix-ui/react-dialog';
 
 interface TaskFormProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     priority: 'medium' as Task['priority'],
     dueDate: '',
     tags: [] as string[],
+    nodeType: 'task' as 'task' | 'milestone' | 'note',
+    connections: [] as string[],
     position: { x: 0, y: 0 },
   });
 
@@ -46,6 +49,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         priority: task.priority,
         dueDate: task.dueDate || '',
         tags: task.tags,
+        nodeType: task.nodeType || 'task',
+        connections: task.connections || [],
         position: task.position,
       });
     } else {
@@ -56,6 +61,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         priority: 'medium',
         dueDate: '',
         tags: [],
+        nodeType: 'task',
+        connections: [],
         position: { x: 0, y: 0 },
       });
     }
@@ -100,6 +107,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           <DialogTitle>
             {task ? 'Edit Task' : 'Create New Task'}
           </DialogTitle>
+          <DialogDescription>
+            {formData.nodeType === 'milestone' 
+              ? 'Milestone nodes represent major project checkpoints' 
+              : formData.nodeType === 'note' 
+              ? 'Note nodes are for documenting context or information'
+              : 'Task nodes represent work items to be completed'}
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -127,20 +141,20 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Priority</Label>
+              <Label>Node Type</Label>
               <Select
-                value={formData.priority}
-                onValueChange={(value: Task['priority']) => 
-                  setFormData(prev => ({ ...prev, priority: value }))
+                value={formData.nodeType}
+                onValueChange={(value: 'task' | 'milestone' | 'note') => 
+                  setFormData(prev => ({ ...prev, nodeType: value }))
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">🟢 Low</SelectItem>
-                  <SelectItem value="medium">🟡 Medium</SelectItem>
-                  <SelectItem value="high">🔴 High</SelectItem>
+                  <SelectItem value="task">Task</SelectItem>
+                  <SelectItem value="milestone">Milestone</SelectItem>
+                  <SelectItem value="note">Note</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -165,14 +179,35 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="dueDate">Due Date</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Priority</Label>
+              <Select
+                value={formData.priority}
+                onValueChange={(value: Task['priority']) => 
+                  setFormData(prev => ({ ...prev, priority: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -196,7 +231,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="px-2 py-1 cursor-pointer hover:bg-gray-200"
+                    className="px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                     onClick={() => removeTag(tag)}
                   >
                     {tag}

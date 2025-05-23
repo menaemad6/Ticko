@@ -11,6 +11,8 @@ export interface Task {
     x: number;
     y: number;
   };
+  nodeType: 'task' | 'milestone' | 'note';
+  connections?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -20,4 +22,21 @@ export interface Column {
   title: string;
   status: Task['status'];
   color: string;
+}
+
+export interface FlowNode {
+  id: string;
+  type: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  data: Task;
+}
+
+export interface FlowEdge {
+  id: string;
+  source: string;
+  target: string;
+  animated?: boolean;
 }
