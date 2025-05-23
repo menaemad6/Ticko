@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { KanbanColumn } from '@/components/KanbanColumn';
 import { TaskForm } from '@/components/TaskForm';
 import { useTasks } from '@/hooks/useTasks';
 import { Task, Column } from '@/types/task';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 const columns: Column[] = [
   {
@@ -30,7 +31,8 @@ const columns: Column[] = [
 ];
 
 const Index = () => {
-  const { tasks, addTask, updateTask, moveTask, getTasksByStatus } = useTasks();
+  const { tasks, addTask, updateTask, moveTask, getTasksByStatus, loading, refreshTasks } = useTasks();
+  const { user, signOut } = useAuth();
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -66,11 +68,13 @@ const Index = () => {
     setIsTaskFormOpen(true);
   };
 
-  const handleSaveTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSaveTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingTask) {
-      updateTask(editingTask.id, taskData);
+      await updateTask(editingTask.id, taskData);
+      refreshTasks();
     } else {
-      addTask(taskData);
+      await addTask(taskData);
+      refreshTasks();
     }
   };
 
@@ -83,6 +87,10 @@ const Index = () => {
   const handleCloseForm = () => {
     setIsTaskFormOpen(false);
     setEditingTask(null);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   const totalTasks = tasks.length;
@@ -100,7 +108,7 @@ const Index = () => {
                 Visual Task Board
               </h1>
               <p className="text-gray-600 mt-1">
-                Drag and drop tasks to organize your workflow
+                Welcome, {user?.email} | Drag and drop tasks to organize your workflow
               </p>
             </div>
             
@@ -112,52 +120,68 @@ const Index = () => {
                 </div>
               </div>
               
-              <Button 
-                onClick={() => handleCreateTask('todo')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Task
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => handleCreateTask('todo')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Task
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Kanban Board */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {columns.map((column) => (
-            <div key={column.id} className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {column.title}
-                </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCreateTask(column.status)}
-                  className="text-xs"
-                >
-                  <Plus className="w-3 h-3 mr-1" />
-                  Add
-                </Button>
-              </div>
-              
-              <KanbanColumn
-                column={column}
-                tasks={getTasksByStatus(column.status)}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                draggedTask={draggedTask}
-                onTaskClick={handleTaskClick}
-              />
-            </div>
-          ))}
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-lg text-gray-500">Loading your tasks...</p>
         </div>
-      </div>
+      ) : (
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {columns.map((column) => (
+              <div key={column.id} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {column.title}
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCreateTask(column.status)}
+                    className="text-xs"
+                  >
+                    <Plus className="w-3 h-3 mr-1" />
+                    Add
+                  </Button>
+                </div>
+                
+                <KanbanColumn
+                  column={column}
+                  tasks={getTasksByStatus(column.status)}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  draggedTask={draggedTask}
+                  onTaskClick={handleTaskClick}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Task Form Dialog */}
       <TaskForm
