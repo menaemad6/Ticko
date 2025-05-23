@@ -15,6 +15,7 @@ export interface Task {
   connections?: string[];
   createdAt: string;
   updatedAt: string;
+  [key: string]: unknown; // Add index signature for React Flow compatibility
 }
 
 export interface Column {
@@ -39,4 +40,7 @@ export interface FlowEdge {
   source: string;
   target: string;
   animated?: boolean;
+  markerEnd?: {
+    type: string;
+  };
 }

@@ -34,8 +34,8 @@ export const useTasks = () => {
         priority: task.priority as Task['priority'],
         dueDate: task.due_date || undefined,
         tags: task.tags || [],
-        nodeType: (task.node_type || 'task') as Task['nodeType'],
-        connections: task.connections || [],
+        nodeType: ((task as any).node_type || 'task') as Task['nodeType'],
+        connections: (task as any).connections || [],
         position: typeof task.position === 'string' 
           ? JSON.parse(task.position) 
           : (task.position as { x: number; y: number }) || { x: 0, y: 0 },
@@ -63,7 +63,7 @@ export const useTasks = () => {
           connections: taskData.connections || [],
           position: JSON.stringify(taskData.position),
           user_id: user.id,
-        })
+        } as any)
         .select()
         .single();
 
@@ -151,7 +151,7 @@ export const useTasks = () => {
   };
 
   // Transform tasks into React Flow nodes
-  const getFlowNodes = (): FlowNode[] => {
+  const getFlowNodes = () => {
     return tasks.map(task => ({
       id: task.id,
       type: task.nodeType || 'task',
@@ -161,7 +161,7 @@ export const useTasks = () => {
   };
 
   // Create edges based on connections
-  const getFlowEdges = (): FlowEdge[] => {
+  const getFlowEdges = () => {
     const edges: FlowEdge[] = [];
     
     tasks.forEach(task => {

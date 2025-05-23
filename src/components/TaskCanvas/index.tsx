@@ -14,10 +14,11 @@ import {
   Edge,
   XYPosition,
   useReactFlow,
+  BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { Task, FlowNode, FlowEdge } from '@/types/task';
+import { Task } from '@/types/task';
 import { useTasks } from '@/hooks/useTasks';
 import { TaskForm } from '@/components/TaskForm';
 import NodeDetail from './NodeDetail';
@@ -41,15 +42,15 @@ const edgeTypes = {
 
 export default function TaskCanvas() {
   const { getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks } = useTasks();
-  const [nodes, setNodes, onNodesChange] = useNodesState(getFlowNodes());
-  const [edges, setEdges, onEdgesChange] = useEdgesState(getFlowEdges());
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>(getFlowNodes());
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(getFlowEdges());
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTaskPosition, setNewTaskPosition] = useState<XYPosition | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { project, getViewport } = useReactFlow();
+  const { screenToFlowPosition, getViewport } = useReactFlow();
 
   // Update nodes and edges when tasks change
   React.useEffect(() => {
@@ -65,7 +66,8 @@ export default function TaskCanvas() {
       if (connection.source && connection.target) {
         const sourceTask = nodes.find(node => node.id === connection.source);
         if (sourceTask && sourceTask.data) {
-          const currentConnections = sourceTask.data.connections || [];
+          const taskData = sourceTask.data as Task;
+          const currentConnections = taskData.connections || [];
           if (!currentConnections.includes(connection.target)) {
             updateTask(connection.source, {
               connections: [...currentConnections, connection.target],
@@ -85,7 +87,7 @@ export default function TaskCanvas() {
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     // Open node details
-    setSelectedTask(node.data);
+    setSelectedTask(node.data as Task);
     setIsDetailOpen(true);
   }, []);
 
@@ -99,7 +101,7 @@ export default function TaskCanvas() {
   const handleAddNode = useCallback(() => {
     const viewport = getViewport();
     const position = reactFlowWrapper.current
-      ? project({
+      ? screenToFlowPosition({
           x: reactFlowWrapper.current.clientWidth / 2,
           y: reactFlowWrapper.current.clientHeight / 2,
         })
@@ -108,7 +110,7 @@ export default function TaskCanvas() {
     setNewTaskPosition(position);
     setEditingTask(null);
     setIsTaskFormOpen(true);
-  }, [project, getViewport]);
+  }, [screenToFlowPosition, getViewport]);
 
   const handleEditNode = useCallback((task: Task) => {
     setEditingTask(task);
@@ -164,7 +166,7 @@ export default function TaskCanvas() {
           color="#94a3b8" 
           gap={16} 
           size={1} 
-          variant="dots" 
+          variant={BackgroundVariant.Dots}
           className="dark:bg-gray-950" 
         />
         <MiniMap 
