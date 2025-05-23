@@ -34,7 +34,7 @@ export const useTasks = () => {
         priority: task.priority as Task['priority'],
         dueDate: task.due_date || undefined,
         tags: task.tags || [],
-        nodeType: task.node_type || 'task',
+        nodeType: (task.node_type || 'task') as Task['nodeType'],
         connections: task.connections || [],
         position: typeof task.position === 'string' 
           ? JSON.parse(task.position) 
