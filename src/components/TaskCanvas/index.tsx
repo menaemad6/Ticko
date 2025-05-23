@@ -3,8 +3,8 @@ import React, { useState, useCallback, useRef } from 'react';
 import {
   ReactFlow,
   MiniMap,
-  Background,
   Controls,
+  Background,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -15,6 +15,7 @@ import {
   XYPosition,
   useReactFlow,
   BackgroundVariant,
+  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -40,7 +41,8 @@ const edgeTypes = {
   default: CustomEdge,
 };
 
-export default function TaskCanvas() {
+// Create an internal canvas component that uses the React Flow hooks
+const FlowCanvas = () => {
   const { getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks } = useTasks();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>(getFlowNodes() as unknown as Node[]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(getFlowEdges() as unknown as Edge[]);
@@ -211,5 +213,14 @@ export default function TaskCanvas() {
         initialStatus="todo"
       />
     </div>
+  );
+};
+
+// Main component that wraps FlowCanvas with ReactFlowProvider
+export default function TaskCanvas() {
+  return (
+    <ReactFlowProvider>
+      <FlowCanvas />
+    </ReactFlowProvider>
   );
 }
