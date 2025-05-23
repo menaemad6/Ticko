@@ -28,6 +28,8 @@ import MilestoneNode from './MilestoneNode';
 import NoteNode from './NoteNode';
 import CustomEdge from './CustomEdge';
 import CustomControls from './CustomControls';
+import { TaskSidebar } from './Sidebar';
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 
@@ -51,6 +53,7 @@ const FlowCanvas = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTaskPosition, setNewTaskPosition] = useState<XYPosition | null>(null);
+  const [newNodeType, setNewNodeType] = useState<'task' | 'milestone' | 'note'>('task');
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, getViewport } = useReactFlow();
 
@@ -100,6 +103,36 @@ const FlowCanvas = () => {
     });
   }, [updateTask]);
 
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow') as 'task' | 'milestone' | 'note';
+
+      // Check if the dropped element is a valid node type
+      if (typeof type === 'undefined' || !type) {
+        return;
+      }
+
+      // Get the position where the node was dropped
+      const position = screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
+
+      setNewTaskPosition(position);
+      setNewNodeType(type);
+      setEditingTask(null);
+      setIsTaskFormOpen(true);
+    },
+    [screenToFlowPosition]
+  );
+
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
   const handleAddNode = useCallback(() => {
     const viewport = getViewport();
     const position = reactFlowWrapper.current
@@ -110,6 +143,7 @@ const FlowCanvas = () => {
       : { x: 100, y: 100 };
 
     setNewTaskPosition(position);
+    setNewNodeType('task');
     setEditingTask(null);
     setIsTaskFormOpen(true);
   }, [screenToFlowPosition, getViewport]);
@@ -128,13 +162,14 @@ const FlowCanvas = () => {
         await addTask({
           ...taskData,
           position,
+          nodeType: newNodeType,
         });
       }
       
       setIsTaskFormOpen(false);
       refreshTasks();
     },
-    [editingTask, updateTask, addTask, refreshTasks, newTaskPosition]
+    [editingTask, updateTask, addTask, refreshTasks, newTaskPosition, newNodeType]
   );
 
   const onPaneClick = () => {
@@ -152,6 +187,8 @@ const FlowCanvas = () => {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onNodeDragStop={onNodeDragStop}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
@@ -216,11 +253,18 @@ const FlowCanvas = () => {
   );
 };
 
-// Main component that wraps FlowCanvas with ReactFlowProvider
+// Main component that wraps FlowCanvas with ReactFlowProvider and Sidebar
 export default function TaskCanvas() {
   return (
-    <ReactFlowProvider>
-      <FlowCanvas />
-    </ReactFlowProvider>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <TaskSidebar />
+        <SidebarInset className="flex-1">
+          <ReactFlowProvider>
+            <FlowCanvas />
+          </ReactFlowProvider>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }

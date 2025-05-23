@@ -22,14 +22,14 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-purple-950">
       {/* Header */}
       <div className="bg-white shadow-sm border-b dark:bg-gray-900 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 Visual Task Canvas
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Welcome, {user?.email} | Create and connect tasks in your workflow
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Welcome, {user?.email} | Drag nodes from the sidebar to create tasks
               </p>
             </div>
             
@@ -54,7 +54,7 @@ const Index = () => {
       </div>
 
       {/* Task Canvas */}
-      <div className="h-[calc(100vh-137px)]">
+      <div className="h-[calc(100vh-97px)]">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-lg text-gray-500 dark:text-gray-400">Loading your tasks...</p>
