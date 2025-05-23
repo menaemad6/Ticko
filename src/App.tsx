@@ -41,26 +41,28 @@ const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Router setup with AuthProvider
+// Router component wrapped with AuthProvider
 const AppRouter = () => (
-  <BrowserRouter>
-    <AuthProvider>
-      <Routes>
-        <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AuthProvider>
-  </BrowserRouter>
+  <AuthProvider>
+    <Routes>
+      <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </AuthProvider>
 );
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AppRouter />
-    </TooltipProvider>
+    <BrowserRouter>
+      <TooltipProvider>
+        <div className="min-h-screen w-full">
+          <Toaster />
+          <Sonner />
+          <AppRouter />
+        </div>
+      </TooltipProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
