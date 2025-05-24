@@ -48,7 +48,12 @@ const QuickAction: React.FC<{ icon: React.ReactNode; label: string; onClick: () 
   </Button>
 );
 
-export function TaskSidebar() {
+interface TaskSidebarProps {
+  onQuickAction?: (action: string) => void;
+  onTemplateSelect?: (templateName: string) => void;
+}
+
+export function TaskSidebar({ onQuickAction, onTemplateSelect }: TaskSidebarProps = {}) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const nodeTypes = [
@@ -77,18 +82,47 @@ export function TaskSidebar() {
 
   const templates = [
     { name: 'Sprint Planning', nodes: 5, color: 'bg-green-100 text-green-800' },
-    { name: 'Project Roadmap', nodes: 12, color: 'bg-blue-100 text-blue-800' },
-    { name: 'Bug Tracking', nodes: 8, color: 'bg-red-100 text-red-800' },
-    { name: 'Feature Development', nodes: 10, color: 'bg-purple-100 text-purple-800' }
+    { name: 'Project Roadmap', nodes: 10, color: 'bg-blue-100 text-blue-800' },
+    { name: 'Bug Tracking', nodes: 7, color: 'bg-red-100 text-red-800' },
+    { name: 'Feature Development', nodes: 9, color: 'bg-purple-100 text-purple-800' }
   ];
 
   const quickActions = [
-    { icon: <Plus className="w-4 h-4" />, label: 'Add Task', onClick: () => {} },
-    { icon: <Calendar className="w-4 h-4" />, label: 'Schedule View', onClick: () => {} },
-    { icon: <Tag className="w-4 h-4" />, label: 'Manage Tags', onClick: () => {} },
-    { icon: <User className="w-4 h-4" />, label: 'Assign Users', onClick: () => {} },
-    { icon: <Grid2x2 className="w-4 h-4" />, label: 'Grid Layout', onClick: () => {} }
+    { 
+      icon: <Plus className="w-4 h-4" />, 
+      label: 'Add Task', 
+      action: 'addTask',
+      onClick: () => onQuickAction?.('addTask')
+    },
+    { 
+      icon: <Calendar className="w-4 h-4" />, 
+      label: 'Schedule View', 
+      action: 'scheduleView',
+      onClick: () => onQuickAction?.('scheduleView')
+    },
+    { 
+      icon: <Tag className="w-4 h-4" />, 
+      label: 'Manage Tags', 
+      action: 'manageTags',
+      onClick: () => onQuickAction?.('manageTags')
+    },
+    { 
+      icon: <User className="w-4 h-4" />, 
+      label: 'Assign Users', 
+      action: 'assignUsers',
+      onClick: () => onQuickAction?.('assignUsers')
+    },
+    { 
+      icon: <Grid2x2 className="w-4 h-4" />, 
+      label: 'Grid Layout', 
+      action: 'gridLayout',
+      onClick: () => onQuickAction?.('gridLayout')
+    }
   ];
+
+  const handleTemplateClick = (templateName: string) => {
+    onTemplateSelect?.(templateName);
+  };
 
   return (
     <Sidebar className="w-80 border-r">
@@ -159,6 +193,7 @@ export function TaskSidebar() {
               <div
                 key={index}
                 className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                onClick={() => handleTemplateClick(template.name)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm font-medium">{template.name}</h4>
@@ -186,6 +221,7 @@ export function TaskSidebar() {
               variant="ghost"
               size="sm"
               className="w-full justify-start gap-2 h-8"
+              onClick={() => console.log('Canvas preferences clicked')}
             >
               <Settings className="w-4 h-4" />
               <span className="text-xs">Preferences</span>
