@@ -155,19 +155,26 @@ const FlowCanvas = () => {
 
   const handleSaveTask = useCallback(
     async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-      if (editingTask) {
-        await updateTask(editingTask.id, taskData);
-      } else {
-        const position = newTaskPosition || { x: 100, y: 100 };
-        await addTask({
-          ...taskData,
-          position,
-          nodeType: newNodeType,
-        });
+      try {
+        if (editingTask) {
+          await updateTask(editingTask.id, taskData);
+        } else {
+          const position = newTaskPosition || { x: 100, y: 100 };
+          await addTask({
+            ...taskData,
+            position,
+            nodeType: newNodeType,
+            connections: taskData.connections || [],
+          });
+        }
+        
+        setIsTaskFormOpen(false);
+        setEditingTask(null);
+        setNewTaskPosition(null);
+        await refreshTasks();
+      } catch (error) {
+        console.error('Error saving task:', error);
       }
-      
-      setIsTaskFormOpen(false);
-      refreshTasks();
     },
     [editingTask, updateTask, addTask, refreshTasks, newTaskPosition, newNodeType]
   );
@@ -244,7 +251,11 @@ const FlowCanvas = () => {
       
       <TaskForm
         isOpen={isTaskFormOpen}
-        onClose={() => setIsTaskFormOpen(false)}
+        onClose={() => {
+          setIsTaskFormOpen(false);
+          setEditingTask(null);
+          setNewTaskPosition(null);
+        }}
         onSave={handleSaveTask}
         task={editingTask}
         initialStatus="todo"

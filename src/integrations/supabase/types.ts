@@ -35,10 +35,12 @@ export type Database = {
       }
       tasks: {
         Row: {
+          connections: string[] | null
           created_at: string
           description: string | null
           due_date: string | null
           id: string
+          node_type: string | null
           position: Json
           priority: string
           status: string
@@ -48,10 +50,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          connections?: string[] | null
           created_at?: string
           description?: string | null
           due_date?: string | null
           id?: string
+          node_type?: string | null
           position?: Json
           priority?: string
           status?: string
@@ -61,10 +65,12 @@ export type Database = {
           user_id: string
         }
         Update: {
+          connections?: string[] | null
           created_at?: string
           description?: string | null
           due_date?: string | null
           id?: string
+          node_type?: string | null
           position?: Json
           priority?: string
           status?: string
