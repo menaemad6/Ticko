@@ -95,20 +95,85 @@ export default function TaskCanvasFlow({
     setIsTaskFormOpen(true);
   }, [screenToFlowPosition, getViewport]);
 
-  const handleQuickAction = useCallback((action: string) => {
+  const handleEditTask = useCallback((task: Task) => {
+    setEditingTask(task);
+    setIsTaskFormOpen(true);
+  }, []);
+
+  const handleQuickAction = useCallback(async (action: string) => {
     console.log('Quick action triggered:', action);
     switch (action) {
       case 'addTask':
         handleAddNode();
         break;
       case 'scheduleView':
-        console.log('Schedule view not implemented yet');
+        // Filter tasks by due date and arrange them chronologically
+        const tasksWithDates = tasks.filter(task => task.dueDate);
+        tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
+        
+        const scheduleNodes = tasksWithDates.map((task, index) => ({
+          ...nodes.find(n => n.id === task.id),
+          position: { x: 100 + (index % 3) * 300, y: 100 + Math.floor(index / 3) * 150 }
+        }));
+        
+        setNodes(prevNodes => 
+          prevNodes.map(node => {
+            const scheduleNode = scheduleNodes.find(sn => sn?.id === node.id);
+            return scheduleNode ? { ...node, position: scheduleNode.position } : node;
+          })
+        );
+        
+        // Update positions in database
+        scheduleNodes.forEach(node => {
+          if (node) updateTask(node.id, { position: node.position });
+        });
+        
+        setTimeout(() => fitView(), 100);
         break;
       case 'manageTags':
-        console.log('Tag management not implemented yet');
+        // Group tasks by their first tag
+        const tasksByTag = tasks.reduce((acc, task) => {
+          const tag = task.tags[0] || 'untagged';
+          if (!acc[tag]) acc[tag] = [];
+          acc[tag].push(task);
+          return acc;
+        }, {} as Record<string, Task[]>);
+
+        let yOffset = 100;
+        Object.entries(tasksByTag).forEach(([tag, tagTasks]) => {
+          tagTasks.forEach((task, index) => {
+            const newPosition = { x: 100 + index * 250, y: yOffset };
+            updateTask(task.id, { position: newPosition });
+          });
+          yOffset += 200;
+        });
+        
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 500);
         break;
       case 'assignUsers':
-        console.log('User assignment not implemented yet');
+        // Group tasks by status
+        const tasksByStatus = {
+          'todo': tasks.filter(t => t.status === 'todo'),
+          'in-progress': tasks.filter(t => t.status === 'in-progress'),
+          'done': tasks.filter(t => t.status === 'done')
+        };
+
+        let columnX = 100;
+        Object.entries(tasksByStatus).forEach(([status, statusTasks]) => {
+          statusTasks.forEach((task, index) => {
+            const newPosition = { x: columnX, y: 100 + index * 150 };
+            updateTask(task.id, { position: newPosition });
+          });
+          columnX += 350;
+        });
+        
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 500);
         break;
       case 'gridLayout':
         console.log('Applying grid layout to', nodes.length, 'nodes');
@@ -134,7 +199,7 @@ export default function TaskCanvasFlow({
       default:
         console.log('Unknown action:', action);
     }
-  }, [handleAddNode, nodes, setNodes, fitView, updateTask]);
+  }, [handleAddNode, nodes, setNodes, fitView, updateTask, tasks, refreshTasks]);
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
     console.log('Template selected:', templateName);
@@ -354,13 +419,19 @@ export default function TaskCanvasFlow({
           className="dark:bg-gray-950" 
         />
         <MiniMap 
-          nodeColor={(n) => {
-            if (n.type === 'task') return '#93c5fd';
-            if (n.type === 'milestone') return '#c084fc';
-            return '#fcd34d';
+          nodeColor={(node) => {
+            if (node.type === 'task') return '#3b82f6';
+            if (node.type === 'milestone') return '#8b5cf6';
+            if (node.type === 'note') return '#f59e0b';
+            return '#6b7280';
           }}
-          maskColor="rgba(240, 240, 240, 0.4)"
-          className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800"
+          maskColor="rgba(255, 255, 255, 0.2)"
+          className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 rounded-lg border dark:border-gray-700 shadow-lg"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          }}
+          nodeStrokeWidth={2}
+          nodeBorderRadius={4}
         />
         <Controls className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800" />
         <CustomControls 
@@ -385,6 +456,7 @@ export default function TaskCanvasFlow({
         isOpen={isDetailOpen} 
         onClose={() => setIsDetailOpen(false)}
         task={selectedTask}
+        onEdit={handleEditTask}
       />
       
       <TaskForm

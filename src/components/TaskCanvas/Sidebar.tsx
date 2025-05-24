@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from '@/components/ui/sidebar';
-import { CheckSquare, Milestone, StickyNote, Plus, Search, Calendar, Tag, User, Grid2x2, Settings } from 'lucide-react';
+import { CheckSquare, Milestone, StickyNote, Search, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { QuickActions } from './QuickActions';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -35,18 +36,6 @@ const DraggableNode: React.FC<DraggableNodeProps> = ({ type, label, icon, color,
     </div>
   );
 };
-
-const QuickAction: React.FC<{ icon: React.ReactNode; label: string; onClick: () => void }> = ({ icon, label, onClick }) => (
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={onClick}
-    className="w-full justify-start gap-2 h-8"
-  >
-    {icon}
-    <span className="text-xs">{label}</span>
-  </Button>
-);
 
 interface TaskSidebarProps {
   onQuickAction?: (action: string) => void;
@@ -81,43 +70,10 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect }: TaskSidebarProp
   ];
 
   const templates = [
-    { name: 'Sprint Planning', nodes: 5, color: 'bg-green-100 text-green-800' },
-    { name: 'Project Roadmap', nodes: 10, color: 'bg-blue-100 text-blue-800' },
-    { name: 'Bug Tracking', nodes: 7, color: 'bg-red-100 text-red-800' },
-    { name: 'Feature Development', nodes: 9, color: 'bg-purple-100 text-purple-800' }
-  ];
-
-  const quickActions = [
-    { 
-      icon: <Plus className="w-4 h-4" />, 
-      label: 'Add Task', 
-      action: 'addTask',
-      onClick: () => onQuickAction?.('addTask')
-    },
-    { 
-      icon: <Calendar className="w-4 h-4" />, 
-      label: 'Schedule View', 
-      action: 'scheduleView',
-      onClick: () => onQuickAction?.('scheduleView')
-    },
-    { 
-      icon: <Tag className="w-4 h-4" />, 
-      label: 'Manage Tags', 
-      action: 'manageTags',
-      onClick: () => onQuickAction?.('manageTags')
-    },
-    { 
-      icon: <User className="w-4 h-4" />, 
-      label: 'Assign Users', 
-      action: 'assignUsers',
-      onClick: () => onQuickAction?.('assignUsers')
-    },
-    { 
-      icon: <Grid2x2 className="w-4 h-4" />, 
-      label: 'Grid Layout', 
-      action: 'gridLayout',
-      onClick: () => onQuickAction?.('gridLayout')
-    }
+    { name: 'Sprint Planning', nodes: 5, color: 'bg-green-100 text-green-800', description: 'Agile sprint workflow' },
+    { name: 'Project Roadmap', nodes: 10, color: 'bg-blue-100 text-blue-800', description: 'Full project lifecycle' },
+    { name: 'Bug Tracking', nodes: 7, color: 'bg-red-100 text-red-800', description: 'Bug resolution process' },
+    { name: 'Feature Development', nodes: 9, color: 'bg-purple-100 text-purple-800', description: 'Feature development cycle' }
   ];
 
   const handleTemplateClick = (templateName: string) => {
@@ -169,15 +125,8 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect }: TaskSidebarProp
           <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Quick Actions
           </SidebarGroupLabel>
-          <SidebarGroupContent className="space-y-1">
-            {quickActions.map((action, index) => (
-              <QuickAction
-                key={index}
-                icon={action.icon}
-                label={action.label}
-                onClick={action.onClick}
-              />
-            ))}
+          <SidebarGroupContent>
+            <QuickActions onAction={onQuickAction || (() => {})} />
           </SidebarGroupContent>
         </SidebarGroup>
 
@@ -192,17 +141,17 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect }: TaskSidebarProp
             {templates.map((template, index) => (
               <div
                 key={index}
-                className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group"
                 onClick={() => handleTemplateClick(template.name)}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-medium">{template.name}</h4>
+                  <h4 className="text-sm font-medium group-hover:text-blue-600 transition-colors">{template.name}</h4>
                   <Badge variant="secondary" className={template.color}>
                     {template.nodes} nodes
                   </Badge>
                 </div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Pre-configured workflow template
+                  {template.description}
                 </p>
               </div>
             ))}
