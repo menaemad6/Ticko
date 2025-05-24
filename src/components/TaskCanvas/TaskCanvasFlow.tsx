@@ -62,17 +62,24 @@ export default function TaskCanvasFlow({
 
   // Update nodes and edges when tasks change
   useEffect(() => {
-    console.log('Tasks updated:', tasks.length, 'tasks');
-    if (!loading && tasks.length >= 0) {
-      const flowNodes = getFlowNodes() as unknown as Node[];
-      const flowEdges = getFlowEdges() as unknown as Edge[];
-      console.log('Setting nodes:', flowNodes.length, 'edges:', flowEdges.length);
-      setNodes(flowNodes);
-      setEdges(flowEdges);
+    console.log('TaskCanvasFlow: Tasks updated, length:', tasks.length);
+    console.log('TaskCanvasFlow: Loading state:', loading);
+    console.log('TaskCanvasFlow: Raw tasks:', tasks);
+    
+    if (!loading) {
+      const flowNodes = getFlowNodes();
+      const flowEdges = getFlowEdges();
+      
+      console.log('TaskCanvasFlow: Setting nodes:', flowNodes);
+      console.log('TaskCanvasFlow: Setting edges:', flowEdges);
+      
+      setNodes(flowNodes as unknown as Node[]);
+      setEdges(flowEdges as unknown as Edge[]);
     }
   }, [tasks, loading, getFlowNodes, getFlowEdges, setNodes, setEdges]);
 
   const handleAddNode = useCallback(() => {
+    console.log('Adding new node');
     const viewport = getViewport();
     const position = reactFlowWrapper.current
       ? screenToFlowPosition({
@@ -81,6 +88,7 @@ export default function TaskCanvasFlow({
         })
       : { x: 100, y: 100 };
 
+    console.log('New node position:', position);
     setNewTaskPosition(position);
     setNewNodeType('task');
     setEditingTask(null);
@@ -88,6 +96,7 @@ export default function TaskCanvasFlow({
   }, [screenToFlowPosition, getViewport]);
 
   const handleQuickAction = useCallback((action: string) => {
+    console.log('Quick action triggered:', action);
     switch (action) {
       case 'addTask':
         handleAddNode();
@@ -102,23 +111,34 @@ export default function TaskCanvasFlow({
         console.log('User assignment not implemented yet');
         break;
       case 'gridLayout':
+        console.log('Applying grid layout to', nodes.length, 'nodes');
         const gridNodes = nodes.map((node, index) => {
           const col = index % 4;
           const row = Math.floor(index / 4);
+          const newPosition = { x: col * 250 + 100, y: row * 200 + 100 };
+          console.log(`Moving node ${node.id} to position:`, newPosition);
           return {
             ...node,
-            position: { x: col * 200 + 100, y: row * 150 + 100 }
+            position: newPosition
           };
         });
         setNodes(gridNodes);
+        
+        // Update positions in database
+        gridNodes.forEach((node, index) => {
+          updateTask(node.id, { position: node.position });
+        });
+        
         setTimeout(() => fitView(), 100);
         break;
       default:
         console.log('Unknown action:', action);
     }
-  }, [handleAddNode, nodes, setNodes, fitView]);
+  }, [handleAddNode, nodes, setNodes, fitView, updateTask]);
 
-  const handleTemplateSelect = useCallback((templateName: string) => {
+  const handleTemplateSelect = useCallback(async (templateName: string) => {
+    console.log('Template selected:', templateName);
+    
     const templates = {
       'Sprint Planning': [
         { title: 'Sprint Goal', type: 'milestone' as const, x: 100, y: 50 },
@@ -163,31 +183,43 @@ export default function TaskCanvasFlow({
 
     const template = templates[templateName as keyof typeof templates];
     if (template) {
-      // Create tasks from template
-      const promises = template.map(async (item) => {
-        return addTask({
-          title: item.title,
-          description: `Generated from ${templateName} template`,
-          status: 'todo',
-          priority: 'medium',
-          tags: [templateName.toLowerCase().replace(' ', '-')],
-          position: { x: item.x, y: item.y },
-          nodeType: item.type,
-          connections: [],
-        });
-      });
+      console.log('Creating tasks from template:', template);
       
-      Promise.all(promises).then(() => {
+      try {
+        // Create tasks from template
+        const promises = template.map(async (item) => {
+          console.log('Creating task:', item);
+          return await addTask({
+            title: item.title,
+            description: `Generated from ${templateName} template`,
+            status: 'todo',
+            priority: 'medium',
+            tags: [templateName.toLowerCase().replace(' ', '-')],
+            position: { x: item.x, y: item.y },
+            nodeType: item.type,
+            connections: [],
+          });
+        });
+        
+        await Promise.all(promises);
+        console.log('All template tasks created successfully');
+        
+        // Refresh and fit view after a short delay
         setTimeout(() => {
           refreshTasks();
           fitView();
         }, 500);
-      });
+      } catch (error) {
+        console.error('Error creating template tasks:', error);
+      }
+    } else {
+      console.error('Template not found:', templateName);
     }
   }, [addTask, refreshTasks, fitView]);
 
   // Register handlers with the sidebar
   useEffect(() => {
+    console.log('Registering handlers with sidebar');
     registerQuickActionHandler(handleQuickAction);
     registerTemplateHandler(handleTemplateSelect);
   }, [registerQuickActionHandler, registerTemplateHandler, handleQuickAction, handleTemplateSelect]);
@@ -256,6 +288,7 @@ export default function TaskCanvasFlow({
   const handleSaveTask = useCallback(
     async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
+        console.log('Saving task:', taskData);
         if (editingTask) {
           await updateTask(editingTask.id, taskData);
         } else {
@@ -272,9 +305,10 @@ export default function TaskCanvasFlow({
         setEditingTask(null);
         setNewTaskPosition(null);
         
+        // Refresh after a short delay
         setTimeout(() => {
           refreshTasks();
-        }, 100);
+        }, 200);
       } catch (error) {
         console.error('Error saving task:', error);
       }
@@ -285,6 +319,8 @@ export default function TaskCanvasFlow({
   const onPaneClick = () => {
     setSelectedTask(null);
   };
+
+  console.log('TaskCanvasFlow render - nodes:', nodes.length, 'edges:', edges.length);
 
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>

@@ -15,6 +15,8 @@ export const useTasks = () => {
     queryFn: async () => {
       if (!user) return [];
       
+      console.log('Fetching tasks for user:', user.id);
+      
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -26,22 +28,42 @@ export const useTasks = () => {
         throw error;
       }
 
-      return (data || []).map(task => ({
-        id: task.id,
-        title: task.title,
-        description: task.description || '',
-        status: task.status as Task['status'],
-        priority: task.priority as Task['priority'],
-        dueDate: task.due_date || undefined,
-        tags: task.tags || [],
-        nodeType: ((task as any).node_type || 'task') as Task['nodeType'],
-        connections: (task as any).connections || [],
-        position: typeof task.position === 'string' 
-          ? JSON.parse(task.position) 
-          : (task.position as { x: number; y: number }) || { x: 0, y: 0 },
-        createdAt: task.created_at,
-        updatedAt: task.updated_at,
-      })) as Task[];
+      console.log('Raw tasks from database:', data);
+
+      const transformedTasks = (data || []).map(task => {
+        let position = { x: 0, y: 0 };
+        
+        // Handle position parsing
+        if (task.position) {
+          if (typeof task.position === 'string') {
+            try {
+              position = JSON.parse(task.position);
+            } catch (e) {
+              console.warn('Failed to parse position for task:', task.id, task.position);
+            }
+          } else if (typeof task.position === 'object') {
+            position = task.position as { x: number; y: number };
+          }
+        }
+
+        return {
+          id: task.id,
+          title: task.title,
+          description: task.description || '',
+          status: task.status as Task['status'],
+          priority: task.priority as Task['priority'],
+          dueDate: task.due_date || undefined,
+          tags: task.tags || [],
+          nodeType: (task.node_type || 'task') as Task['nodeType'],
+          connections: task.connections || [],
+          position,
+          createdAt: task.created_at,
+          updatedAt: task.updated_at,
+        };
+      }) as Task[];
+
+      console.log('Transformed tasks:', transformedTasks);
+      return transformedTasks;
     },
     enabled: !!user,
   });
@@ -152,16 +174,25 @@ export const useTasks = () => {
 
   // Transform tasks into React Flow nodes
   const getFlowNodes = () => {
-    return tasks.map(task => ({
-      id: task.id,
-      type: task.nodeType || 'task',
-      position: task.position,
-      data: task,
-    })) as FlowNode[];
+    console.log('Getting flow nodes from tasks:', tasks);
+    const nodes = tasks.map(task => {
+      const node = {
+        id: task.id,
+        type: task.nodeType || 'task',
+        position: task.position || { x: 100, y: 100 },
+        data: task,
+      };
+      console.log('Created node:', node);
+      return node;
+    }) as FlowNode[];
+    
+    console.log('Final flow nodes:', nodes);
+    return nodes;
   };
 
   // Create edges based on connections
   const getFlowEdges = () => {
+    console.log('Getting flow edges from tasks:', tasks);
     const edges: FlowEdge[] = [];
     
     tasks.forEach(task => {
@@ -184,6 +215,7 @@ export const useTasks = () => {
       }
     });
     
+    console.log('Final flow edges:', edges);
     return edges as FlowEdge[];
   };
 
