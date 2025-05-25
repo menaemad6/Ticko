@@ -486,9 +486,9 @@ export default function TaskCanvasFlow({
           />
         )}
         
-        {!focusMode && (
+        {/* {!focusMode && (
           <Controls className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800" />
-        )}
+        )} */}
         
         {!focusMode && (
           <CustomControls 
@@ -499,7 +499,7 @@ export default function TaskCanvasFlow({
           />
         )}
         
-        {!focusMode && (
+        {/* {!focusMode && (
           <div className="absolute left-4 bottom-4">
             <Button
               onClick={handleAddNode}
@@ -510,7 +510,8 @@ export default function TaskCanvasFlow({
               Add Task
             </Button>
           </div>
-        )}
+        )} */}
+
       </ReactFlow>
       
       <NodeDetail 
