@@ -5,9 +5,10 @@ import { Plus, Calendar, Tag, User, Grid2x2 } from 'lucide-react';
 
 interface QuickActionsProps {
   onAction: (action: string) => void;
+  disabled?: boolean;
 }
 
-export const QuickActions: React.FC<QuickActionsProps> = ({ onAction }) => {
+export const QuickActions: React.FC<QuickActionsProps> = ({ onAction, disabled = false }) => {
   const actions = [
     { 
       id: 'addTask',
@@ -55,8 +56,9 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ onAction }) => {
             key={action.id}
             variant="ghost"
             size="sm"
-            onClick={() => onAction(action.id)}
-            className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+            onClick={() => !disabled && onAction(action.id)}
+            disabled={disabled}
+            className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50"
           >
             <div className={`p-1.5 rounded ${action.color} text-white`}>
               <IconComponent className="w-3 h-3" />

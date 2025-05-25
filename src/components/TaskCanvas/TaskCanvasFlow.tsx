@@ -42,11 +42,15 @@ const edgeTypes = {
 interface TaskCanvasFlowProps {
   registerQuickActionHandler: (handler: (action: string) => void) => void;
   registerTemplateHandler: (handler: (templateName: string) => void) => void;
+  isActionInProgress?: boolean;
+  onActionStateChange?: (inProgress: boolean) => void;
 }
 
 export default function TaskCanvasFlow({ 
   registerQuickActionHandler, 
-  registerTemplateHandler 
+  registerTemplateHandler,
+  isActionInProgress = false,
+  onActionStateChange
 }: TaskCanvasFlowProps) {
   const { tasks, getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks } = useTasks();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -100,6 +104,8 @@ export default function TaskCanvasFlow({
   }, [tasks, loading, setNodes, setEdges]); // Removed getFlowNodes, getFlowEdges from dependencies
 
   const handleAddNode = useCallback(() => {
+    if (isActionInProgress) return;
+    
     console.log('Adding new node');
     const viewport = getViewport();
     const position = reactFlowWrapper.current
@@ -114,108 +120,120 @@ export default function TaskCanvasFlow({
     setNewNodeType('task');
     setEditingTask(null);
     setIsTaskFormOpen(true);
-  }, [screenToFlowPosition, getViewport]);
+  }, [screenToFlowPosition, getViewport, isActionInProgress]);
 
   const handleEditTask = useCallback((task: Task) => {
+    if (isActionInProgress) return;
     setEditingTask(task);
     setIsTaskFormOpen(true);
-  }, []);
+  }, [isActionInProgress]);
 
   const handleQuickAction = useCallback(async (action: string) => {
+    if (isActionInProgress) return;
+    
     console.log('Quick action triggered:', action);
-    switch (action) {
-      case 'addTask':
-        handleAddNode();
-        break;
-      case 'scheduleView':
-        // Filter tasks by due date and arrange them chronologically
-        const tasksWithDates = tasks.filter(task => task.dueDate);
-        tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
-        
-        // Update positions for scheduled view
-        for (let i = 0; i < tasksWithDates.length; i++) {
-          const task = tasksWithDates[i];
-          const newPosition = { 
-            x: 100 + (i % 4) * 300, 
-            y: 100 + Math.floor(i / 4) * 200 
+    onActionStateChange?.(true);
+    
+    try {
+      switch (action) {
+        case 'addTask':
+          handleAddNode();
+          break;
+        case 'scheduleView':
+          // Filter tasks by due date and arrange them chronologically
+          const tasksWithDates = tasks.filter(task => task.dueDate);
+          tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
+          
+          // Update positions for scheduled view
+          for (let i = 0; i < tasksWithDates.length; i++) {
+            const task = tasksWithDates[i];
+            const newPosition = { 
+              x: 100 + (i % 4) * 300, 
+              y: 100 + Math.floor(i / 4) * 200 
+            };
+            await updateTask(task.id, { position: newPosition });
+          }
+          
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 500);
+          break;
+        case 'manageTags':
+          // Group tasks by their first tag
+          const tasksByTag = tasks.reduce((acc, task) => {
+            const tag = task.tags && task.tags.length > 0 ? task.tags[0] : 'untagged';
+            if (!acc[tag]) acc[tag] = [];
+            acc[tag].push(task);
+            return acc;
+          }, {} as Record<string, Task[]>);
+
+          let yOffset = 100;
+          for (const [tag, tagTasks] of Object.entries(tasksByTag)) {
+            for (let i = 0; i < tagTasks.length; i++) {
+              const task = tagTasks[i];
+              const newPosition = { x: 100 + i * 250, y: yOffset };
+              await updateTask(task.id, { position: newPosition });
+            }
+            yOffset += 200;
+          }
+          
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 500);
+          break;
+        case 'assignUsers':
+          // Group tasks by status
+          const statusColumns = {
+            'todo': { x: 100, tasks: tasks.filter(t => t.status === 'todo') },
+            'in-progress': { x: 450, tasks: tasks.filter(t => t.status === 'in-progress') },
+            'done': { x: 800, tasks: tasks.filter(t => t.status === 'done') }
           };
-          await updateTask(task.id, { position: newPosition });
-        }
-        
-        setTimeout(() => {
-          refreshTasks();
-          fitView();
-        }, 500);
-        break;
-      case 'manageTags':
-        // Group tasks by their first tag
-        const tasksByTag = tasks.reduce((acc, task) => {
-          const tag = task.tags && task.tags.length > 0 ? task.tags[0] : 'untagged';
-          if (!acc[tag]) acc[tag] = [];
-          acc[tag].push(task);
-          return acc;
-        }, {} as Record<string, Task[]>);
 
-        let yOffset = 100;
-        for (const [tag, tagTasks] of Object.entries(tasksByTag)) {
-          for (let i = 0; i < tagTasks.length; i++) {
-            const task = tagTasks[i];
-            const newPosition = { x: 100 + i * 250, y: yOffset };
+          for (const [status, { x, tasks: statusTasks }] of Object.entries(statusColumns)) {
+            for (let i = 0; i < statusTasks.length; i++) {
+              const task = statusTasks[i];
+              const newPosition = { x, y: 100 + i * 150 };
+              await updateTask(task.id, { position: newPosition });
+            }
+          }
+          
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 500);
+          break;
+        case 'gridLayout':
+          console.log('Applying grid layout to', tasks.length, 'tasks');
+          
+          for (let i = 0; i < tasks.length; i++) {
+            const task = tasks[i];
+            const col = i % 4;
+            const row = Math.floor(i / 4);
+            const newPosition = { x: col * 250 + 100, y: row * 200 + 100 };
+            console.log(`Moving task ${task.id} to position:`, newPosition);
             await updateTask(task.id, { position: newPosition });
           }
-          yOffset += 200;
-        }
-        
-        setTimeout(() => {
-          refreshTasks();
-          fitView();
-        }, 500);
-        break;
-      case 'assignUsers':
-        // Group tasks by status
-        const statusColumns = {
-          'todo': { x: 100, tasks: tasks.filter(t => t.status === 'todo') },
-          'in-progress': { x: 450, tasks: tasks.filter(t => t.status === 'in-progress') },
-          'done': { x: 800, tasks: tasks.filter(t => t.status === 'done') }
-        };
-
-        for (const [status, { x, tasks: statusTasks }] of Object.entries(statusColumns)) {
-          for (let i = 0; i < statusTasks.length; i++) {
-            const task = statusTasks[i];
-            const newPosition = { x, y: 100 + i * 150 };
-            await updateTask(task.id, { position: newPosition });
-          }
-        }
-        
-        setTimeout(() => {
-          refreshTasks();
-          fitView();
-        }, 500);
-        break;
-      case 'gridLayout':
-        console.log('Applying grid layout to', tasks.length, 'tasks');
-        
-        for (let i = 0; i < tasks.length; i++) {
-          const task = tasks[i];
-          const col = i % 4;
-          const row = Math.floor(i / 4);
-          const newPosition = { x: col * 250 + 100, y: row * 200 + 100 };
-          console.log(`Moving task ${task.id} to position:`, newPosition);
-          await updateTask(task.id, { position: newPosition });
-        }
-        
-        setTimeout(() => {
-          refreshTasks();
-          fitView();
-        }, 500);
-        break;
-      default:
-        console.log('Unknown action:', action);
+          
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 500);
+          break;
+        default:
+          console.log('Unknown action:', action);
+      }
+    } finally {
+      onActionStateChange?.(false);
     }
-  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView]);
+  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView, isActionInProgress, onActionStateChange]);
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
+    if (isActionInProgress) return;
+    
     console.log('Template selected:', templateName);
+    onActionStateChange?.(true);
     
     const templates = {
       'Sprint Planning': [
@@ -280,7 +298,6 @@ export default function TaskCanvasFlow({
         
         console.log('All template tasks created successfully');
         
-        // Refresh and fit view after a short delay
         setTimeout(() => {
           refreshTasks();
           fitView();
@@ -291,7 +308,9 @@ export default function TaskCanvasFlow({
     } else {
       console.error('Template not found:', templateName);
     }
-  }, [addTask, refreshTasks, fitView]);
+    
+    onActionStateChange?.(false);
+  }, [addTask, refreshTasks, fitView, isActionInProgress, onActionStateChange]);
 
   // Register handlers with the sidebar
   useEffect(() => {
@@ -454,7 +473,8 @@ export default function TaskCanvasFlow({
         <div className="absolute left-4 bottom-4">
           <Button
             onClick={handleAddNode}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            disabled={isActionInProgress}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Task
