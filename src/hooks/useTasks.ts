@@ -34,18 +34,20 @@ export const useTasks = () => {
       const transformedTasks = (data || []).map(task => {
         let position = { x: 100, y: 100 };
         
-        // Handle position parsing safely
+        // Handle position parsing safely with proper type checking
         if (task.position) {
           if (typeof task.position === 'string') {
             try {
               const parsed = JSON.parse(task.position);
-              if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+              if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && 
+                  typeof parsed.x === 'number' && typeof parsed.y === 'number') {
                 position = parsed;
               }
             } catch (e) {
               console.warn('Failed to parse position for task:', task.id, task.position);
             }
-          } else if (task.position && typeof task.position === 'object' && 
+          } else if (typeof task.position === 'object' && !Array.isArray(task.position) && 
+                     task.position !== null && 'x' in task.position && 'y' in task.position &&
                      typeof task.position.x === 'number' && typeof task.position.y === 'number') {
             position = { x: task.position.x, y: task.position.y };
           }
