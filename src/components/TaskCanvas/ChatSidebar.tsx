@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { Send, ChevronLeft, MessageSquare, Plus, Loader2, Search } from 'lucide-react';
+import { Send, ChevronLeft, MessageSquare, Plus, Loader2, Search, PanelLeft, X, History, Trash2 } from 'lucide-react';
 import { sendMessageToGemini } from '@/lib/utils';
 import { useChats } from '@/hooks/useChats';
 import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { useState as useReactState } from 'react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 function isArabic(text: string) {
   // Simple check for Arabic Unicode range
@@ -80,17 +81,45 @@ export default function ChatSidebar() {
 
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
-  // On sidebar open, fetch chats and select the most recent
+  // Prevent concurrent or repeated chat creation
+  const creatingChatRef = useRef(false);
+
+  // Track if chats have been fetched from Supabase
+  const [chatsFetched, setChatsFetched] = useState(false);
+
+  // On sidebar open, fetch chats and track when fetch completes
   useEffect(() => {
     if (open) {
-      fetchChats().then(() => {
-        if (chats.length > 0) {
-          setSelectedChatId(chats[0].id);
-        }
-      });
+      setChatsFetched(false);
+      fetchChats().then(() => setChatsFetched(true));
+    } else {
+      setChatsFetched(false);
     }
     // eslint-disable-next-line
   }, [open]);
+
+  // Only create a new chat if there are truly no chats in the database AND no chat is currently being created
+  useEffect(() => {
+    if (!open) {
+      creatingChatRef.current = false;
+      return;
+    }
+    if (!chatsFetched || loading) return;
+    if (chats && chats.length === 0 && !creatingChatRef.current) {
+      creatingChatRef.current = true;
+      (async () => {
+        const chat = await createChat('New Chat');
+        if (chat) {
+          setSelectedChatId(chat.id);
+          setModalOpen(false);
+          insertWelcomeMessage(chat.id);
+        }
+        creatingChatRef.current = false;
+      })();
+    } else if (chats && chats.length > 0 && !selectedChatId) {
+      setSelectedChatId(chats[0].id);
+    }
+  }, [open, loading, chatsFetched, chats, selectedChatId]);
 
   // When selected chat changes, fetch its messages
   useEffect(() => {
@@ -114,9 +143,9 @@ export default function ChatSidebar() {
     // Save user message to Supabase and update UI only with the result
     const userMsg = await sendMessage(selectedChatId, 'user', input);
     setInput('');
-    // If this is the first message in the chat, update the chat name using Gemini
-    const chatMessages = messages.filter(m => m.chat_id === selectedChatId);
-    if (chatMessages.length === 0 && userMsg) {
+    // If this is the user's first message in the chat, update the chat name using Gemini
+    const userMessages = messages.filter(m => m.chat_id === selectedChatId && m.role === 'user');
+    if (userMessages.length === 0 && userMsg) {
       // Prompt Gemini for a chat title
       const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${input}". Return ONLY the name, no other words or explanation.`;
       const aiTitle = await sendMessageToGemini(titlePrompt);
@@ -148,14 +177,32 @@ export default function ChatSidebar() {
     }
   };
 
+  // Delete chat handler
+  const handleDeleteChat = async (chatId: string) => {
+    if (!window.confirm('Are you sure you want to delete this chat?')) return;
+    await supabase.from('chats').delete().eq('id', chatId);
+    setChats(prev => prev.filter(chat => chat.id !== chatId));
+    if (selectedChatId === chatId) setSelectedChatId(null);
+  };
+
+  // Helper to insert a first AI message when a new chat is created
+  const insertWelcomeMessage = async (chatId: string) => {
+    await supabase.from('messages').insert({
+      chat_id: chatId,
+      role: 'ai',
+      content: 'How can I help you today?'
+    });
+    fetchMessages(chatId);
+  };
+
   // Floating action button to open sidebar
   if (!open) {
     return (
       <button
-        className="fixed right-6 bottom-6 z-50 bg-gradient-to-br from-purple-500 via-blue-500 to-indigo-500 text-white shadow-2xl rounded-full p-4 flex items-center justify-center hover:scale-105 transition-transform backdrop-blur-lg border border-white/20"
+        className="fixed bottom-[180px] right-4 z-40 bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-lg rounded-full p-3 flex items-center justify-center hover:scale-105 transition-transform border-none"
         onClick={() => setOpen(true)}
         aria-label="Open AI Chat"
-        style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}
+        style={{ boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.18)' }}
       >
         <MessageSquare className="w-7 h-7" />
       </button>
@@ -163,19 +210,11 @@ export default function ChatSidebar() {
   }
 
   return (
-    <div className="fixed top-0 right-0 h-full w-full max-w-md z-40 flex flex-col shadow-2xl" style={{ pointerEvents: 'auto' }}>
+    <div className="fixed top-0 right-0 h-full w-[90vw] max-w-md z-40 flex flex-col shadow-2xl" style={{ pointerEvents: 'auto' }}>
       {/* Glassmorphism background */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-purple-100/60 dark:from-gray-900/80 dark:via-gray-950/80 dark:to-purple-950/60 backdrop-blur-2xl rounded-l-3xl border-l border-white/20" />
       {/* Sidebar Content */}
       <div className="relative flex flex-col h-full w-full">
-        {/* Collapse Button */}
-        <button
-          className="absolute -left-5 top-6 z-50 bg-white/80 dark:bg-gray-900/80 border border-border shadow-lg rounded-full p-1 hover:scale-110 transition-all"
-          onClick={() => setOpen(false)}
-          aria-label="Collapse chat sidebar"
-        >
-          <ChevronLeft className="w-5 h-5 text-primary" />
-        </button>
         {/* Header */}
         <div className="p-6 border-b border-white/20 flex items-center gap-4 relative z-10">
           <Avatar className="w-12 h-12 shadow-lg ring-2 ring-primary/30">
@@ -186,15 +225,36 @@ export default function ChatSidebar() {
             <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
             <div className="text-xs text-muted-foreground">Ask anything about your tasks</div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="ml-auto"
-            onClick={() => setModalOpen(true)}
-            title="Open chats"
-          >
-            <MessageSquare className="w-6 h-6 text-primary" />
-          </Button>
+          <div className="flex items-center gap-2 ml-auto">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                  title="Open chat history"
+                  aria-label="Open chat history"
+                  onClick={() => setModalOpen(true)}
+                >
+                  <History className="w-6 h-6" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Open chat history</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                  title="Close chat sidebar"
+                  aria-label="Close chat sidebar"
+                  onClick={() => setOpen(false)}
+                >
+                  <X className="w-6 h-6" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Close chat sidebar</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         <Separator className="opacity-30" />
         {/* Messages */}
@@ -360,12 +420,14 @@ export default function ChatSidebar() {
               <div className="flex items-center px-6 py-4 gap-3 border-b border-white/20">
                 <MessageSquare className="w-7 h-7 text-primary" />
                 <span className="font-bold text-xl">Chats</span>
-                <Button variant="ghost" size="icon" className="ml-auto rounded-full" title="New chat" onClick={handleStartNewChat}>
-                  <Plus className="w-6 h-6" />
-                </Button>
-                <Button variant="ghost" size="icon" className="ml-2" onClick={() => setModalOpen(false)} aria-label="Close chats modal">
-                  <ChevronLeft className="w-7 h-7 rotate-180" />
-                </Button>
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button variant="ghost" size="icon" className="rounded-full" title="New chat" onClick={handleStartNewChat}>
+                    <Plus className="w-6 h-6" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="rounded-full" title="Close chats modal" onClick={() => setModalOpen(false)} aria-label="Close chats modal">
+                    <X className="w-6 h-6" />
+                  </Button>
+                </div>
               </div>
               <div className="px-6 pt-2 pb-2">
                 <div className="relative mb-3">
@@ -390,19 +452,33 @@ export default function ChatSidebar() {
                     .map((chat) => (
                       <div
                         key={chat.id}
-                        className={`flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-primary/30 hover:shadow-md transition cursor-pointer bg-white/70 dark:bg-gray-800/70 ${selectedChatId === chat.id ? 'border-primary/60 shadow-lg bg-primary/10 dark:bg-primary/20' : ''}`}
-                        onClick={() => {
-                          setSelectedChatId(chat.id);
-                          setModalOpen(false);
-                        }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-primary/30 hover:shadow-md transition bg-white/70 dark:bg-gray-800/70 ${selectedChatId === chat.id ? 'border-l-4 border-l-primary/90 shadow-lg bg-primary/10 dark:bg-primary/20' : ''}`}
                       >
                         <Avatar className="w-9 h-9 shadow-sm">
                           <AvatarImage src="/ai-avatar.png" alt={chat.title} />
                           <AvatarFallback>{chat.title[0]}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => {
+                          setSelectedChatId(chat.id);
+                          setModalOpen(false);
+                        }}>
                           <div className="font-semibold truncate text-base leading-tight">{chat.title}</div>
                         </div>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-700"
+                              aria-label="Delete chat"
+                              title="Delete chat"
+                              onClick={() => handleDeleteChat(chat.id)}
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete chat</TooltipContent>
+                        </Tooltip>
                       </div>
                     ))}
                 </div>

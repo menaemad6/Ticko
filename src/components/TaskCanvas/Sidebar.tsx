@@ -35,6 +35,7 @@ import { QuickActions } from './QuickActions';
 import { PreferencesModal, CanvasPreferences } from './PreferencesModal';
 import { useAuth } from '@/context/AuthContext';
 import { useTasks } from '@/hooks/useTasks';
+import { Progress } from '@/components/ui/progress';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -248,8 +249,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
     <>
       {/* Floating trigger button to open sidebar when collapsed (desktop) or closed (mobile) */}
       {(!isMobile && state === 'collapsed') || (isMobile && !openMobile) ? (
-        <div style={{ position: 'fixed', top: 16, left: 16, zIndex: 50 }}>
-          <SidebarTrigger />
+        <div
+          className="fixed left-4 top-4 z-40 sm:hidden"
+        >
+          <SidebarTrigger
+            className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-lg rounded-full p-4 flex items-center justify-center hover:scale-105 transition-transform border-none"
+          />
         </div>
       ) : null}
       <Sidebar
@@ -257,11 +262,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         collapsible="offcanvas"
         style={isMobile ? { '--sidebar-width': '90vw' } : undefined}
       >
-        <SidebarHeader className="p-4 border-b">
-          <div className="flex items-center gap-2 mb-3">
-            <CheckSquare className="w-6 h-6 text-blue-600" />
-            <h2 className="text-lg font-semibold">Visual Task Canvas</h2>
-            {/* Collapse button */}
+        <SidebarHeader className="p-4 border-b bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-t-xl shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <img src="/placeholder.svg" alt="Logo" className="w-8 h-8 rounded shadow-sm border border-gray-200 dark:border-gray-800 bg-white" />
+            <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none">
+              TaskWeaver
+            </h2>
             {!isMobile && state === 'expanded' && (
               <Button
                 variant="ghost"
@@ -279,34 +285,21 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               </Badge>
             )}
           </div>
-          
-          {/* User Info & Progress */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <User className="w-4 h-4" />
               <span className="truncate">{user?.email}</span>
             </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-2">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium">Progress</span>
-                <Badge variant="outline">{completionRate}%</Badge>
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{completionRate}%</span>
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <Progress value={completionRate} className="h-3 bg-gray-200 dark:bg-gray-700" />
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {completedTasks} of {totalTasks} tasks completed
               </div>
             </div>
-          </div>
-          
-          <div className="relative mt-3">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="Search tools..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-8 text-sm"
-              disabled={isActionInProgress}
-            />
           </div>
         </SidebarHeader>
 
@@ -522,10 +515,9 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             </Button>
             
             <Button 
-              variant="outline" 
               size="sm"
               onClick={handleSignOut}
-              className="w-full justify-start gap-2"
+              className="w-full justify-start gap-2 font-semibold text-white bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 hover:from-blue-700 hover:to-pink-600 shadow-md border-0 transition-colors"
               disabled={isActionInProgress}
             >
               <LogOut className="w-4 h-4" />
