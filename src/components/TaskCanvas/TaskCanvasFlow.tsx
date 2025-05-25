@@ -83,7 +83,7 @@ export default function TaskCanvasFlow({
   });
   const [focusMode, setFocusMode] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { screenToFlowPosition, getViewport, fitView } = useReactFlow();
+  const { screenToFlowPosition, getViewport, fitView, zoomIn, zoomOut, setViewport } = useReactFlow();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -427,6 +427,19 @@ export default function TaskCanvasFlow({
     });
   };
 
+  // Handlers for custom controls
+  const handleZoomIn = useCallback(() => {
+    zoomIn();
+  }, [zoomIn]);
+
+  const handleZoomOut = useCallback(() => {
+    zoomOut();
+  }, [zoomOut]);
+
+  const handleFitView = useCallback(() => {
+    fitView();
+  }, [fitView]);
+
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
       <input
@@ -492,9 +505,9 @@ export default function TaskCanvasFlow({
         
         {!focusMode && (
           <CustomControls 
-            onZoomIn={() => {}}
-            onZoomOut={() => {}}
-            onFitView={() => {}}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onFitView={handleFitView}
             onAddNode={handleAddNode}
           />
         )}
