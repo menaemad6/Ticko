@@ -86,10 +86,10 @@ export const useTasks = () => {
       // Create the insert object with proper typing
       const insertData = {
         title: taskData.title as string,
-        description: taskData.description || null,
+        description: (taskData.description || null) as string | null,
         status: taskData.status as string,
         priority: taskData.priority as string,
-        due_date: taskData.dueDate || null,
+        due_date: (taskData.dueDate || null) as string | null,
         tags: (taskData.tags || []) as string[],
         node_type: taskData.nodeType as string,
         connections: (taskData.connections || []) as string[],
