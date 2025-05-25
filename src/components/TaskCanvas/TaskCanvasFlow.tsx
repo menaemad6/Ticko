@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   ReactFlow,
@@ -66,7 +65,7 @@ export default function TaskCanvasFlow({
     console.log('TaskCanvasFlow: Tasks updated, count:', tasks.length);
     console.log('TaskCanvasFlow: Loading state:', loading);
     
-    if (!loading) {
+    if (!loading && tasks.length >= 0) {
       try {
         const flowNodes = getFlowNodes();
         const flowEdges = getFlowEdges();
@@ -98,7 +97,7 @@ export default function TaskCanvasFlow({
         console.error('Error setting nodes/edges:', error);
       }
     }
-  }, [tasks, loading, getFlowNodes, getFlowEdges, setNodes, setEdges]);
+  }, [tasks, loading, setNodes, setEdges]); // Removed getFlowNodes, getFlowEdges from dependencies
 
   const handleAddNode = useCallback(() => {
     console.log('Adding new node');

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Task, FlowNode, FlowEdge } from '@/types/task';
@@ -207,8 +207,8 @@ export const useTasks = () => {
     return tasks.filter(task => task.status === status);
   };
 
-  // Transform tasks into React Flow nodes with clean data
-  const getFlowNodes = () => {
+  // Memoize getFlowNodes to prevent infinite re-renders
+  const getFlowNodes = useCallback(() => {
     console.log('Getting flow nodes from tasks:', tasks.length);
     
     const nodes = tasks.map(task => {
@@ -230,22 +230,15 @@ export const useTasks = () => {
         }
       };
       
-      console.log('Created clean node:', {
-        id: node.id,
-        type: node.type,
-        position: node.position,
-        dataKeys: Object.keys(node.data)
-      });
-      
       return node;
     });
     
     console.log('Final flow nodes count:', nodes.length);
     return nodes;
-  };
+  }, [tasks]);
 
-  // Create edges based on connections
-  const getFlowEdges = () => {
+  // Memoize getFlowEdges to prevent infinite re-renders
+  const getFlowEdges = useCallback(() => {
     console.log('Getting flow edges from tasks:', tasks.length);
     const edges: FlowEdge[] = [];
     
@@ -271,7 +264,7 @@ export const useTasks = () => {
     
     console.log('Final flow edges count:', edges.length);
     return edges;
-  };
+  }, [tasks]);
 
   return {
     tasks,
