@@ -47,8 +47,8 @@ export const useTasks = () => {
             }
           } else if (typeof task.position === 'object' && !Array.isArray(task.position) && 
                      task.position !== null && 'x' in task.position && 'y' in task.position &&
-                     typeof task.position.x === 'number' && typeof task.position.y === 'number') {
-            position = { x: task.position.x, y: task.position.y };
+                     typeof (task.position as any).x === 'number' && typeof (task.position as any).y === 'number') {
+            position = { x: (task.position as any).x, y: (task.position as any).y };
           }
         }
 
@@ -85,14 +85,14 @@ export const useTasks = () => {
 
       // Create the insert object with proper typing
       const insertData = {
-        title: taskData.title,
+        title: taskData.title as string,
         description: taskData.description || null,
-        status: taskData.status,
-        priority: taskData.priority,
+        status: taskData.status as string,
+        priority: taskData.priority as string,
         due_date: taskData.dueDate || null,
-        tags: taskData.tags || [],
-        node_type: taskData.nodeType,
-        connections: taskData.connections || [],
+        tags: (taskData.tags || []) as string[],
+        node_type: taskData.nodeType as string,
+        connections: (taskData.connections || []) as string[],
         position: JSON.stringify(taskData.position),
         user_id: user.id,
       };
