@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -191,6 +192,35 @@ export const useTasks = () => {
     },
   });
 
+  const deleteAllTasksMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error('User not authenticated');
+      
+      console.log('Deleting all tasks for user:', user.id);
+      
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error deleting all tasks:', error);
+        throw error;
+      }
+      
+      console.log('All tasks deleted successfully');
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      toast.success('All tasks deleted successfully');
+    },
+    onError: (error) => {
+      console.error('Error deleting all tasks:', error);
+      toast.error('Failed to delete all tasks');
+    },
+  });
+
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     return addTaskMutation.mutateAsync(taskData);
   };
@@ -201,6 +231,10 @@ export const useTasks = () => {
 
   const deleteTask = (id: string) => {
     return deleteTaskMutation.mutateAsync(id);
+  };
+
+  const deleteAllTasks = () => {
+    return deleteAllTasksMutation.mutateAsync();
   };
 
   const getTasksByStatus = (status: Task['status']) => {
@@ -271,6 +305,7 @@ export const useTasks = () => {
     addTask,
     updateTask,
     deleteTask,
+    deleteAllTasks,
     getTasksByStatus,
     getFlowNodes,
     getFlowEdges,
