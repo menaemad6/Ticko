@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { 
   CheckSquare, 
   Milestone, 
@@ -25,7 +24,8 @@ import {
   FolderOpen,
   Archive,
   Clock,
-  Target
+  Target,
+  PanelLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,6 +85,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { tasks, loading } = useTasks();
+  const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'done').length;
@@ -245,13 +246,35 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
 
   return (
     <>
-      <Sidebar className="w-80 border-r">
+      {/* Floating trigger button to open sidebar when collapsed (desktop) or closed (mobile) */}
+      {(!isMobile && state === 'collapsed') || (isMobile && !openMobile) ? (
+        <div style={{ position: 'fixed', top: 16, left: 16, zIndex: 50 }}>
+          <SidebarTrigger />
+        </div>
+      ) : null}
+      <Sidebar
+        className="w-80 border-r"
+        collapsible="offcanvas"
+        style={isMobile ? { '--sidebar-width': '90vw' } : undefined}
+      >
         <SidebarHeader className="p-4 border-b">
           <div className="flex items-center gap-2 mb-3">
             <CheckSquare className="w-6 h-6 text-blue-600" />
             <h2 className="text-lg font-semibold">Visual Task Canvas</h2>
+            {/* Collapse button */}
+            {!isMobile && state === 'expanded' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto"
+                onClick={toggleSidebar}
+                title="Collapse sidebar"
+              >
+                <PanelLeft className="w-5 h-5" />
+              </Button>
+            )}
             {isActionInProgress && (
-              <Badge variant="secondary" className="ml-auto">
+              <Badge variant="secondary" className="ml-2">
                 Processing...
               </Badge>
             )}
