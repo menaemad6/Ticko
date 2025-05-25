@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +7,8 @@ import { Task } from '@/types/task';
 import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CheckSquare, Milestone as MilestoneIcon, StickyNote } from 'lucide-react';
 
 interface NodeDetailProps {
   isOpen: boolean;
@@ -17,10 +18,15 @@ interface NodeDetailProps {
 }
 
 export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetailProps) {
-  const { deleteTask } = useTasks();
+  const { deleteTask, updateTask } = useTasks();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [descValue, setDescValue] = useState(task?.description || '');
+  const [localTask, setLocalTask] = useState(task || undefined);
 
-  if (!task) return null;
+  useEffect(() => { setLocalTask(task || undefined); }, [task]);
+
+  if (!task || !localTask) return null;
 
   const handleEdit = () => {
     onEdit?.(task);
@@ -68,36 +74,77 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
   const getNodeTypeIcon = (nodeType: string) => {
     switch (nodeType) {
       case 'milestone':
-        return '🎯';
+        return <MilestoneIcon className="w-7 h-7 text-purple-600 dark:text-purple-400" />;
       case 'note':
-        return '📝';
+        return <StickyNote className="w-7 h-7 text-amber-500 dark:text-amber-400" />;
       default:
-        return '✅';
+        return <CheckSquare className="w-7 h-7 text-blue-600 dark:text-blue-400" />;
     }
+  };
+
+  // Inline status update
+  const handleStatusChange = async (value: string) => {
+    if (value !== localTask.status) {
+      setLocalTask({ ...localTask, status: value });
+      updateTask(localTask.id, { ...localTask, status: value });
+    }
+  };
+
+  // Inline priority update
+  const handlePriorityChange = async (value: string) => {
+    if (value !== localTask.priority) {
+      setLocalTask({ ...localTask, priority: value });
+      updateTask(localTask.id, { ...localTask, priority: value });
+    }
+  };
+
+  // Inline description update
+  const handleDescriptionSave = async () => {
+    if (descValue !== localTask.description) {
+      setLocalTask({ ...localTask, description: descValue });
+      updateTask(localTask.id, { ...localTask, description: descValue });
+    }
+    setEditingDescription(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl rounded-2xl border-0 p-0 md:p-0">
         <DialogHeader className="space-y-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="text-2xl">{getNodeTypeIcon(task.nodeType)}</div>
+          <div className="flex items-start justify-between p-6 pb-0">
+            <div className="flex items-center gap-4 flex-1">
+              <div className="drop-shadow-lg select-none flex items-center justify-center">
+                {getNodeTypeIcon(task.nodeType)}
+              </div>
               <div className="flex-1">
-                <DialogTitle className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <DialogTitle className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
                   {task.title}
                 </DialogTitle>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className={`${getStatusColor(task.status)} font-medium`}>
-                    <Clock className="w-3 h-3 mr-1" />
-                    {task.status.replace('-', ' ')}
-                  </Badge>
-                  <Badge className={`${getPriorityColor(task.priority)} font-medium`}>
-                    <Flag className="w-3 h-3 mr-1" />
-                    {task.priority} priority
-                  </Badge>
-                  <Badge variant="outline" className="capitalize">
-                    {task.nodeType}
+                  {/* Status Select */}
+                  <Select value={localTask.status} onValueChange={handleStatusChange}>
+                    <SelectTrigger className={`w-[120px] ${getStatusColor(localTask.status)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-blue-400`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todo">To Do</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {/* Priority Select */}
+                  <Select value={localTask.priority} onValueChange={handlePriorityChange}>
+                    <SelectTrigger className={`w-[120px] ${getPriorityColor(localTask.priority)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-red-400`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Badge variant="outline" className="capitalize px-3 py-1 text-xs rounded-full border-gray-300 dark:border-gray-700">
+                    {localTask.nodeType}
                   </Badge>
                 </div>
               </div>
@@ -107,7 +154,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                 variant="outline"
                 size="sm"
                 onClick={handleEdit}
-                className="hover:bg-blue-50 hover:border-blue-300"
+                className="hover:bg-blue-50 hover:border-blue-300 shadow-md"
               >
                 <Edit className="w-4 h-4 mr-1" />
                 Edit
@@ -117,7 +164,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                 size="sm"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 shadow-md"
               >
                 <Trash2 className="w-4 h-4 mr-1" />
                 {isDeleting ? 'Deleting...' : 'Delete'}
@@ -126,44 +173,54 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 px-2 pb-4 sm:px-6 sm:pb-6">
           {/* Description Section */}
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-            <h4 className="text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Description</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              {task.description || 'No description provided'}
-            </p>
+          <div className="bg-white/70 dark:bg-gray-800/70 rounded-xl p-3 sm:p-4 shadow border border-gray-100 dark:border-gray-800 relative">
+            <h4 className="text-base font-semibold mb-2 text-gray-800 dark:text-gray-200 tracking-tight flex items-center justify-between">
+              Description
+              {!editingDescription ? (
+                <Button size="icon" variant="ghost" className="ml-2" onClick={() => { setEditingDescription(true); setDescValue(task.description || ''); }}>
+                  <Edit className="w-4 h-4" />
+                </Button>
+              ) : null}
+            </h4>
+            {!editingDescription ? (
+              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                {localTask.description || 'No description provided'}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 text-base text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 resize-none min-h-[80px]"
+                  value={descValue}
+                  onChange={e => setDescValue(e.target.value)}
+                  autoFocus
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button size="sm" onClick={handleDescriptionSave}>
+                    Save
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditingDescription(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Due Date */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-blue-500" />
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Due Date</h4>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 pl-6">
-                {task.dueDate
-                  ? new Date(task.dueDate).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })
-                  : 'No due date set'}
-              </p>
-            </div>
-
-            {/* Position */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-green-500" />
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Position</h4>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 pl-6">
-                x: {Math.round(task.position.x)}, y: {Math.round(task.position.y)}
-              </p>
-            </div>
+          {/* Due Date */}
+          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-100 dark:border-blue-900 shadow-sm">
+            <Calendar className="w-5 h-5 text-blue-500" />
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Due Date:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              {task.dueDate
+                ? new Date(task.dueDate).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : 'No due date set'}
+            </span>
           </div>
 
           {/* Tags */}
@@ -199,20 +256,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
               </p>
             </div>
           )}
-
-          <Separator />
-
-          {/* Timestamps */}
-          <div className="space-y-2 text-xs text-gray-500 dark:text-gray-500">
-            <div className="flex justify-between">
-              <span>Created:</span>
-              <span>{new Date(task.createdAt).toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Last Updated:</span>
-              <span>{new Date(task.updatedAt).toLocaleString()}</span>
-            </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

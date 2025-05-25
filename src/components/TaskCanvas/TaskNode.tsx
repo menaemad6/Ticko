@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +19,12 @@ const nodeTypeColors = {
   task: 'border-blue-400 bg-blue-50 dark:bg-blue-950/50 dark:border-blue-700',
   milestone: 'border-purple-400 bg-purple-50 dark:bg-purple-950/50 dark:border-purple-700',
   note: 'border-amber-400 bg-amber-50 dark:bg-amber-950/50 dark:border-amber-700',
+};
+
+const statusColors = {
+  'done': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400',
+  'in-progress': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
+  'todo': 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300',
 };
 
 const formatDate = (dateString: string) => {
@@ -46,10 +51,10 @@ function TaskNode({ data }: TaskNodeProps) {
         <div className="flex gap-1">
           <Badge 
             variant="outline"
-            className={cn('text-xs px-2', priorityColors[data.priority])}
+            className={cn('text-xs px-2', statusColors[data.status])}
           >
             <Flag className="w-3 h-3 mr-1" />
-            {data.priority}
+            {data.status.replace('-', ' ')}
           </Badge>
         </div>
       </div>
