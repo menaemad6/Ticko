@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -84,20 +83,23 @@ export const useTasks = () => {
 
       console.log('Adding task with data:', taskData);
 
+      // Create the insert object with proper typing
+      const insertData = {
+        title: taskData.title,
+        description: taskData.description || null,
+        status: taskData.status,
+        priority: taskData.priority,
+        due_date: taskData.dueDate || null,
+        tags: taskData.tags || [],
+        node_type: taskData.nodeType,
+        connections: taskData.connections || [],
+        position: JSON.stringify(taskData.position),
+        user_id: user.id,
+      };
+
       const { data, error } = await supabase
         .from('tasks')
-        .insert({
-          title: taskData.title,
-          description: taskData.description || null,
-          status: taskData.status,
-          priority: taskData.priority,
-          due_date: taskData.dueDate || null,
-          tags: taskData.tags || [],
-          node_type: taskData.nodeType,
-          connections: taskData.connections || [],
-          position: JSON.stringify(taskData.position),
-          user_id: user.id,
-        })
+        .insert(insertData)
         .select()
         .single();
 
