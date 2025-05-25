@@ -1,0 +1,33 @@
+/* Modern thin scrollbar for sidebar content */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a5b4fc #f3f4f6; /* thumb, track */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a5b4fc; /* blue-200 */
+  border-radius: 8px;
+  border: 2px solid #f3f4f6; /* track color */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6; /* gray-100 */
+  border-radius: 8px;
+}
+
+/* Dark mode */
+.dark .custom-scrollbar {
+  scrollbar-color: #334155 #0f172a;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155; /* gray-800 */
+  border: 2px solid #0f172a;
+}
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #0f172a;
+} 

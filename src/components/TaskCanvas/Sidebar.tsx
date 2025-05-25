@@ -36,6 +36,7 @@ import { PreferencesModal, CanvasPreferences } from './PreferencesModal';
 import { useAuth } from '@/context/AuthContext';
 import { useTasks } from '@/hooks/useTasks';
 import { Progress } from '@/components/ui/progress';
+import './sidebar-scrollbar.css';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -248,7 +249,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
   return (
     <>
       {/* Floating trigger button to open sidebar when collapsed (desktop) or closed (mobile) */}
-      {(!isMobile && state === 'collapsed') || (isMobile && !openMobile) ? (
+      {isMobile && !openMobile ? (
         <div
           className="fixed left-4 top-4 z-40 sm:hidden"
         >
@@ -260,24 +261,21 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
       <Sidebar
         className="w-80 border-r"
         collapsible="offcanvas"
-        style={isMobile ? { '--sidebar-width': '90vw' } : undefined}
+        style={isMobile ? ({ ['--sidebar-width']: '90vw' } as Record<string, string>) : undefined}
       >
-        <SidebarHeader className="p-4 border-b bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-t-xl shadow-sm">
+        <SidebarHeader className="p-4 border-b bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-t-xl shadow-sm relative">
           <div className="flex items-center gap-3 mb-4">
             <img src="/placeholder.svg" alt="Logo" className="w-8 h-8 rounded shadow-sm border border-gray-200 dark:border-gray-800 bg-white" />
             <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none">
               TaskWeaver
             </h2>
-            {!isMobile && state === 'expanded' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-auto"
-                onClick={toggleSidebar}
-                title="Collapse sidebar"
-              >
-                <PanelLeft className="w-5 h-5" />
-              </Button>
+            {!isMobile && (
+              <div className="ml-auto">
+                <SidebarTrigger
+                  className="bg-transparent hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full p-2 transition-colors border-none"
+                  title={state === 'collapsed' ? 'Expand sidebar' : 'Collapse sidebar'}
+                />
+              </div>
             )}
             {isActionInProgress && (
               <Badge variant="secondary" className="ml-2">
@@ -303,7 +301,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="p-4 space-y-6">
+        <SidebarContent className="p-4 space-y-6 bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-b-xl shadow-sm border-t border-gray-200 dark:border-gray-800 custom-scrollbar">
           {/* Node Types */}
           <SidebarGroup>
             <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -439,7 +437,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Canvas Tools
             </SidebarGroupLabel>
-            <SidebarGroupContent className="space-y-2">
+            <SidebarGroupContent className="flex flex-col space-y-2 min-w-0">
               {toolActions.map((action) => {
                 const IconComponent = action.icon;
                 return (
@@ -449,14 +447,14 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                     size="sm"
                     onClick={() => handleToolAction(action.id)}
                     disabled={isActionInProgress}
-                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex-nowrap min-w-0"
                   >
-                    <div className="p-1.5 rounded bg-cyan-500 text-white">
+                    <div className="p-1.5 rounded bg-cyan-500 text-white flex-shrink-0">
                       <IconComponent className="w-3 h-3" />
                     </div>
-                    <div className="text-left">
-                      <div className="text-sm font-medium">{action.label}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
+                    <div className="text-left min-w-0">
+                      <div className="text-sm font-medium truncate">{action.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{action.description}</div>
                     </div>
                   </Button>
                 );
@@ -501,7 +499,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-4 border-t">
+        <SidebarFooter className="p-4 border-t bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-b-xl shadow-sm border-t border-gray-200 dark:border-gray-800">
           <div className="space-y-3">
             <Button
               variant="ghost"
