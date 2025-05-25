@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   ReactFlow,
@@ -62,19 +63,40 @@ export default function TaskCanvasFlow({
 
   // Update nodes and edges when tasks change
   useEffect(() => {
-    console.log('TaskCanvasFlow: Tasks updated, length:', tasks.length);
+    console.log('TaskCanvasFlow: Tasks updated, count:', tasks.length);
     console.log('TaskCanvasFlow: Loading state:', loading);
-    console.log('TaskCanvasFlow: Raw tasks:', tasks);
     
     if (!loading) {
-      const flowNodes = getFlowNodes();
-      const flowEdges = getFlowEdges();
-      
-      console.log('TaskCanvasFlow: Setting nodes:', flowNodes);
-      console.log('TaskCanvasFlow: Setting edges:', flowEdges);
-      
-      setNodes(flowNodes as unknown as Node[]);
-      setEdges(flowEdges as unknown as Edge[]);
+      try {
+        const flowNodes = getFlowNodes();
+        const flowEdges = getFlowEdges();
+        
+        console.log('TaskCanvasFlow: Setting nodes count:', flowNodes.length);
+        console.log('TaskCanvasFlow: Setting edges count:', flowEdges.length);
+        
+        // Ensure nodes have proper structure
+        const validNodes = flowNodes.map(node => ({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+          data: node.data,
+        })) as Node[];
+        
+        const validEdges = flowEdges.map(edge => ({
+          id: edge.id,
+          source: edge.source,
+          target: edge.target,
+          animated: edge.animated || false,
+          markerEnd: edge.markerEnd,
+        })) as Edge[];
+        
+        setNodes(validNodes);
+        setEdges(validEdges);
+        
+        console.log('TaskCanvasFlow: Nodes and edges set successfully');
+      } catch (error) {
+        console.error('Error setting nodes/edges:', error);
+      }
     }
   }, [tasks, loading, getFlowNodes, getFlowEdges, setNodes, setEdges]);
 
@@ -111,42 +133,39 @@ export default function TaskCanvasFlow({
         const tasksWithDates = tasks.filter(task => task.dueDate);
         tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
         
-        const scheduleNodes = tasksWithDates.map((task, index) => ({
-          ...nodes.find(n => n.id === task.id),
-          position: { x: 100 + (index % 3) * 300, y: 100 + Math.floor(index / 3) * 150 }
-        }));
+        // Update positions for scheduled view
+        for (let i = 0; i < tasksWithDates.length; i++) {
+          const task = tasksWithDates[i];
+          const newPosition = { 
+            x: 100 + (i % 4) * 300, 
+            y: 100 + Math.floor(i / 4) * 200 
+          };
+          await updateTask(task.id, { position: newPosition });
+        }
         
-        setNodes(prevNodes => 
-          prevNodes.map(node => {
-            const scheduleNode = scheduleNodes.find(sn => sn?.id === node.id);
-            return scheduleNode ? { ...node, position: scheduleNode.position } : node;
-          })
-        );
-        
-        // Update positions in database
-        scheduleNodes.forEach(node => {
-          if (node) updateTask(node.id, { position: node.position });
-        });
-        
-        setTimeout(() => fitView(), 100);
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 500);
         break;
       case 'manageTags':
         // Group tasks by their first tag
         const tasksByTag = tasks.reduce((acc, task) => {
-          const tag = task.tags[0] || 'untagged';
+          const tag = task.tags && task.tags.length > 0 ? task.tags[0] : 'untagged';
           if (!acc[tag]) acc[tag] = [];
           acc[tag].push(task);
           return acc;
         }, {} as Record<string, Task[]>);
 
         let yOffset = 100;
-        Object.entries(tasksByTag).forEach(([tag, tagTasks]) => {
-          tagTasks.forEach((task, index) => {
-            const newPosition = { x: 100 + index * 250, y: yOffset };
-            updateTask(task.id, { position: newPosition });
-          });
+        for (const [tag, tagTasks] of Object.entries(tasksByTag)) {
+          for (let i = 0; i < tagTasks.length; i++) {
+            const task = tagTasks[i];
+            const newPosition = { x: 100 + i * 250, y: yOffset };
+            await updateTask(task.id, { position: newPosition });
+          }
           yOffset += 200;
-        });
+        }
         
         setTimeout(() => {
           refreshTasks();
@@ -155,20 +174,19 @@ export default function TaskCanvasFlow({
         break;
       case 'assignUsers':
         // Group tasks by status
-        const tasksByStatus = {
-          'todo': tasks.filter(t => t.status === 'todo'),
-          'in-progress': tasks.filter(t => t.status === 'in-progress'),
-          'done': tasks.filter(t => t.status === 'done')
+        const statusColumns = {
+          'todo': { x: 100, tasks: tasks.filter(t => t.status === 'todo') },
+          'in-progress': { x: 450, tasks: tasks.filter(t => t.status === 'in-progress') },
+          'done': { x: 800, tasks: tasks.filter(t => t.status === 'done') }
         };
 
-        let columnX = 100;
-        Object.entries(tasksByStatus).forEach(([status, statusTasks]) => {
-          statusTasks.forEach((task, index) => {
-            const newPosition = { x: columnX, y: 100 + index * 150 };
-            updateTask(task.id, { position: newPosition });
-          });
-          columnX += 350;
-        });
+        for (const [status, { x, tasks: statusTasks }] of Object.entries(statusColumns)) {
+          for (let i = 0; i < statusTasks.length; i++) {
+            const task = statusTasks[i];
+            const newPosition = { x, y: 100 + i * 150 };
+            await updateTask(task.id, { position: newPosition });
+          }
+        }
         
         setTimeout(() => {
           refreshTasks();
@@ -176,30 +194,26 @@ export default function TaskCanvasFlow({
         }, 500);
         break;
       case 'gridLayout':
-        console.log('Applying grid layout to', nodes.length, 'nodes');
-        const gridNodes = nodes.map((node, index) => {
-          const col = index % 4;
-          const row = Math.floor(index / 4);
+        console.log('Applying grid layout to', tasks.length, 'tasks');
+        
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+          const col = i % 4;
+          const row = Math.floor(i / 4);
           const newPosition = { x: col * 250 + 100, y: row * 200 + 100 };
-          console.log(`Moving node ${node.id} to position:`, newPosition);
-          return {
-            ...node,
-            position: newPosition
-          };
-        });
-        setNodes(gridNodes);
+          console.log(`Moving task ${task.id} to position:`, newPosition);
+          await updateTask(task.id, { position: newPosition });
+        }
         
-        // Update positions in database
-        gridNodes.forEach((node, index) => {
-          updateTask(node.id, { position: node.position });
-        });
-        
-        setTimeout(() => fitView(), 100);
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 500);
         break;
       default:
         console.log('Unknown action:', action);
     }
-  }, [handleAddNode, nodes, setNodes, fitView, updateTask, tasks, refreshTasks]);
+  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView]);
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
     console.log('Template selected:', templateName);
@@ -251,10 +265,9 @@ export default function TaskCanvasFlow({
       console.log('Creating tasks from template:', template);
       
       try {
-        // Create tasks from template
-        const promises = template.map(async (item) => {
+        for (const item of template) {
           console.log('Creating task:', item);
-          return await addTask({
+          await addTask({
             title: item.title,
             description: `Generated from ${templateName} template`,
             status: 'todo',
@@ -264,16 +277,15 @@ export default function TaskCanvasFlow({
             nodeType: item.type,
             connections: [],
           });
-        });
+        }
         
-        await Promise.all(promises);
         console.log('All template tasks created successfully');
         
         // Refresh and fit view after a short delay
         setTimeout(() => {
           refreshTasks();
           fitView();
-        }, 500);
+        }, 1000);
       } catch (error) {
         console.error('Error creating template tasks:', error);
       }
@@ -312,11 +324,13 @@ export default function TaskCanvasFlow({
   );
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    console.log('Node clicked:', node);
     setSelectedTask(node.data as Task);
     setIsDetailOpen(true);
   }, []);
 
   const onNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
+    console.log('Node drag stopped:', node.id, node.position);
     updateTask(node.id, {
       position: node.position,
     });
@@ -373,7 +387,7 @@ export default function TaskCanvasFlow({
         // Refresh after a short delay
         setTimeout(() => {
           refreshTasks();
-        }, 200);
+        }, 500);
       } catch (error) {
         console.error('Error saving task:', error);
       }
@@ -385,7 +399,7 @@ export default function TaskCanvasFlow({
     setSelectedTask(null);
   };
 
-  console.log('TaskCanvasFlow render - nodes:', nodes.length, 'edges:', edges.length);
+  console.log('TaskCanvasFlow render - nodes:', nodes.length, 'edges:', edges.length, 'tasks:', tasks.length);
 
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
@@ -427,9 +441,6 @@ export default function TaskCanvasFlow({
           }}
           maskColor="rgba(255, 255, 255, 0.2)"
           className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 rounded-lg border dark:border-gray-700 shadow-lg"
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          }}
           nodeStrokeWidth={2}
           nodeBorderRadius={4}
         />

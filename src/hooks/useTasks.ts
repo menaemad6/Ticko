@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,36 +32,43 @@ export const useTasks = () => {
       console.log('Raw tasks from database:', data);
 
       const transformedTasks = (data || []).map(task => {
-        let position = { x: 0, y: 0 };
+        let position = { x: 100, y: 100 };
         
-        // Handle position parsing
+        // Handle position parsing safely
         if (task.position) {
           if (typeof task.position === 'string') {
             try {
-              position = JSON.parse(task.position);
+              const parsed = JSON.parse(task.position);
+              if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+                position = parsed;
+              }
             } catch (e) {
               console.warn('Failed to parse position for task:', task.id, task.position);
             }
-          } else if (typeof task.position === 'object') {
-            position = task.position as { x: number; y: number };
+          } else if (task.position && typeof task.position === 'object' && 
+                     typeof task.position.x === 'number' && typeof task.position.y === 'number') {
+            position = { x: task.position.x, y: task.position.y };
           }
         }
 
-        return {
+        // Create clean task object without circular references
+        const cleanTask: Task = {
           id: task.id,
-          title: task.title,
+          title: task.title || '',
           description: task.description || '',
-          status: task.status as Task['status'],
-          priority: task.priority as Task['priority'],
+          status: (task.status || 'todo') as Task['status'],
+          priority: (task.priority || 'medium') as Task['priority'],
           dueDate: task.due_date || undefined,
-          tags: task.tags || [],
+          tags: Array.isArray(task.tags) ? task.tags : [],
           nodeType: (task.node_type || 'task') as Task['nodeType'],
-          connections: task.connections || [],
-          position,
+          connections: Array.isArray(task.connections) ? task.connections : [],
+          position: position,
           createdAt: task.created_at,
           updatedAt: task.updated_at,
         };
-      }) as Task[];
+
+        return cleanTask;
+      });
 
       console.log('Transformed tasks:', transformedTasks);
       return transformedTasks;
@@ -72,6 +80,8 @@ export const useTasks = () => {
     mutationFn: async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
       if (!user) throw new Error('User not authenticated');
 
+      console.log('Adding task with data:', taskData);
+
       const { data, error } = await supabase
         .from('tasks')
         .insert({
@@ -80,16 +90,21 @@ export const useTasks = () => {
           status: taskData.status,
           priority: taskData.priority,
           due_date: taskData.dueDate || null,
-          tags: taskData.tags,
+          tags: taskData.tags || [],
           node_type: taskData.nodeType,
           connections: taskData.connections || [],
           position: JSON.stringify(taskData.position),
           user_id: user.id,
-        } as any)
+        })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding task:', error);
+        throw error;
+      }
+      
+      console.log('Task added successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -104,6 +119,8 @@ export const useTasks = () => {
 
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, taskData }: { id: string; taskData: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>> }) => {
+      console.log('Updating task:', id, 'with data:', taskData);
+      
       const updateObj: any = {};
       
       if (taskData.title !== undefined) updateObj.title = taskData.title;
@@ -114,7 +131,9 @@ export const useTasks = () => {
       if (taskData.tags !== undefined) updateObj.tags = taskData.tags;
       if (taskData.nodeType !== undefined) updateObj.node_type = taskData.nodeType;
       if (taskData.connections !== undefined) updateObj.connections = taskData.connections;
-      if (taskData.position !== undefined) updateObj.position = JSON.stringify(taskData.position);
+      if (taskData.position !== undefined) {
+        updateObj.position = JSON.stringify(taskData.position);
+      }
       
       const { data, error } = await supabase
         .from('tasks')
@@ -123,7 +142,12 @@ export const useTasks = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating task:', error);
+        throw error;
+      }
+      
+      console.log('Task updated successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -138,12 +162,19 @@ export const useTasks = () => {
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log('Deleting task:', id);
+      
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting task:', error);
+        throw error;
+      }
+      
+      console.log('Task deleted successfully:', id);
       return id;
     },
     onSuccess: () => {
@@ -172,31 +203,50 @@ export const useTasks = () => {
     return tasks.filter(task => task.status === status);
   };
 
-  // Transform tasks into React Flow nodes
+  // Transform tasks into React Flow nodes with clean data
   const getFlowNodes = () => {
-    console.log('Getting flow nodes from tasks:', tasks);
+    console.log('Getting flow nodes from tasks:', tasks.length);
+    
     const nodes = tasks.map(task => {
-      const node = {
+      // Create a clean node object
+      const node: FlowNode = {
         id: task.id,
         type: task.nodeType || 'task',
-        position: task.position || { x: 100, y: 100 },
-        data: task,
+        position: {
+          x: task.position?.x || 100,
+          y: task.position?.y || 100
+        },
+        data: {
+          ...task,
+          // Ensure position is not circular
+          position: {
+            x: task.position?.x || 100,
+            y: task.position?.y || 100
+          }
+        }
       };
-      console.log('Created node:', node);
+      
+      console.log('Created clean node:', {
+        id: node.id,
+        type: node.type,
+        position: node.position,
+        dataKeys: Object.keys(node.data)
+      });
+      
       return node;
-    }) as FlowNode[];
+    });
     
-    console.log('Final flow nodes:', nodes);
+    console.log('Final flow nodes count:', nodes.length);
     return nodes;
   };
 
   // Create edges based on connections
   const getFlowEdges = () => {
-    console.log('Getting flow edges from tasks:', tasks);
+    console.log('Getting flow edges from tasks:', tasks.length);
     const edges: FlowEdge[] = [];
     
     tasks.forEach(task => {
-      if (task.connections && task.connections.length > 0) {
+      if (task.connections && Array.isArray(task.connections) && task.connections.length > 0) {
         task.connections.forEach(targetId => {
           // Make sure the target task exists
           const targetTask = tasks.find(t => t.id === targetId);
@@ -215,8 +265,8 @@ export const useTasks = () => {
       }
     });
     
-    console.log('Final flow edges:', edges);
-    return edges as FlowEdge[];
+    console.log('Final flow edges count:', edges.length);
+    return edges;
   };
 
   return {
