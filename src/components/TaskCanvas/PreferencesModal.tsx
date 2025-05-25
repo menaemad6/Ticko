@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -39,7 +38,7 @@ const defaultPreferences: CanvasPreferences = {
   showGrid: true,
   showMiniMap: true,
   snapToGrid: false,
-  darkMode: false,
+  darkMode: true,
   animationsEnabled: true,
   defaultNodeType: 'task',
   gridSize: '16',
@@ -62,8 +61,30 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
       try {
         const parsed = JSON.parse(savedPreferences);
         setPreferences({ ...defaultPreferences, ...parsed });
+        // Only apply dark mode if the saved preference is true
+        if (typeof parsed.darkMode === 'boolean') {
+          if (parsed.darkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } else {
+          // If not set, use default
+          if (defaultPreferences.darkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
       } catch (error) {
         console.error('Error loading preferences:', error);
+      }
+    } else {
+      // No saved preferences, use default
+      if (defaultPreferences.darkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
     }
   }, []);
