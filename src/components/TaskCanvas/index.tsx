@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { TaskSidebar } from './Sidebar';
 import TaskCanvasFlow from './TaskCanvasFlow';
+import ChatSidebar from './ChatSidebar';
 
 export default function TaskCanvas() {
   const [isActionInProgress, setIsActionInProgress] = useState(false);
@@ -48,6 +48,7 @@ export default function TaskCanvas() {
             />
           </ReactFlowProvider>
         </SidebarInset>
+        <ChatSidebar />
       </div>
     </SidebarProvider>
   );
