@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,45 +13,102 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Palette, Grid, Eye, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PreferencesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPreferencesChange?: (preferences: CanvasPreferences) => void;
 }
 
-export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onClose }) => {
-  const [preferences, setPreferences] = useState({
-    autoSave: true,
-    showGrid: true,
-    showMiniMap: true,
-    snapToGrid: false,
-    darkMode: false,
-    animationsEnabled: true,
-    defaultNodeType: 'task',
-    gridSize: '16',
-    autoLayout: false,
-    showConnections: true,
-  });
+export interface CanvasPreferences {
+  autoSave: boolean;
+  showGrid: boolean;
+  showMiniMap: boolean;
+  snapToGrid: boolean;
+  darkMode: boolean;
+  animationsEnabled: boolean;
+  defaultNodeType: 'task' | 'milestone' | 'note';
+  gridSize: string;
+  autoLayout: boolean;
+  showConnections: boolean;
+}
+
+const defaultPreferences: CanvasPreferences = {
+  autoSave: true,
+  showGrid: true,
+  showMiniMap: true,
+  snapToGrid: false,
+  darkMode: false,
+  animationsEnabled: true,
+  defaultNodeType: 'task',
+  gridSize: '16',
+  autoLayout: false,
+  showConnections: true,
+};
+
+export const PreferencesModal: React.FC<PreferencesModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onPreferencesChange 
+}) => {
+  const [preferences, setPreferences] = useState<CanvasPreferences>(defaultPreferences);
+  const { toast } = useToast();
+
+  // Load preferences from localStorage on mount
+  useEffect(() => {
+    const savedPreferences = localStorage.getItem('taskCanvasPreferences');
+    if (savedPreferences) {
+      try {
+        const parsed = JSON.parse(savedPreferences);
+        setPreferences({ ...defaultPreferences, ...parsed });
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      }
+    }
+  }, []);
+
+  // Apply dark mode when preference changes
+  useEffect(() => {
+    if (preferences.darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [preferences.darkMode]);
 
   const handleSave = () => {
-    // Save preferences to localStorage or backend
-    localStorage.setItem('taskCanvasPreferences', JSON.stringify(preferences));
-    onClose();
+    try {
+      localStorage.setItem('taskCanvasPreferences', JSON.stringify(preferences));
+      onPreferencesChange?.(preferences);
+      toast({
+        title: "Preferences saved",
+        description: "Your canvas preferences have been saved successfully.",
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      toast({
+        title: "Error saving preferences",
+        description: "Failed to save your preferences. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReset = () => {
-    setPreferences({
-      autoSave: true,
-      showGrid: true,
-      showMiniMap: true,
-      snapToGrid: false,
-      darkMode: false,
-      animationsEnabled: true,
-      defaultNodeType: 'task',
-      gridSize: '16',
-      autoLayout: false,
-      showConnections: true,
+    setPreferences(defaultPreferences);
+    toast({
+      title: "Preferences reset",
+      description: "All preferences have been reset to defaults.",
     });
+  };
+
+  const updatePreference = <K extends keyof CanvasPreferences>(
+    key: K,
+    value: CanvasPreferences[K]
+  ) => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -81,9 +138,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="auto-save"
                   checked={preferences.autoSave}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, autoSave: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('autoSave', checked)}
                 />
               </div>
 
@@ -92,9 +147,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="animations"
                   checked={preferences.animationsEnabled}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, animationsEnabled: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('animationsEnabled', checked)}
                 />
               </div>
 
@@ -103,9 +156,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="auto-layout"
                   checked={preferences.autoLayout}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, autoLayout: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('autoLayout', checked)}
                 />
               </div>
 
@@ -113,8 +164,8 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Label htmlFor="default-node">Default node type</Label>
                 <Select
                   value={preferences.defaultNodeType}
-                  onValueChange={(value) => 
-                    setPreferences(prev => ({ ...prev, defaultNodeType: value }))
+                  onValueChange={(value: 'task' | 'milestone' | 'note') => 
+                    updatePreference('defaultNodeType', value)
                   }
                 >
                   <SelectTrigger className="w-32">
@@ -145,9 +196,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="show-grid"
                   checked={preferences.showGrid}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, showGrid: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('showGrid', checked)}
                 />
               </div>
 
@@ -156,9 +205,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="show-minimap"
                   checked={preferences.showMiniMap}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, showMiniMap: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('showMiniMap', checked)}
                 />
               </div>
 
@@ -167,9 +214,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="show-connections"
                   checked={preferences.showConnections}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, showConnections: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('showConnections', checked)}
                 />
               </div>
 
@@ -178,9 +223,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="dark-mode"
                   checked={preferences.darkMode}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, darkMode: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('darkMode', checked)}
                 />
               </div>
             </div>
@@ -201,9 +244,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Switch
                   id="snap-to-grid"
                   checked={preferences.snapToGrid}
-                  onCheckedChange={(checked) => 
-                    setPreferences(prev => ({ ...prev, snapToGrid: checked }))
-                  }
+                  onCheckedChange={(checked) => updatePreference('snapToGrid', checked)}
                 />
               </div>
 
@@ -211,9 +252,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ isOpen, onCl
                 <Label htmlFor="grid-size">Grid size</Label>
                 <Select
                   value={preferences.gridSize}
-                  onValueChange={(value) => 
-                    setPreferences(prev => ({ ...prev, gridSize: value }))
-                  }
+                  onValueChange={(value) => updatePreference('gridSize', value)}
                 >
                   <SelectTrigger className="w-20">
                     <SelectValue />

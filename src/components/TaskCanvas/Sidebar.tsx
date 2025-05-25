@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from '@/components/ui/sidebar';
 import { 
@@ -20,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { QuickActions } from './QuickActions';
-import { PreferencesModal } from './PreferencesModal';
+import { PreferencesModal, CanvasPreferences } from './PreferencesModal';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -159,6 +158,11 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
     if (!isActionInProgress) {
       onQuickAction?.(actionId);
     }
+  };
+
+  const handlePreferencesChange = (preferences: CanvasPreferences) => {
+    // Preferences are automatically saved to localStorage in the modal
+    console.log('Preferences updated:', preferences);
   };
 
   return (
@@ -344,7 +348,8 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
 
       <PreferencesModal 
         isOpen={isPreferencesOpen} 
-        onClose={() => setIsPreferencesOpen(false)} 
+        onClose={() => setIsPreferencesOpen(false)}
+        onPreferencesChange={handlePreferencesChange}
       />
     </>
   );

@@ -26,8 +26,17 @@ import MilestoneNode from './MilestoneNode';
 import NoteNode from './NoteNode';
 import CustomEdge from './CustomEdge';
 import CustomControls from './CustomControls';
+import { FilterModal, NodeFilters } from './FilterModal';
+import { CanvasPreferences } from './PreferencesModal';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  exportCanvasAsJSON, 
+  exportCanvasAsImage, 
+  importCanvasFromFile,
+  arrangeNodesInLayers 
+} from '@/utils/canvasUtils';
 
 const nodeTypes = {
   task: TaskNode,
@@ -52,17 +61,43 @@ export default function TaskCanvasFlow({
   isActionInProgress = false,
   onActionStateChange
 }: TaskCanvasFlowProps) {
-  const { tasks, getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks } = useTasks();
+  const { tasks, getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks, deleteAllTasks } = useTasks();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const [filteredNodes, setFilteredNodes] = useState<Node[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTaskPosition, setNewTaskPosition] = useState<XYPosition | null>(null);
   const [newNodeType, setNewNodeType] = useState<'task' | 'milestone' | 'note'>('task');
+  const [preferences, setPreferences] = useState<CanvasPreferences | null>(null);
+  const [currentFilters, setCurrentFilters] = useState<NodeFilters>({
+    showTasks: true,
+    showMilestones: true,
+    showNotes: true,
+    statusFilter: 'all',
+    priorityFilter: 'all',
+    tagFilter: '',
+  });
+  const [focusMode, setFocusMode] = useState(false);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, getViewport, fitView } = useReactFlow();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load preferences on mount
+  useEffect(() => {
+    const savedPreferences = localStorage.getItem('taskCanvasPreferences');
+    if (savedPreferences) {
+      try {
+        setPreferences(JSON.parse(savedPreferences));
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      }
+    }
+  }, []);
 
   // Update nodes and edges when tasks change
   useEffect(() => {
@@ -77,7 +112,6 @@ export default function TaskCanvasFlow({
         console.log('TaskCanvasFlow: Setting nodes count:', flowNodes.length);
         console.log('TaskCanvasFlow: Setting edges count:', flowEdges.length);
         
-        // Ensure nodes have proper structure
         const validNodes = flowNodes.map(node => ({
           id: node.id,
           type: node.type,
@@ -101,7 +135,27 @@ export default function TaskCanvasFlow({
         console.error('Error setting nodes/edges:', error);
       }
     }
-  }, [tasks, loading, setNodes, setEdges]); // Removed getFlowNodes, getFlowEdges from dependencies
+  }, [tasks, loading, setNodes, setEdges]);
+
+  // Apply filters when nodes or filters change
+  useEffect(() => {
+    const filtered = nodes.filter(node => {
+      // Type filter
+      if (node.type === 'task' && !currentFilters.showTasks) return false;
+      if (node.type === 'milestone' && !currentFilters.showMilestones) return false;
+      if (node.type === 'note' && !currentFilters.showNotes) return false;
+
+      // Status filter
+      if (currentFilters.statusFilter !== 'all' && node.data?.status !== currentFilters.statusFilter) return false;
+
+      // Priority filter
+      if (currentFilters.priorityFilter !== 'all' && node.data?.priority !== currentFilters.priorityFilter) return false;
+
+      return true;
+    });
+
+    setFilteredNodes(filtered);
+  }, [nodes, currentFilters]);
 
   const handleAddNode = useCallback(() => {
     if (isActionInProgress) return;
@@ -221,13 +275,131 @@ export default function TaskCanvasFlow({
             fitView();
           }, 500);
           break;
+        // Canvas Tools
+        case 'exportCanvas':
+          exportCanvasAsJSON(nodes, edges, tasks);
+          toast({
+            title: "Canvas exported",
+            description: "Your canvas has been exported as JSON file.",
+          });
+          break;
+        case 'importCanvas':
+          fileInputRef.current?.click();
+          break;
+        case 'duplicateCanvas':
+          // Create a duplicate of current canvas with new IDs
+          const duplicatedTasks = tasks.map(task => ({
+            ...task,
+            title: `${task.title} (Copy)`,
+            position: {
+              x: task.position.x + 50,
+              y: task.position.y + 50,
+            },
+          }));
+          
+          for (const task of duplicatedTasks) {
+            await addTask(task);
+          }
+          
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 1000);
+          
+          toast({
+            title: "Canvas duplicated",
+            description: "A copy of your canvas has been created.",
+          });
+          break;
+        case 'clearCanvas':
+          if (window.confirm('Are you sure you want to clear the entire canvas? This action cannot be undone.')) {
+            await deleteAllTasks();
+            toast({
+              title: "Canvas cleared",
+              description: "All nodes have been removed from the canvas.",
+            });
+          }
+          break;
+        // View & Tools
+        case 'filterNodes':
+          setIsFilterModalOpen(true);
+          break;
+        case 'layerView':
+          const layeredNodes = arrangeNodesInLayers(nodes);
+          for (const node of layeredNodes) {
+            await updateTask(node.id, { position: node.position });
+          }
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 500);
+          toast({
+            title: "Layer view applied",
+            description: "Nodes have been arranged in layers by type.",
+          });
+          break;
+        case 'focusMode':
+          setFocusMode(!focusMode);
+          toast({
+            title: focusMode ? "Focus mode disabled" : "Focus mode enabled",
+            description: focusMode ? "All UI elements are now visible." : "Distractions have been hidden.",
+          });
+          break;
         default:
           console.log('Unknown action:', action);
       }
     } finally {
       onActionStateChange?.(false);
     }
-  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView, isActionInProgress, onActionStateChange]);
+  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView, nodes, edges, isActionInProgress, onActionStateChange, focusMode, toast, addTask, deleteAllTasks]);
+
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await importCanvasFromFile(file);
+      
+      if (data.tasks && Array.isArray(data.tasks)) {
+        for (const task of data.tasks) {
+          await addTask({
+            ...task,
+            title: `${task.title} (Imported)`,
+          });
+        }
+        
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 1000);
+        
+        toast({
+          title: "Canvas imported",
+          description: `Successfully imported ${data.tasks.length} tasks.`,
+        });
+      } else {
+        throw new Error('Invalid canvas file format');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({
+        title: "Import failed",
+        description: "Failed to import canvas. Please check the file format.",
+        variant: "destructive",
+      });
+    }
+    
+    // Reset file input
+    event.target.value = '';
+  };
+
+  const handleApplyFilters = (filters: NodeFilters) => {
+    setCurrentFilters(filters);
+    toast({
+      title: "Filters applied",
+      description: "Node visibility has been updated based on your filters.",
+    });
+  };
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
     if (isActionInProgress) return;
@@ -417,12 +589,22 @@ export default function TaskCanvasFlow({
     setSelectedTask(null);
   };
 
+  const displayNodes = filteredNodes.length > 0 ? filteredNodes : nodes;
+
   console.log('TaskCanvasFlow render - nodes:', nodes.length, 'edges:', edges.length, 'tasks:', tasks.length);
 
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileImport}
+        style={{ display: 'none' }}
+      />
+      
       <ReactFlow
-        nodes={nodes}
+        nodes={displayNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -442,44 +624,59 @@ export default function TaskCanvasFlow({
           style: { strokeWidth: 2 }
         }}
         className="bg-white dark:bg-gray-950"
+        snapToGrid={preferences?.snapToGrid}
+        snapGrid={preferences?.gridSize ? [parseInt(preferences.gridSize), parseInt(preferences.gridSize)] : [16, 16]}
       >
-        <Background 
-          color="#94a3b8" 
-          gap={16} 
-          size={1} 
-          variant={BackgroundVariant.Dots}
-          className="dark:bg-gray-950" 
-        />
-        <MiniMap 
-          nodeColor={(node) => {
-            if (node.type === 'task') return '#3b82f6';
-            if (node.type === 'milestone') return '#8b5cf6';
-            if (node.type === 'note') return '#f59e0b';
-            return '#6b7280';
-          }}
-          maskColor="rgba(255, 255, 255, 0.2)"
-          className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 rounded-lg border dark:border-gray-700 shadow-lg"
-          nodeStrokeWidth={2}
-          nodeBorderRadius={4}
-        />
-        <Controls className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800" />
-        <CustomControls 
-          onZoomIn={() => {}}
-          onZoomOut={() => {}}
-          onFitView={() => {}}
-          onAddNode={handleAddNode}
-        />
+        {preferences?.showGrid !== false && (
+          <Background 
+            color="#94a3b8" 
+            gap={preferences?.gridSize ? parseInt(preferences.gridSize) : 16} 
+            size={1} 
+            variant={BackgroundVariant.Dots}
+            className="dark:bg-gray-950" 
+          />
+        )}
         
-        <div className="absolute left-4 bottom-4">
-          <Button
-            onClick={handleAddNode}
-            disabled={isActionInProgress}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Task
-          </Button>
-        </div>
+        {preferences?.showMiniMap !== false && !focusMode && (
+          <MiniMap 
+            nodeColor={(node) => {
+              if (node.type === 'task') return '#3b82f6';
+              if (node.type === 'milestone') return '#8b5cf6';
+              if (node.type === 'note') return '#f59e0b';
+              return '#6b7280';
+            }}
+            maskColor="rgba(255, 255, 255, 0.2)"
+            className="bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 rounded-lg border dark:border-gray-700 shadow-lg"
+            nodeStrokeWidth={2}
+            nodeBorderRadius={4}
+          />
+        )}
+        
+        {!focusMode && (
+          <Controls className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800" />
+        )}
+        
+        {!focusMode && (
+          <CustomControls 
+            onZoomIn={() => {}}
+            onZoomOut={() => {}}
+            onFitView={() => {}}
+            onAddNode={handleAddNode}
+          />
+        )}
+        
+        {!focusMode && (
+          <div className="absolute left-4 bottom-4">
+            <Button
+              onClick={handleAddNode}
+              disabled={isActionInProgress}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Task
+            </Button>
+          </div>
+        )}
       </ReactFlow>
       
       <NodeDetail 
@@ -499,6 +696,12 @@ export default function TaskCanvasFlow({
         onSave={handleSaveTask}
         task={editingTask}
         initialStatus="todo"
+      />
+
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApplyFilters={handleApplyFilters}
       />
     </div>
   );
