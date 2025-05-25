@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,8 +15,6 @@ export const useTasks = () => {
     queryFn: async () => {
       if (!user) return [];
       
-      console.log('Fetching tasks for user:', user.id);
-      
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -25,11 +22,8 @@ export const useTasks = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching tasks:', error);
         throw error;
       }
-
-      console.log('Raw tasks from database:', data);
 
       const transformedTasks = (data || []).map(task => {
         let position = { x: 100, y: 100 };
@@ -44,7 +38,6 @@ export const useTasks = () => {
                 position = parsed;
               }
             } catch (e) {
-              console.warn('Failed to parse position for task:', task.id, task.position);
             }
           } else if (typeof task.position === 'object' && !Array.isArray(task.position) && 
                      task.position !== null && 'x' in task.position && 'y' in task.position &&
@@ -72,7 +65,6 @@ export const useTasks = () => {
         return cleanTask;
       });
 
-      console.log('Transformed tasks:', transformedTasks);
       return transformedTasks;
     },
     enabled: !!user,
@@ -81,8 +73,6 @@ export const useTasks = () => {
   const addTaskMutation = useMutation({
     mutationFn: async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
       if (!user) throw new Error('User not authenticated');
-
-      console.log('Adding task with data:', taskData);
 
       // Create the insert object with proper typing
       const insertData = {
@@ -105,11 +95,9 @@ export const useTasks = () => {
         .single();
 
       if (error) {
-        console.error('Error adding task:', error);
         throw error;
       }
       
-      console.log('Task added successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -117,15 +105,12 @@ export const useTasks = () => {
       toast.success('Task added successfully');
     },
     onError: (error) => {
-      console.error('Error adding task:', error);
       toast.error('Failed to add task');
     },
   });
 
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, taskData }: { id: string; taskData: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>> }) => {
-      console.log('Updating task:', id, 'with data:', taskData);
-      
       const updateObj: any = {};
       
       if (taskData.title !== undefined) updateObj.title = taskData.title;
@@ -148,11 +133,9 @@ export const useTasks = () => {
         .single();
 
       if (error) {
-        console.error('Error updating task:', error);
         throw error;
       }
       
-      console.log('Task updated successfully:', data);
       return data;
     },
     onSuccess: () => {
@@ -160,26 +143,21 @@ export const useTasks = () => {
       toast.success('Task updated successfully');
     },
     onError: (error) => {
-      console.error('Error updating task:', error);
       toast.error('Failed to update task');
     },
   });
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (id: string) => {
-      console.log('Deleting task:', id);
-      
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting task:', error);
         throw error;
       }
       
-      console.log('Task deleted successfully:', id);
       return id;
     },
     onSuccess: () => {
@@ -187,7 +165,6 @@ export const useTasks = () => {
       toast.success('Task deleted successfully');
     },
     onError: (error) => {
-      console.error('Error deleting task:', error);
       toast.error('Failed to delete task');
     },
   });
@@ -196,19 +173,15 @@ export const useTasks = () => {
     mutationFn: async () => {
       if (!user) throw new Error('User not authenticated');
       
-      console.log('Deleting all tasks for user:', user.id);
-      
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error deleting all tasks:', error);
         throw error;
       }
       
-      console.log('All tasks deleted successfully');
       return true;
     },
     onSuccess: () => {
@@ -216,7 +189,6 @@ export const useTasks = () => {
       toast.success('All tasks deleted successfully');
     },
     onError: (error) => {
-      console.error('Error deleting all tasks:', error);
       toast.error('Failed to delete all tasks');
     },
   });
@@ -243,8 +215,6 @@ export const useTasks = () => {
 
   // Memoize getFlowNodes to prevent infinite re-renders
   const getFlowNodes = useCallback(() => {
-    console.log('Getting flow nodes from tasks:', tasks.length);
-    
     const nodes = tasks.map(task => {
       // Create a clean node object
       const node: FlowNode = {
@@ -267,13 +237,11 @@ export const useTasks = () => {
       return node;
     });
     
-    console.log('Final flow nodes count:', nodes.length);
     return nodes;
   }, [tasks]);
 
   // Memoize getFlowEdges to prevent infinite re-renders
   const getFlowEdges = useCallback(() => {
-    console.log('Getting flow edges from tasks:', tasks.length);
     const edges: FlowEdge[] = [];
     
     tasks.forEach(task => {
@@ -296,7 +264,6 @@ export const useTasks = () => {
       }
     });
     
-    console.log('Final flow edges count:', edges.length);
     return edges;
   }, [tasks]);
 

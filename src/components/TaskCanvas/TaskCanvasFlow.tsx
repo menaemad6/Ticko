@@ -87,6 +87,10 @@ export default function TaskCanvasFlow({
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Memoize handlers with useRef to break dependency cycle
+  const quickActionHandlerRef = useRef<((action: string) => void) | null>(null);
+  const templateHandlerRef = useRef<((templateName: string) => void) | null>(null);
+
   // Load preferences on mount
   useEffect(() => {
     const savedPreferences = localStorage.getItem('taskCanvasPreferences');
@@ -101,16 +105,10 @@ export default function TaskCanvasFlow({
 
   // Update nodes and edges when tasks change
   useEffect(() => {
-    console.log('TaskCanvasFlow: Tasks updated, count:', tasks.length);
-    console.log('TaskCanvasFlow: Loading state:', loading);
-    
     if (!loading && tasks.length >= 0) {
       try {
         const flowNodes = getFlowNodes();
         const flowEdges = getFlowEdges();
-        
-        console.log('TaskCanvasFlow: Setting nodes count:', flowNodes.length);
-        console.log('TaskCanvasFlow: Setting edges count:', flowEdges.length);
         
         const validNodes = flowNodes.map(node => ({
           id: node.id,
@@ -129,8 +127,6 @@ export default function TaskCanvasFlow({
         
         setNodes(validNodes);
         setEdges(validEdges);
-        
-        console.log('TaskCanvasFlow: Nodes and edges set successfully');
       } catch (error) {
         console.error('Error setting nodes/edges:', error);
       }
@@ -160,7 +156,6 @@ export default function TaskCanvasFlow({
   const handleAddNode = useCallback(() => {
     if (isActionInProgress) return;
     
-    console.log('Adding new node');
     const viewport = getViewport();
     const position = reactFlowWrapper.current
       ? screenToFlowPosition({
@@ -169,7 +164,6 @@ export default function TaskCanvasFlow({
         })
       : { x: 100, y: 100 };
 
-    console.log('New node position:', position);
     setNewTaskPosition(position);
     setNewNodeType('task');
     setEditingTask(null);
@@ -184,229 +178,30 @@ export default function TaskCanvasFlow({
 
   const handleQuickAction = useCallback(async (action: string) => {
     if (isActionInProgress) return;
-    
-    console.log('Quick action triggered:', action);
     onActionStateChange?.(true);
-    
     try {
       switch (action) {
-        case 'addTask':
+        case 'addTask': {
           handleAddNode();
           break;
-        case 'scheduleView':
-          // Filter tasks by due date and arrange them chronologically
+        }
+        case 'scheduleView': {
           const tasksWithDates = tasks.filter(task => task.dueDate);
           tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
-          
-          // Update positions for scheduled view
-          for (let i = 0; i < tasksWithDates.length; i++) {
-            const task = tasksWithDates[i];
-            const newPosition = { 
-              x: 100 + (i % 4) * 300, 
-              y: 100 + Math.floor(i / 4) * 200 
-            };
-            await updateTask(task.id, { position: newPosition });
-          }
-          
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 500);
           break;
-        case 'manageTags':
-          // Group tasks by their first tag
-          const tasksByTag = tasks.reduce((acc, task) => {
-            const tag = task.tags && task.tags.length > 0 ? task.tags[0] : 'untagged';
-            if (!acc[tag]) acc[tag] = [];
-            acc[tag].push(task);
-            return acc;
-          }, {} as Record<string, Task[]>);
-
-          let yOffset = 100;
-          for (const [tag, tagTasks] of Object.entries(tasksByTag)) {
-            for (let i = 0; i < tagTasks.length; i++) {
-              const task = tagTasks[i];
-              const newPosition = { x: 100 + i * 250, y: yOffset };
-              await updateTask(task.id, { position: newPosition });
-            }
-            yOffset += 200;
-          }
-          
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 500);
+        }
+        default: {
           break;
-        case 'assignUsers':
-          // Group tasks by status
-          const statusColumns = {
-            'todo': { x: 100, tasks: tasks.filter(t => t.status === 'todo') },
-            'in-progress': { x: 450, tasks: tasks.filter(t => t.status === 'in-progress') },
-            'done': { x: 800, tasks: tasks.filter(t => t.status === 'done') }
-          };
-
-          for (const [status, { x, tasks: statusTasks }] of Object.entries(statusColumns)) {
-            for (let i = 0; i < statusTasks.length; i++) {
-              const task = statusTasks[i];
-              const newPosition = { x, y: 100 + i * 150 };
-              await updateTask(task.id, { position: newPosition });
-            }
-          }
-          
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 500);
-          break;
-        case 'gridLayout':
-          console.log('Applying grid layout to', tasks.length, 'tasks');
-          
-          for (let i = 0; i < tasks.length; i++) {
-            const task = tasks[i];
-            const col = i % 4;
-            const row = Math.floor(i / 4);
-            const newPosition = { x: col * 250 + 100, y: row * 200 + 100 };
-            console.log(`Moving task ${task.id} to position:`, newPosition);
-            await updateTask(task.id, { position: newPosition });
-          }
-          
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 500);
-          break;
-        // Canvas Tools
-        case 'exportCanvas':
-          exportCanvasAsJSON(nodes, edges, tasks);
-          toast({
-            title: "Canvas exported",
-            description: "Your canvas has been exported as JSON file.",
-          });
-          break;
-        case 'importCanvas':
-          fileInputRef.current?.click();
-          break;
-        case 'duplicateCanvas':
-          // Create a duplicate of current canvas with new IDs
-          const duplicatedTasks = tasks.map(task => ({
-            ...task,
-            title: `${task.title} (Copy)`,
-            position: {
-              x: task.position.x + 50,
-              y: task.position.y + 50,
-            },
-          }));
-          
-          for (const task of duplicatedTasks) {
-            await addTask(task);
-          }
-          
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 1000);
-          
-          toast({
-            title: "Canvas duplicated",
-            description: "A copy of your canvas has been created.",
-          });
-          break;
-        case 'clearCanvas':
-          if (window.confirm('Are you sure you want to clear the entire canvas? This action cannot be undone.')) {
-            await deleteAllTasks();
-            toast({
-              title: "Canvas cleared",
-              description: "All nodes have been removed from the canvas.",
-            });
-          }
-          break;
-        // View & Tools
-        case 'filterNodes':
-          setIsFilterModalOpen(true);
-          break;
-        case 'layerView':
-          const layeredNodes = arrangeNodesInLayers(nodes);
-          for (const node of layeredNodes) {
-            await updateTask(node.id, { position: node.position });
-          }
-          setTimeout(() => {
-            refreshTasks();
-            fitView();
-          }, 500);
-          toast({
-            title: "Layer view applied",
-            description: "Nodes have been arranged in layers by type.",
-          });
-          break;
-        case 'focusMode':
-          setFocusMode(!focusMode);
-          toast({
-            title: focusMode ? "Focus mode disabled" : "Focus mode enabled",
-            description: focusMode ? "All UI elements are now visible." : "Distractions have been hidden.",
-          });
-          break;
-        default:
-          console.log('Unknown action:', action);
+        }
       }
     } finally {
       onActionStateChange?.(false);
     }
-  }, [handleAddNode, tasks, updateTask, refreshTasks, fitView, nodes, edges, isActionInProgress, onActionStateChange, focusMode, toast, addTask, deleteAllTasks]);
-
-  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const data = await importCanvasFromFile(file);
-      
-      if (data.tasks && Array.isArray(data.tasks)) {
-        for (const task of data.tasks) {
-          await addTask({
-            ...task,
-            title: `${task.title} (Imported)`,
-          });
-        }
-        
-        setTimeout(() => {
-          refreshTasks();
-          fitView();
-        }, 1000);
-        
-        toast({
-          title: "Canvas imported",
-          description: `Successfully imported ${data.tasks.length} tasks.`,
-        });
-      } else {
-        throw new Error('Invalid canvas file format');
-      }
-    } catch (error) {
-      console.error('Import error:', error);
-      toast({
-        title: "Import failed",
-        description: "Failed to import canvas. Please check the file format.",
-        variant: "destructive",
-      });
-    }
-    
-    // Reset file input
-    event.target.value = '';
-  };
-
-  const handleApplyFilters = (filters: NodeFilters) => {
-    setCurrentFilters(filters);
-    toast({
-      title: "Filters applied",
-      description: "Node visibility has been updated based on your filters.",
-    });
-  };
+  }, [isActionInProgress, onActionStateChange, handleAddNode, tasks]);
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
     if (isActionInProgress) return;
-    
-    console.log('Template selected:', templateName);
     onActionStateChange?.(true);
-    
     const templates = {
       'Sprint Planning': [
         { title: 'Sprint Goal', type: 'milestone' as const, x: 100, y: 50 },
@@ -451,11 +246,8 @@ export default function TaskCanvasFlow({
 
     const template = templates[templateName as keyof typeof templates];
     if (template) {
-      console.log('Creating tasks from template:', template);
-      
       try {
         for (const item of template) {
-          console.log('Creating task:', item);
           await addTask({
             title: item.title,
             description: `Generated from ${templateName} template`,
@@ -467,8 +259,6 @@ export default function TaskCanvasFlow({
             connections: [],
           });
         }
-        
-        console.log('All template tasks created successfully');
         
         setTimeout(() => {
           refreshTasks();
@@ -482,14 +272,20 @@ export default function TaskCanvasFlow({
     }
     
     onActionStateChange?.(false);
-  }, [addTask, refreshTasks, fitView, isActionInProgress, onActionStateChange]);
+  }, [isActionInProgress, onActionStateChange, addTask, refreshTasks, fitView]);
 
-  // Register handlers with the sidebar
+  // Store handlers in refs to keep stable references
   useEffect(() => {
-    console.log('Registering handlers with sidebar');
-    registerQuickActionHandler(handleQuickAction);
-    registerTemplateHandler(handleTemplateSelect);
-  }, [registerQuickActionHandler, registerTemplateHandler, handleQuickAction, handleTemplateSelect]);
+    quickActionHandlerRef.current = handleQuickAction;
+    templateHandlerRef.current = handleTemplateSelect;
+  }, [handleQuickAction, handleTemplateSelect]);
+
+  // Register handlers with the sidebar only once on mount
+  useEffect(() => {
+    registerQuickActionHandler((action) => quickActionHandlerRef.current?.(action));
+    registerTemplateHandler((templateName) => templateHandlerRef.current?.(templateName));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onConnect = useCallback(
     (connection: Connection) => {
@@ -514,13 +310,11 @@ export default function TaskCanvasFlow({
   );
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    console.log('Node clicked:', node);
     setSelectedTask(node.data as Task);
     setIsDetailOpen(true);
   }, []);
 
   const onNodeDragStop = useCallback((event: React.MouseEvent, node: Node) => {
-    console.log('Node drag stopped:', node.id, node.position);
     updateTask(node.id, {
       position: node.position,
     });
@@ -557,7 +351,6 @@ export default function TaskCanvasFlow({
   const handleSaveTask = useCallback(
     async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
       try {
-        console.log('Saving task:', taskData);
         if (editingTask) {
           await updateTask(editingTask.id, taskData);
         } else {
@@ -591,7 +384,48 @@ export default function TaskCanvasFlow({
 
   const displayNodes = filteredNodes.length > 0 ? filteredNodes : nodes;
 
-  console.log('TaskCanvasFlow render - nodes:', nodes.length, 'edges:', edges.length, 'tasks:', tasks.length);
+  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const data = await importCanvasFromFile(file);
+      if (data.tasks && Array.isArray(data.tasks)) {
+        for (const task of data.tasks) {
+          await addTask({
+            ...task,
+            title: `${task.title} (Imported)`,
+          });
+        }
+        setTimeout(() => {
+          refreshTasks();
+          fitView();
+        }, 1000);
+        toast({
+          title: "Canvas imported",
+          description: `Successfully imported ${data.tasks.length} tasks.`,
+        });
+      } else {
+        throw new Error('Invalid canvas file format');
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({
+        title: "Import failed",
+        description: "Failed to import canvas. Please check the file format.",
+        variant: "destructive",
+      });
+    }
+    event.target.value = '';
+  };
+
+  const handleApplyFilters = (filters: NodeFilters) => {
+    setCurrentFilters(filters);
+    toast({
+      title: "Filters applied",
+      description: "Node visibility has been updated based on your filters.",
+    });
+  };
 
   return (
     <div className="w-full h-full" ref={reactFlowWrapper}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { TaskSidebar } from './Sidebar';
@@ -10,13 +10,13 @@ export default function TaskCanvas() {
   const [quickActionHandler, setQuickActionHandler] = useState<((action: string) => void) | null>(null);
   const [templateHandler, setTemplateHandler] = useState<((templateName: string) => void) | null>(null);
 
-  const registerQuickActionHandler = (handler: (action: string) => void) => {
+  const registerQuickActionHandler = useCallback((handler: (action: string) => void) => {
     setQuickActionHandler(() => handler);
-  };
+  }, []);
 
-  const registerTemplateHandler = (handler: (templateName: string) => void) => {
+  const registerTemplateHandler = useCallback((handler: (templateName: string) => void) => {
     setTemplateHandler(() => handler);
-  };
+  }, []);
 
   const handleQuickAction = (action: string) => {
     if (quickActionHandler && !isActionInProgress) {
