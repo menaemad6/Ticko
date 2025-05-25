@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { 
   CheckSquare, 
   Milestone, 
@@ -12,7 +13,19 @@ import {
   Trash2, 
   Copy,
   Layers,
-  Zap
+  Zap,
+  LogOut,
+  User,
+  BarChart3,
+  Calendar,
+  Tag,
+  Plus,
+  RefreshCw,
+  FileText,
+  FolderOpen,
+  Archive,
+  Clock,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +33,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { QuickActions } from './QuickActions';
 import { PreferencesModal, CanvasPreferences } from './PreferencesModal';
+import { useAuth } from '@/context/AuthContext';
+import { useTasks } from '@/hooks/useTasks';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -68,6 +83,12 @@ interface TaskSidebarProps {
 export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgress = false }: TaskSidebarProps = {}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const { tasks, loading } = useTasks();
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.status === 'done').length;
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const nodeTypes = [
     {
@@ -98,6 +119,60 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
     { name: 'Project Roadmap', nodes: 10, color: 'bg-blue-100 text-blue-800', description: 'Full project lifecycle' },
     { name: 'Bug Tracking', nodes: 7, color: 'bg-red-100 text-red-800', description: 'Bug resolution process' },
     { name: 'Feature Development', nodes: 9, color: 'bg-purple-100 text-purple-800', description: 'Feature development cycle' }
+  ];
+
+  const taskManagementActions = [
+    { 
+      id: 'createBulkTasks',
+      icon: Plus, 
+      label: 'Bulk Create Tasks', 
+      description: 'Create multiple tasks at once'
+    },
+    { 
+      id: 'archiveTasks',
+      icon: Archive, 
+      label: 'Archive Completed', 
+      description: 'Archive all completed tasks'
+    },
+    { 
+      id: 'reportGeneration',
+      icon: BarChart3, 
+      label: 'Generate Report', 
+      description: 'Create progress reports'
+    },
+    { 
+      id: 'dueDateReminder',
+      icon: Clock, 
+      label: 'Due Date Alerts', 
+      description: 'Set up deadline notifications'
+    }
+  ];
+
+  const projectActions = [
+    { 
+      id: 'projectStats',
+      icon: Target, 
+      label: 'Project Analytics', 
+      description: 'View detailed project metrics'
+    },
+    { 
+      id: 'exportProject',
+      icon: FolderOpen, 
+      label: 'Export Project', 
+      description: 'Export entire project data'
+    },
+    { 
+      id: 'taskTemplates',
+      icon: FileText, 
+      label: 'Task Templates', 
+      description: 'Create reusable task templates'
+    },
+    { 
+      id: 'refreshData',
+      icon: RefreshCw, 
+      label: 'Refresh Data', 
+      description: 'Sync with latest changes'
+    }
   ];
 
   const toolActions = [
@@ -161,8 +236,11 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
   };
 
   const handlePreferencesChange = (preferences: CanvasPreferences) => {
-    // Preferences are automatically saved to localStorage in the modal
     console.log('Preferences updated:', preferences);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   return (
@@ -171,14 +249,33 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         <SidebarHeader className="p-4 border-b">
           <div className="flex items-center gap-2 mb-3">
             <CheckSquare className="w-6 h-6 text-blue-600" />
-            <h2 className="text-lg font-semibold">Task Canvas</h2>
+            <h2 className="text-lg font-semibold">Visual Task Canvas</h2>
             {isActionInProgress && (
               <Badge variant="secondary" className="ml-auto">
                 Processing...
               </Badge>
             )}
           </div>
-          <div className="relative">
+          
+          {/* User Info & Progress */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <User className="w-4 h-4" />
+              <span className="truncate">{user?.email}</span>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Progress</span>
+                <Badge variant="outline">{completionRate}%</Badge>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {completedTasks} of {totalTasks} tasks completed
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative mt-3">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search tools..."
@@ -220,6 +317,70 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <QuickActions onAction={onQuickAction || (() => {})} disabled={isActionInProgress} />
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <Separator />
+
+          {/* Task Management */}
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Task Management
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-2">
+              {taskManagementActions.map((action) => {
+                const IconComponent = action.icon;
+                return (
+                  <Button
+                    key={action.id}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToolAction(action.id)}
+                    disabled={isActionInProgress}
+                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <div className="p-1.5 rounded bg-emerald-500 text-white">
+                      <IconComponent className="w-3 h-3" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-medium">{action.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
+                    </div>
+                  </Button>
+                );
+              })}
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <Separator />
+
+          {/* Project Tools */}
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Project Tools
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-2">
+              {projectActions.map((action) => {
+                const IconComponent = action.icon;
+                return (
+                  <Button
+                    key={action.id}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToolAction(action.id)}
+                    disabled={isActionInProgress}
+                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <div className="p-1.5 rounded bg-indigo-500 text-white">
+                      <IconComponent className="w-3 h-3" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-medium">{action.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
+                    </div>
+                  </Button>
+                );
+              })}
             </SidebarGroupContent>
           </SidebarGroup>
 
@@ -322,28 +483,33 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               ))}
             </SidebarGroupContent>
           </SidebarGroup>
-
-          <Separator />
-
-          {/* Canvas Settings */}
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Canvas Settings
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start gap-2 h-8"
-                onClick={() => setIsPreferencesOpen(true)}
-                disabled={isActionInProgress}
-              >
-                <Settings className="w-4 h-4" />
-                <span className="text-xs">Preferences</span>
-              </Button>
-            </SidebarGroupContent>
-          </SidebarGroup>
         </SidebarContent>
+
+        <SidebarFooter className="p-4 border-t">
+          <div className="space-y-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2 h-8"
+              onClick={() => setIsPreferencesOpen(true)}
+              disabled={isActionInProgress}
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-xs">Preferences</span>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleSignOut}
+              className="w-full justify-start gap-2"
+              disabled={isActionInProgress}
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="text-xs">Sign Out</span>
+            </Button>
+          </div>
+        </SidebarFooter>
       </Sidebar>
 
       <PreferencesModal 
