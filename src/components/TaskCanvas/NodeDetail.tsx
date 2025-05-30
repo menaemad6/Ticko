@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -82,19 +83,25 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Inline status update
+  // Inline status update with proper typing
   const handleStatusChange = async (value: string) => {
-    if (value !== localTask.status) {
-      setLocalTask({ ...localTask, status: value });
-      updateTask(localTask.id, { ...localTask, status: value });
+    // Type guard to ensure value is a valid status
+    if (value === 'todo' || value === 'in-progress' || value === 'done') {
+      if (value !== localTask.status) {
+        setLocalTask({ ...localTask, status: value });
+        updateTask(localTask.id, { ...localTask, status: value });
+      }
     }
   };
 
-  // Inline priority update
+  // Inline priority update with proper typing
   const handlePriorityChange = async (value: string) => {
-    if (value !== localTask.priority) {
-      setLocalTask({ ...localTask, priority: value });
-      updateTask(localTask.id, { ...localTask, priority: value });
+    // Type guard to ensure value is a valid priority
+    if (value === 'low' || value === 'medium' || value === 'high') {
+      if (value !== localTask.priority) {
+        setLocalTask({ ...localTask, priority: value });
+        updateTask(localTask.id, { ...localTask, priority: value });
+      }
     }
   };
 
