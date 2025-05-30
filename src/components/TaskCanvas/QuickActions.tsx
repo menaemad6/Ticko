@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Calendar, Tag, User, Grid2x2 } from 'lucide-react';
+import { Plus, Calendar, Tag, User, Grid2x2, Zap, Archive, BarChart3, Timer } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { Task } from '@/types/task';
 import { toast } from 'sonner';
@@ -12,10 +12,108 @@ interface QuickActionsProps {
 }
 
 export const QuickActions: React.FC<QuickActionsProps> = ({ onAction, disabled = false }) => {
-  const { tasks, updateTask } = useTasks();
+  const { tasks, updateTask, addTask, deleteTask } = useTasks();
 
   const handleAddTask = () => {
     onAction('addTask');
+  };
+
+  const handleBulkCreateTasks = async () => {
+    const taskTemplates = [
+      { title: 'Review project requirements', priority: 'high' as const },
+      { title: 'Set up development environment', priority: 'medium' as const },
+      { title: 'Create initial wireframes', priority: 'medium' as const },
+      { title: 'Plan testing strategy', priority: 'low' as const },
+      { title: 'Schedule team meeting', priority: 'medium' as const },
+    ];
+
+    let createdCount = 0;
+    for (const template of taskTemplates) {
+      try {
+        await addTask({
+          title: template.title,
+          description: 'Auto-generated task from bulk creation',
+          status: 'todo',
+          priority: template.priority,
+          tags: ['bulk-created'],
+          position: { 
+            x: 100 + (createdCount * 50), 
+            y: 100 + (createdCount * 100) 
+          },
+          nodeType: 'task',
+          connections: [],
+        });
+        createdCount++;
+      } catch (error) {
+        console.error('Error creating task:', error);
+      }
+    }
+    
+    toast.success(`Created ${createdCount} tasks successfully`);
+  };
+
+  const handleArchiveCompleted = async () => {
+    const completedTasks = tasks.filter(task => task.status === 'done');
+    
+    if (completedTasks.length === 0) {
+      toast.info('No completed tasks to archive');
+      return;
+    }
+
+    let archivedCount = 0;
+    for (const task of completedTasks) {
+      try {
+        await deleteTask(task.id);
+        archivedCount++;
+      } catch (error) {
+        console.error('Error archiving task:', error);
+      }
+    }
+    
+    toast.success(`Archived ${archivedCount} completed tasks`);
+  };
+
+  const handleShowStats = () => {
+    const todoCount = tasks.filter(task => task.status === 'todo').length;
+    const inProgressCount = tasks.filter(task => task.status === 'in-progress').length;
+    const doneCount = tasks.filter(task => task.status === 'done').length;
+    const totalTasks = tasks.length;
+    
+    const completionRate = totalTasks > 0 ? Math.round((doneCount / totalTasks) * 100) : 0;
+    
+    toast.success(
+      `Task Stats: ${todoCount} Todo, ${inProgressCount} In Progress, ${doneCount} Done. Completion: ${completionRate}%`,
+      { duration: 5000 }
+    );
+  };
+
+  const handleDueDateAlerts = () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dueSoon = tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const dueDate = new Date(task.dueDate);
+      return dueDate <= tomorrow && task.status !== 'done';
+    });
+
+    if (dueSoon.length === 0) {
+      toast.info('No tasks due soon');
+      return;
+    }
+
+    const overdue = dueSoon.filter(task => new Date(task.dueDate!) < today);
+    const dueToday = dueSoon.filter(task => {
+      const dueDate = new Date(task.dueDate!);
+      return dueDate.toDateString() === today.toDateString();
+    });
+
+    let alertMessage = `${dueSoon.length} tasks need attention: `;
+    if (overdue.length > 0) alertMessage += `${overdue.length} overdue, `;
+    if (dueToday.length > 0) alertMessage += `${dueToday.length} due today`;
+
+    toast.warning(alertMessage, { duration: 6000 });
   };
 
   const handleScheduleView = () => {
@@ -166,6 +264,38 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ onAction, disabled =
       description: 'Create a new task node',
       color: 'bg-blue-500 hover:bg-blue-600',
       handler: handleAddTask
+    },
+    { 
+      id: 'bulkCreate',
+      icon: Zap, 
+      label: 'Bulk Create Tasks', 
+      description: 'Create multiple sample tasks',
+      color: 'bg-purple-500 hover:bg-purple-600',
+      handler: handleBulkCreateTasks
+    },
+    { 
+      id: 'archiveCompleted',
+      icon: Archive, 
+      label: 'Archive Completed', 
+      description: 'Remove all completed tasks',
+      color: 'bg-gray-500 hover:bg-gray-600',
+      handler: handleArchiveCompleted
+    },
+    { 
+      id: 'showStats',
+      icon: BarChart3, 
+      label: 'Show Task Stats', 
+      description: 'Display task completion statistics',
+      color: 'bg-emerald-500 hover:bg-emerald-600',
+      handler: handleShowStats
+    },
+    { 
+      id: 'dueDateAlerts',
+      icon: Timer, 
+      label: 'Due Date Alerts', 
+      description: 'Check for overdue and upcoming tasks',
+      color: 'bg-red-500 hover:bg-red-600',
+      handler: handleDueDateAlerts
     },
     { 
       id: 'scheduleView',
