@@ -37,6 +37,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useTasks } from '@/hooks/useTasks';
 import { Progress } from '@/components/ui/progress';
 import './sidebar-scrollbar.css';
+import { ProjectAnalyticsModal } from './ProjectAnalyticsModal';
+import { TaskTemplatesModal } from './TaskTemplatesModal';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -85,8 +87,10 @@ interface TaskSidebarProps {
 export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgress = false }: TaskSidebarProps = {}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { tasks, loading } = useTasks();
+  const { tasks, loading, refreshTasks } = useTasks();
   const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
 
   const totalTasks = tasks.length;
@@ -153,28 +157,28 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
 
   const projectActions = [
     { 
-      id: 'projectStats',
+      id: 'projectAnalytics',
       icon: Target, 
       label: 'Project Analytics', 
-      description: 'View detailed project metrics'
-    },
-    { 
-      id: 'exportProject',
-      icon: FolderOpen, 
-      label: 'Export Project', 
-      description: 'Export entire project data'
+      description: 'View detailed project metrics',
+      handler: () => setIsAnalyticsOpen(true)
     },
     { 
       id: 'taskTemplates',
       icon: FileText, 
       label: 'Task Templates', 
-      description: 'Create reusable task templates'
+      description: 'Create tasks from templates',
+      handler: () => setIsTemplatesOpen(true)
     },
     { 
       id: 'refreshData',
       icon: RefreshCw, 
       label: 'Refresh Data', 
-      description: 'Sync with latest changes'
+      description: 'Sync with latest changes',
+      handler: () => {
+        refreshTasks();
+        toast.success('Data refreshed successfully');
+      }
     }
   ];
 
@@ -234,6 +238,13 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
 
   const handleToolAction = (actionId: string) => {
     if (!isActionInProgress) {
+      // Check if it's a project action with custom handler
+      const projectAction = projectActions.find(action => action.id === actionId);
+      if (projectAction && projectAction.handler) {
+        projectAction.handler();
+        return;
+      }
+      
       onQuickAction?.(actionId);
     }
   };
@@ -525,10 +536,21 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         </SidebarFooter>
       </Sidebar>
 
+      {/* Modals */}
       <PreferencesModal 
         isOpen={isPreferencesOpen} 
         onClose={() => setIsPreferencesOpen(false)}
         onPreferencesChange={handlePreferencesChange}
+      />
+      
+      <ProjectAnalyticsModal
+        isOpen={isAnalyticsOpen}
+        onClose={() => setIsAnalyticsOpen(false)}
+      />
+      
+      <TaskTemplatesModal
+        isOpen={isTemplatesOpen}
+        onClose={() => setIsTemplatesOpen(false)}
       />
     </>
   );
