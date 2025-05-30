@@ -9,6 +9,59 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chats: {
+        Row: {
+          created_at: string | null
+          id: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          chat_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          chat_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          role: string
+        }
+        Update: {
+          chat_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -81,65 +134,6 @@ export type Database = {
         }
         Relationships: []
       }
-      chats: {
-        Row: {
-          id: string;
-          user_id: string;
-          title: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          title: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          title?: string;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'chats_user_id_fkey';
-            columns: ['user_id'];
-            referencedRelation: 'users';
-            referencedColumns: ['id'];
-          }
-        ];
-      };
-      messages: {
-        Row: {
-          id: string;
-          chat_id: string;
-          role: 'user' | 'ai';
-          content: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          chat_id: string;
-          role: 'user' | 'ai';
-          content: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          chat_id?: string;
-          role?: 'user' | 'ai';
-          content?: string;
-          created_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'messages_chat_id_fkey';
-            columns: ['chat_id'];
-            referencedRelation: 'chats';
-            referencedColumns: ['id'];
-          }
-        ];
-      };
     }
     Views: {
       [_ in never]: never
