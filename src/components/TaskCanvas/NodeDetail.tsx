@@ -1,15 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Task } from '@/types/task';
-import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User } from 'lucide-react';
+import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User, CheckSquare } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckSquare, Milestone as MilestoneIcon, StickyNote } from 'lucide-react';
+import { Milestone as MilestoneIcon, StickyNote } from 'lucide-react';
 
 interface NodeDetailProps {
   isOpen: boolean;
@@ -83,6 +82,30 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
+  // Map status to icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'done':
+        return <CheckSquare className="w-7 h-7 text-green-600 dark:text-green-400" />;
+      case 'in-progress':
+        return <Clock className="w-7 h-7 text-blue-600 dark:text-blue-400" />;
+      default:
+        return <Flag className="w-7 h-7 text-gray-500 dark:text-gray-300" />;
+    }
+  };
+
+  // Map status to modal background color
+  const getStatusBg = (status: string) => {
+    switch (status) {
+      case 'done':
+        return 'bg-green-50 dark:bg-green-900/80';
+      case 'in-progress':
+        return 'bg-blue-50 dark:bg-blue-900/80';
+      default:
+        return 'bg-gray-50 dark:bg-gray-900/80';
+    }
+  };
+
   // Inline status update with proper typing
   const handleStatusChange = async (value: string) => {
     // Type guard to ensure value is a valid status
@@ -116,21 +139,21 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl rounded-2xl border-0 p-0 md:p-0">
-        <DialogHeader className="space-y-4">
-          <div className="flex items-start justify-between p-6 pb-0">
-            <div className="flex items-center gap-4 flex-1">
+      <DialogContent className={`w-full max-w-full sm:max-w-2xl max-h-[80vh] overflow-y-auto backdrop-blur-xl shadow-2xl rounded-none sm:rounded-2xl border-0 p-0 md:p-0 ${getStatusBg(localTask.status)}`}>
+        <DialogHeader className="space-y-4 pt-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between p-4 sm:p-6 pb-0 gap-4 sm:gap-0">
+            <div className="flex items-center gap-4 flex-1 w-full">
               <div className="drop-shadow-lg select-none flex items-center justify-center">
-                {getNodeTypeIcon(task.nodeType)}
+                {getStatusIcon(localTask.status)}
               </div>
-              <div className="flex-1">
-                <DialogTitle className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+              <div className="flex-1 min-w-0">
+                <DialogTitle className="text-lg sm:text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight truncate">
                   {task.title}
                 </DialogTitle>
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex flex-wrap items-center gap-2">
                   {/* Status Select */}
                   <Select value={localTask.status} onValueChange={handleStatusChange}>
-                    <SelectTrigger className={`w-[120px] ${getStatusColor(localTask.status)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-blue-400`}>
+                    <SelectTrigger className={`w-[100px] sm:w-[120px] ${getStatusColor(localTask.status)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-blue-400`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -141,7 +164,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                   </Select>
                   {/* Priority Select */}
                   <Select value={localTask.priority} onValueChange={handlePriorityChange}>
-                    <SelectTrigger className={`w-[120px] ${getPriorityColor(localTask.priority)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-red-400`}>
+                    <SelectTrigger className={`w-[100px] sm:w-[120px] ${getPriorityColor(localTask.priority)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-red-400`}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -156,7 +179,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -192,7 +215,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
               ) : null}
             </h4>
             {!editingDescription ? (
-              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed break-words">
                 {localTask.description || 'No description provided'}
               </p>
             ) : (
@@ -216,7 +239,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
           </div>
 
           {/* Due Date */}
-          <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-100 dark:border-blue-900 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-100 dark:border-blue-900 shadow-sm">
             <Calendar className="w-5 h-5 text-blue-500" />
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Due Date:</span>
             <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -237,7 +260,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                 <Tag className="w-4 h-4 text-purple-500" />
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tags</h4>
               </div>
-              <div className="flex flex-wrap gap-2 pl-6">
+              <div className="flex flex-wrap gap-2 pl-0 sm:pl-6">
                 {task.tags.map((tag, index) => (
                   <Badge
                     key={index}
@@ -258,7 +281,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                 <User className="w-4 h-4 text-orange-500" />
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Connected Tasks</h4>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 pl-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400 pl-0 sm:pl-6">
                 {task.connections.length} connection(s)
               </p>
             </div>

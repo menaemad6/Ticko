@@ -429,37 +429,20 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             </SidebarGroupContent>
           </SidebarGroup>
 
-          <Separator />
+
 
           {/* Task Management */}
+          {/* <Separator />
           <SidebarGroup>
             <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Task Management
             </SidebarGroupLabel>
-            <SidebarGroupContent className="space-y-2">
-              {taskManagementActions.map((action) => {
-                const IconComponent = action.icon;
-                return (
-                  <Button
-                    key={action.id}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToolAction(action.id)}
-                    disabled={isActionInProgress}
-                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <div className="p-1.5 rounded bg-emerald-500 text-white">
-                      <IconComponent className="w-3 h-3" />
-                    </div>
-                    <div className="text-left">
-                      <div className="text-sm font-medium">{action.label}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
-                    </div>
-                  </Button>
-                );
-              })}
+            <SidebarGroupContent>
+              <QuickActions onAction={onQuickAction || (() => {})} disabled={isActionInProgress} />
             </SidebarGroupContent>
-          </SidebarGroup>
+          </SidebarGroup> */}
+
+
 
           <Separator />
 

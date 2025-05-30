@@ -1,7 +1,7 @@
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Flag, Tag } from 'lucide-react';
+import { Calendar, Flag, Tag, Clock, CheckSquare } from 'lucide-react';
 import { Task } from '@/types/task';
 import { cn } from '@/lib/utils';
 
@@ -15,16 +15,16 @@ const priorityColors = {
   high: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400',
 };
 
-const nodeTypeColors = {
-  task: 'border-blue-400 bg-blue-50 dark:bg-blue-950/50 dark:border-blue-700',
-  milestone: 'border-purple-400 bg-purple-50 dark:bg-purple-950/50 dark:border-purple-700',
-  note: 'border-amber-400 bg-amber-50 dark:bg-amber-950/50 dark:border-amber-700',
-};
-
 const statusColors = {
   'done': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400',
   'in-progress': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
   'todo': 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-300',
+};
+
+const statusBg = {
+  'done': 'bg-green-50 dark:bg-green-900/80',
+  'in-progress': 'bg-blue-50 dark:bg-blue-900/80',
+  'todo': 'bg-gray-50 dark:bg-gray-900/80',
 };
 
 const formatDate = (dateString: string) => {
@@ -35,12 +35,23 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'done':
+      return <CheckSquare className="w-3 h-3 mr-1" />;
+    case 'in-progress':
+      return <Clock className="w-3 h-3 mr-1" />;
+    default:
+      return <Flag className="w-3 h-3 mr-1" />;
+  }
+};
+
 function TaskNode({ data }: TaskNodeProps) {
   return (
     <div className={cn(
       'p-3 rounded-md border-2 shadow-lg w-64',
       'transition-shadow hover:shadow-xl',
-      nodeTypeColors[data.nodeType || 'task'],
+      statusBg[data.status] || statusBg['todo'],
     )}>
       <Handle type="target" position={Position.Top} className="w-3 h-3 rounded-full bg-blue-500" />
       
@@ -53,7 +64,7 @@ function TaskNode({ data }: TaskNodeProps) {
             variant="outline"
             className={cn('text-xs px-2', statusColors[data.status])}
           >
-            <Flag className="w-3 h-3 mr-1" />
+            {getStatusIcon(data.status)}
             {data.status.replace('-', ' ')}
           </Badge>
         </div>
