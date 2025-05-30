@@ -5,9 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { Send, ChevronLeft, MessageSquare, Plus, Loader2, Search, PanelLeft, X, History, Trash2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Send, ChevronLeft, MessageSquare, Plus, Loader2, Search, PanelLeft, X, History, Trash2, Zap } from 'lucide-react';
 import { sendMessageToGemini } from '@/lib/utils';
 import { useChats } from '@/hooks/useChats';
+import { useTaskActions } from '@/hooks/useTaskActions';
 import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
@@ -62,6 +65,7 @@ export default function ChatSidebar() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [newChatTitle, setNewChatTitle] = useState('');
+  const [actionMode, setActionMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
@@ -78,6 +82,8 @@ export default function ChatSidebar() {
     setChats,
     setMessages,
   } = useChats();
+
+  const { processTaskActions } = useTaskActions();
 
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
@@ -140,24 +146,46 @@ export default function ChatSidebar() {
   const handleSend = async () => {
     if (!input.trim() || sending || !selectedChatId) return;
     setSending(true);
+    
     // Save user message to Supabase and update UI only with the result
     const userMsg = await sendMessage(selectedChatId, 'user', input);
+    const userInput = input;
     setInput('');
-    // If this is the user's first message in the chat, update the chat name using Gemini
-    const userMessages = messages.filter(m => m.chat_id === selectedChatId && m.role === 'user');
-    if (userMessages.length === 0 && userMsg) {
-      // Prompt Gemini for a chat title
-      const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${input}". Return ONLY the name, no other words or explanation.`;
-      const aiTitle = await sendMessageToGemini(titlePrompt);
-      // Update chat title in Supabase
-      await supabase.from('chats').update({ title: aiTitle }).eq('id', selectedChatId);
-      // Update chat title in UI
-      setChats(prev => prev.map(chat => chat.id === selectedChatId ? { ...chat, title: aiTitle } : chat));
+    
+    try {
+      if (actionMode) {
+        // Process as task action
+        const result = await processTaskActions(userInput);
+        
+        if (result.success) {
+          await sendMessage(selectedChatId, 'ai', `✅ ${result.message}`);
+        } else {
+          await sendMessage(selectedChatId, 'ai', `❌ ${result.message}`);
+        }
+      } else {
+        // Regular chat mode
+        // If this is the user's first message in the chat, update the chat name using Gemini
+        const userMessages = messages.filter(m => m.chat_id === selectedChatId && m.role === 'user');
+        if (userMessages.length === 0 && userMsg) {
+          // Prompt Gemini for a chat title
+          const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${userInput}". Return ONLY the name, no other words or explanation.`;
+          const aiTitle = await sendMessageToGemini(titlePrompt);
+          // Update chat title in Supabase
+          await supabase.from('chats').update({ title: aiTitle }).eq('id', selectedChatId);
+          // Update chat title in UI
+          setChats(prev => prev.map(chat => chat.id === selectedChatId ? { ...chat, title: aiTitle } : chat));
+        }
+        
+        // Get AI response
+        const aiText = await sendMessageToGemini(userInput);
+        // Save AI message to Supabase and update UI only with the result
+        await sendMessage(selectedChatId, 'ai', aiText);
+      }
+    } catch (error) {
+      console.error('Error processing message:', error);
+      await sendMessage(selectedChatId, 'ai', '❌ Sorry, I encountered an error processing your request.');
     }
-    // Get AI response
-    const aiText = await sendMessageToGemini(input);
-    // Save AI message to Supabase and update UI only with the result
-    await sendMessage(selectedChatId, 'ai', aiText);
+    
     setSending(false);
   };
 
@@ -223,7 +251,9 @@ export default function ChatSidebar() {
           </Avatar>
           <div className="flex-1">
             <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
-            <div className="text-xs text-muted-foreground">Ask anything about your tasks</div>
+            <div className="text-xs text-muted-foreground">
+              {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
+            </div>
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <Tooltip>
@@ -256,7 +286,31 @@ export default function ChatSidebar() {
             </Tooltip>
           </div>
         </div>
+
+        {/* Action Mode Toggle */}
+        <div className="px-6 py-3 border-b border-white/20 bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm">
+          <div className="flex items-center space-x-3">
+            <Zap className={cn("w-5 h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
+            <Label htmlFor="action-mode" className="text-sm font-medium cursor-pointer flex-1">
+              Action Mode
+            </Label>
+            <Switch
+              id="action-mode"
+              checked={actionMode}
+              onCheckedChange={setActionMode}
+              className="data-[state=checked]:bg-yellow-500"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1 ml-8">
+            {actionMode 
+              ? "AI will perform task actions directly" 
+              : "Regular conversation mode"
+            }
+          </p>
+        </div>
+
         <Separator className="opacity-30" />
+        
         {/* Messages */}
         <ScrollArea className="flex-1 p-6 space-y-6 z-10">
           <div ref={scrollRef} className="space-y-6">
@@ -369,7 +423,7 @@ export default function ChatSidebar() {
                 </Avatar>
                 <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-white/80 dark:bg-gray-900/80 text-foreground rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2" style={{ backdropFilter: 'blur(2px)' }}>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Gemini is typing...
+                  {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
                 </Card>
               </div>
             )}
@@ -379,10 +433,11 @@ export default function ChatSidebar() {
             <div ref={endOfMessagesRef} />
           </div>
         </ScrollArea>
+        
         {/* Input */}
         <div className="p-6 border-t border-white/20 bg-white/60 dark:bg-gray-900/60 flex items-center gap-3 backdrop-blur-xl z-10">
           <Input
-            placeholder="Type your message..."
+            placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
             className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base"
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -393,7 +448,10 @@ export default function ChatSidebar() {
           <Button
             variant="default"
             size="icon"
-            className="rounded-full shadow-lg"
+            className={cn(
+              "rounded-full shadow-lg",
+              actionMode && "bg-yellow-500 hover:bg-yellow-600"
+            )}
             onClick={handleSend}
             disabled={sending || loading || !input.trim() || !selectedChatId}
           >
@@ -401,6 +459,7 @@ export default function ChatSidebar() {
           </Button>
         </div>
       </div>
+      
       {/* Modal for Chats */}
       {modalOpen && (
         <>
@@ -498,4 +557,4 @@ export default function ChatSidebar() {
       )}
     </div>
   );
-} 
+}
