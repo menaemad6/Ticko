@@ -165,8 +165,8 @@ export default function ChatSidebar() {
       } else {
         // Regular chat mode
         // If this is the user's first message in the chat, update the chat name using Gemini
-        const userMessages = messages.filter(m => m.chat_id === selectedChatId && m.role === 'user');
-        if (userMessages.length === 0 && userMsg) {
+        const currentChat = chats.find(chat => chat.id === selectedChatId);
+        if (currentChat && currentChat.title === 'New Chat' && userMsg) {
           // Prompt Gemini for a chat title
           const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${userInput}". Return ONLY the name, no other words or explanation.`;
           const aiTitle = await sendMessageToGemini(titlePrompt);
