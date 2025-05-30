@@ -1,8 +1,8 @@
-
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useTasks } from './useTasks';
 import { toast } from 'sonner';
+import { sendTaskActionsToGemini } from '@/lib/utils';
 
 interface TaskAction {
   action: 'create_task' | 'edit_task' | 'delete_task' | 'mark_complete' | 'mark_incomplete' | 'set_priority' | 'set_due_date' | 'list_tasks';
@@ -12,6 +12,7 @@ interface TaskAction {
   due_date?: string;
   priority?: 'low' | 'medium' | 'high';
   status?: 'todo' | 'in-progress' | 'done';
+  tags?: string[];
 }
 
 export function useTaskActions() {
@@ -21,28 +22,21 @@ export function useTaskActions() {
     try {
       console.log('Processing task action for message:', message);
       
-      // Call the Edge Function with current tasks as context
-      const { data, error } = await supabase.functions.invoke('ai-task-actions', {
-        body: { 
-          message,
-          existingTasks: tasks.map(task => ({
-            id: task.id,
-            title: task.title,
-            status: task.status,
-            priority: task.priority
-          }))
-        }
+      // Call the local Gemini function with current tasks as context
+      const response = await sendTaskActionsToGemini({
+        message,
+        existingTasks: tasks.map(task => ({
+          id: task.id,
+          title: task.title,
+          status: task.status,
+          priority: task.priority
+        }))
       });
 
-      if (error) {
-        throw error;
-      }
-
-      const { response } = data;
       console.log('AI response:', response);
 
       // Handle error messages
-      if (response.message) {
+      if ('message' in response) {
         return { success: false, message: response.message };
       }
 
@@ -92,7 +86,7 @@ export function useTaskActions() {
             status: action.status || 'todo',
             priority: action.priority || 'medium',
             dueDate: action.due_date,
-            tags: [],
+            tags: action.tags || [],
             position: { x: Math.random() * 400 + 100, y: Math.random() * 400 + 100 },
             nodeType: 'task',
             connections: [],

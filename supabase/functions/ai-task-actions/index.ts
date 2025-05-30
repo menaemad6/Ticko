@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -71,16 +70,47 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        systemInstruction: {
+          parts: [
+            { text: contextualPrompt }
+          ]
+        },
         contents: [
           {
             parts: [
-              { text: `${contextualPrompt}\n\nUser message: ${message}` }
+              { text: message }
             ]
           }
         ],
         generationConfig: {
           temperature: 0.1,
           maxOutputTokens: 1000,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                action: { type: "string" },
+                id: { type: "string" },
+                title: { type: "string" },
+                description: { type: "string" },
+                due_date: { type: "string" },
+                priority: { type: "string" },
+                status: { type: "string" }
+              },
+              required: ["action"],
+              propertyOrdering: [
+                "action",
+                "id",
+                "title",
+                "description",
+                "due_date",
+                "priority",
+                "status"
+              ]
+            }
+          }
         }
       }),
     });
