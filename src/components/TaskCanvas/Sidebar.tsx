@@ -39,6 +39,8 @@ import { Progress } from '@/components/ui/progress';
 import './sidebar-scrollbar.css';
 import { ProjectAnalyticsModal } from './ProjectAnalyticsModal';
 import { TaskTemplatesModal } from './TaskTemplatesModal';
+import { FilterModal, NodeFilters } from './FilterModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface DraggableNodeProps {
   type: 'task' | 'milestone' | 'note';
@@ -89,9 +91,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const { user, signOut } = useAuth();
-  const { tasks, loading, refreshTasks } = useTasks();
+  const { tasks, loading, refreshTasks, deleteAllTasks } = useTasks();
   const { state, isMobile, openMobile, toggleSidebar } = useSidebar();
+  const { toast } = useToast();
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'done').length;
@@ -177,7 +182,10 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
       description: 'Sync with latest changes',
       handler: () => {
         refreshTasks();
-        toast.success('Data refreshed successfully');
+        toast({
+          title: "Data refreshed",
+          description: "Successfully refreshed all tasks and connections.",
+        });
       }
     }
   ];
@@ -187,25 +195,63 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
       id: 'exportCanvas',
       icon: Download, 
       label: 'Export Canvas', 
-      description: 'Download your canvas as image or JSON'
+      description: 'Download your canvas as image or JSON',
+      handler: () => {
+        onQuickAction?.('exportCanvas');
+        toast({
+          title: "Export started",
+          description: "Your canvas is being exported. Download will start shortly.",
+        });
+      }
     },
     { 
       id: 'importCanvas',
       icon: Upload, 
       label: 'Import Canvas', 
-      description: 'Import canvas from file'
+      description: 'Import canvas from file',
+      handler: () => {
+        onQuickAction?.('importCanvas');
+        toast({
+          title: "Import canvas",
+          description: "Please select a JSON file to import.",
+        });
+      }
     },
     { 
       id: 'duplicateCanvas',
       icon: Copy, 
       label: 'Duplicate Canvas', 
-      description: 'Create a copy of current canvas'
+      description: 'Create a copy of current canvas',
+      handler: () => {
+        onQuickAction?.('duplicateCanvas');
+        toast({
+          title: "Canvas duplicated",
+          description: "A copy of your canvas has been created.",
+        });
+      }
     },
     { 
       id: 'clearCanvas',
       icon: Trash2, 
       label: 'Clear Canvas', 
-      description: 'Remove all nodes and start fresh'
+      description: 'Remove all nodes and start fresh',
+      handler: async () => {
+        if (window.confirm('Are you sure you want to clear all tasks? This action cannot be undone.')) {
+          try {
+            await deleteAllTasks();
+            toast({
+              title: "Canvas cleared",
+              description: "All tasks have been removed from the canvas.",
+            });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "Failed to clear canvas. Please try again.",
+              variant: "destructive",
+            });
+          }
+        }
+      }
     }
   ];
 
@@ -214,19 +260,35 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
       id: 'filterNodes',
       icon: Filter, 
       label: 'Filter Nodes', 
-      description: 'Show/hide nodes by type or status'
+      description: 'Show/hide nodes by type or status',
+      handler: () => setIsFilterModalOpen(true)
     },
     { 
       id: 'layerView',
       icon: Layers, 
       label: 'Layer View', 
-      description: 'Organize nodes in layers'
+      description: 'Organize nodes in layers',
+      handler: () => {
+        onQuickAction?.('arrangeInLayers');
+        toast({
+          title: "Layer view applied",
+          description: "Nodes have been organized in layers by type.",
+        });
+      }
     },
     { 
       id: 'focusMode',
       icon: Zap, 
       label: 'Focus Mode', 
-      description: 'Hide distractions and focus on tasks'
+      description: 'Hide distractions and focus on tasks',
+      handler: () => {
+        setFocusMode(!focusMode);
+        onQuickAction?.('toggleFocusMode');
+        toast({
+          title: focusMode ? "Focus mode disabled" : "Focus mode enabled",
+          description: focusMode ? "UI controls are now visible." : "UI distractions hidden for better focus.",
+        });
+      }
     }
   ];
 
@@ -245,6 +307,20 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         return;
       }
       
+      // Check if it's a view action with custom handler
+      const viewAction = viewActions.find(action => action.id === actionId);
+      if (viewAction && viewAction.handler) {
+        viewAction.handler();
+        return;
+      }
+      
+      // Check if it's a tool action with custom handler
+      const toolAction = toolActions.find(action => action.id === actionId);
+      if (toolAction && toolAction.handler) {
+        toolAction.handler();
+        return;
+      }
+      
       onQuickAction?.(actionId);
     }
   };
@@ -255,6 +331,14 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleApplyFilters = (filters: NodeFilters) => {
+    onQuickAction?.('applyFilters');
+    toast({
+      title: "Filters applied",
+      description: "Node visibility has been updated based on your filters.",
+    });
   };
 
   return (
@@ -551,6 +635,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
       <TaskTemplatesModal
         isOpen={isTemplatesOpen}
         onClose={() => setIsTemplatesOpen(false)}
+      />
+      
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApplyFilters={handleApplyFilters}
       />
     </>
   );

@@ -190,14 +190,62 @@ export default function TaskCanvasFlow({
           tasksWithDates.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
           break;
         }
+        case 'arrangeInLayers': {
+          const arrangedNodes = arrangeNodesInLayers(nodes);
+          setNodes(arrangedNodes);
+          setTimeout(() => fitView(), 100);
+          break;
+        }
+        case 'toggleFocusMode': {
+          setFocusMode(!focusMode);
+          break;
+        }
+        case 'exportCanvas': {
+          exportCanvasAsJSON(nodes, edges, tasks);
+          break;
+        }
+        case 'importCanvas': {
+          fileInputRef.current?.click();
+          break;
+        }
+        case 'duplicateCanvas': {
+          // Create duplicated tasks with offset positions
+          for (const task of tasks) {
+            await addTask({
+              ...task,
+              title: `${task.title} (Copy)`,
+              position: {
+                x: task.position.x + 50,
+                y: task.position.y + 50
+              },
+              connections: [], // Clear connections for duplicated items
+            });
+          }
+          setTimeout(() => {
+            refreshTasks();
+            fitView();
+          }, 1000);
+          break;
+        }
+        case 'applyFilters': {
+          setIsFilterModalOpen(true);
+          break;
+        }
         default: {
           break;
         }
       }
+    } catch (error) {
+      console.error('Error handling quick action:', error);
+      toast({
+        title: "Action failed",
+        description: "Failed to complete the requested action. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       onActionStateChange?.(false);
     }
-  }, [isActionInProgress, onActionStateChange, handleAddNode, tasks]);
+  }, [isActionInProgress, onActionStateChange, handleAddNode, tasks, nodes, edges, focusMode, setNodes, fitView, addTask, refreshTasks, setIsFilterModalOpen, toast]);
 
   const handleTemplateSelect = useCallback(async (templateName: string) => {
     if (isActionInProgress) return;
