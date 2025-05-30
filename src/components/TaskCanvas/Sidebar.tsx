@@ -362,7 +362,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           <div className="flex items-center gap-3 mb-4">
             <img src="/placeholder.svg" alt="Logo" className="w-8 h-8 rounded shadow-sm border border-gray-200 dark:border-gray-800 bg-white" />
             <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none">
-              TaskWeaver
+              Taskaty
             </h2>
             {!isMobile && (
               <div className="ml-auto">
