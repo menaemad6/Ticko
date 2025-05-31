@@ -1,3 +1,4 @@
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -94,7 +95,7 @@ If the input is unrelated to task management or too vague, respond with:
 
 Respond ONLY with valid JSON. Do not include any explanatory text outside the JSON.`;
 
-export type Task = {
+interface Task {
   id: string;
   title: string;
   description?: string;
@@ -102,20 +103,20 @@ export type Task = {
   priority?: string;
   status?: string;
   tags?: string[];
-};
+}
 
-export type TaskAction = {
-  action: string;
+interface TaskActionResponse {
+  action: 'create_task' | 'edit_task' | 'delete_task' | 'mark_complete' | 'mark_incomplete' | 'set_priority' | 'set_due_date' | 'list_tasks';
   id?: string;
   title?: string;
   description?: string;
   due_date?: string;
-  priority?: string;
-  status?: string;
+  priority?: 'low' | 'medium' | 'high';
+  status?: 'todo' | 'in-progress' | 'done';
   tags?: string[];
-};
+}
 
-export async function sendTaskActionsToGemini({ message, existingTasks }: { message: string, existingTasks?: Task[] }): Promise<TaskAction[] | { message: string; raw?: string }> {
+export async function sendTaskActionsToGemini({ message, existingTasks }: { message: string, existingTasks?: Task[] }): Promise<TaskActionResponse[] | { message: string; raw?: string }> {
   const baseUrl = import.meta.env.VITE_GEMINI_BASE_URL;
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
   if (!baseUrl || !apiKey) {
