@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -117,13 +116,13 @@ const FeatureSections = () => {
       <section className="animate-fade-in delay-200 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-blue-600/10 rounded-[60px] blur-3xl"></div>
         
-        <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[60px] p-20 bg-gradient-to-br from-gray-900/30 to-gray-800/20">
+        <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[32px] p-6 sm:p-10 md:p-20 bg-gradient-to-br from-gray-900/30 to-gray-800/20">
           <div className="text-center mb-20">
             <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-full mb-8 backdrop-blur-xl border border-green-500/20">
               <Award className="w-8 h-8 text-green-400 mr-3" />
               <span className="text-green-300 font-medium text-lg">Trusted Globally</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-bold mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-7xl font-bold mb-8">
               <span className="bg-gradient-to-r from-green-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
                 World-Class
               </span>
@@ -132,10 +131,10 @@ const FeatureSections = () => {
                 Performance
               </span>
             </h2>
-            <p className="text-gray-300 text-2xl max-w-4xl mx-auto">Numbers that speak louder than words</p>
+            <p className="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-4xl mx-auto">Numbers that speak louder than words</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
             {[
               { value: "99.99%", label: "Uptime SLA", icon: Award, color: "text-green-400", bg: "from-green-500/20 to-emerald-500/10" },
               { value: "10B+", label: "Operations/Day", icon: Database, color: "text-blue-400", bg: "from-blue-500/20 to-cyan-500/10" },
@@ -148,10 +147,10 @@ const FeatureSections = () => {
                 }}>
                   <metric.icon className={`w-12 h-12 ${metric.color} drop-shadow-lg`} />
                 </div>
-                <div className={`text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent`}>
+                <div className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent`}>
                   {metric.value}
                 </div>
-                <div className="text-gray-400 text-xl font-medium">{metric.label}</div>
+                <div className="text-gray-400 text-base sm:text-lg md:text-xl font-medium">{metric.label}</div>
               </div>
             ))}
           </div>
@@ -165,7 +164,7 @@ const FeatureSections = () => {
             <Rocket className="w-8 h-8 text-blue-400 mr-3" />
             <span className="text-blue-300 font-medium text-lg">Next-Gen Technology</span>
           </div>
-          <h2 className="text-6xl md:text-8xl font-bold mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-8xl font-bold mb-12">
             <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
               Revolutionary
             </span>
@@ -174,12 +173,12 @@ const FeatureSections = () => {
               Innovation
             </span>
           </h2>
-          <p className="text-2xl text-gray-300 max-w-5xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto">
             Technologies that redefine the boundaries of what's possible
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
           {[
             {
               title: "Quantum AI Processing",
@@ -201,19 +200,19 @@ const FeatureSections = () => {
             <div key={index} className="group relative">
               <div className={`absolute inset-0 bg-gradient-to-r ${innovation.bgGradient} rounded-[40px] blur-3xl opacity-0 group-hover:opacity-100 transition-all duration-1000`}></div>
               
-              <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[40px] p-16 h-full hover:border-purple-500/30 transition-all duration-700 bg-gradient-to-br from-gray-900/40 to-gray-800/20">
+              <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[24px] p-6 sm:p-10 md:p-16 h-full hover:border-purple-500/30 transition-all duration-700 bg-gradient-to-br from-gray-900/40 to-gray-800/20">
                 <div className={`w-32 h-32 bg-gradient-to-r ${innovation.gradient} rounded-3xl flex items-center justify-center mb-12 shadow-2xl border border-white/20`}>
                   <innovation.icon className="w-16 h-16 text-white drop-shadow-xl" />
                 </div>
                 
-                <h3 className="text-4xl font-bold mb-8 text-white">{innovation.title}</h3>
-                <p className="text-gray-300 text-xl mb-12 leading-relaxed">{innovation.description}</p>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 md:mb-8 text-white">{innovation.title}</h3>
+                <p className="text-gray-300 text-base sm:text-lg md:text-xl mb-8 md:mb-12 leading-relaxed">{innovation.description}</p>
                 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {innovation.features.map((feature, featureIndex) => (
                     <div key={featureIndex} className="flex items-center space-x-4 group-hover:translate-x-2 transition-all duration-500" style={{ transitionDelay: `${featureIndex * 100}ms` }}>
                       <div className={`w-4 h-4 bg-gradient-to-r ${innovation.gradient} rounded-full shadow-lg`}></div>
-                      <span className="text-gray-300 text-lg font-medium">{feature}</span>
+                      <span className="text-gray-300 text-sm sm:text-base md:text-lg font-medium">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -227,12 +226,12 @@ const FeatureSections = () => {
       <section className="animate-fade-in delay-400 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-600/5 via-purple-600/5 to-blue-600/5 rounded-[60px] blur-3xl"></div>
         
-        <div className="text-center mb-24 relative z-10">
+        <div className="text-center mb-16 sm:mb-20 md:mb-24 relative z-10">
           <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-full mb-8 backdrop-blur-xl border border-pink-500/20">
             <Trophy className="w-8 h-8 text-pink-400 mr-3" />
             <span className="text-pink-300 font-medium text-lg">Premium Excellence</span>
           </div>
-          <h2 className="text-6xl md:text-8xl font-bold mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-8xl font-bold mb-8 md:mb-12">
             <span className="bg-gradient-to-r from-pink-300 via-purple-300 to-blue-300 bg-clip-text text-transparent">
               Exclusive
             </span>
@@ -241,12 +240,12 @@ const FeatureSections = () => {
               Experience
             </span>
           </h2>
-          <p className="text-2xl text-gray-300 max-w-5xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto">
             Unlock features reserved for visionaries and industry leaders
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 relative z-10">
           {[
             {
               icon: Lock,
@@ -273,7 +272,7 @@ const FeatureSections = () => {
             <div key={index} className="group relative">
               <div className="absolute -inset-2 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-[32px] blur-sm opacity-20 group-hover:opacity-50 transition-all duration-700"></div>
               
-              <div className="relative backdrop-blur-2xl border border-gray-700/50 rounded-3xl p-12 h-full bg-gradient-to-br from-gray-900/60 to-gray-800/40 hover:from-gray-900/80 hover:to-gray-800/60 transition-all duration-700">
+              <div className="relative backdrop-blur-2xl border border-gray-700/50 rounded-2xl p-6 sm:p-8 md:p-12 h-full bg-gradient-to-br from-gray-900/60 to-gray-800/40 hover:from-gray-900/80 hover:to-gray-800/60 transition-all duration-700">
                 <div className="flex items-center justify-between mb-8">
                   <div className="w-20 h-20 bg-gradient-to-br from-purple-500/40 to-pink-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10">
                     <feature.icon className="w-10 h-10 text-purple-300" />
@@ -283,10 +282,10 @@ const FeatureSections = () => {
                   </span>
                 </div>
                 
-                <h3 className="text-3xl font-bold mb-6 text-white">{feature.title}</h3>
-                <p className="text-gray-300 text-lg leading-relaxed mb-8">{feature.description}</p>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-white">{feature.title}</h3>
+                <p className="text-gray-300 text-base sm:text-lg leading-relaxed mb-6 md:mb-8">{feature.description}</p>
                 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {feature.benefits.map((benefit, benefitIndex) => (
                     <div key={benefitIndex} className="flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-500" style={{ transitionDelay: `${benefitIndex * 100}ms` }}>
                       <Star className="w-4 h-4 text-purple-400" />
@@ -303,13 +302,13 @@ const FeatureSections = () => {
       {/* Enhanced Final CTA */}
       <section className="animate-fade-in delay-500 text-center relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-blue-600/20 rounded-[60px] blur-3xl"></div>
-        <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[60px] p-24 bg-gradient-to-br from-gray-900/40 to-gray-800/20">
+        <div className="relative backdrop-blur-2xl border border-gray-700/30 rounded-[24px] p-6 sm:p-12 md:p-24 bg-gradient-to-br from-gray-900/40 to-gray-800/20">
           <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full mb-12 backdrop-blur-xl border border-purple-500/20">
             <Rocket className="w-8 h-8 text-purple-400 mr-3" />
             <span className="text-purple-300 font-medium text-lg">Begin Your Journey</span>
           </div>
           
-          <h2 className="text-6xl md:text-8xl font-bold mb-12 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-8xl font-bold mb-8 md:mb-12 leading-tight">
             <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
               Transform
             </span>
@@ -318,31 +317,31 @@ const FeatureSections = () => {
               Everything
             </span>
           </h2>
-          <p className="text-2xl text-gray-300 mb-16 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-8 md:mb-16 max-w-4xl mx-auto leading-relaxed">
             Step into the future of performance management. Your transformation begins with a single click.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-12">
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-16 py-8 text-2xl rounded-full shadow-2xl shadow-purple-500/30 transition-all duration-500 hover:scale-105 hover:shadow-purple-500/50 border border-purple-400/30">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 justify-center items-center mb-8 md:mb-12">
+            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 sm:px-16 py-4 sm:py-8 text-lg sm:text-2xl rounded-full shadow-2xl shadow-purple-500/30 transition-all duration-500 hover:scale-105 hover:shadow-purple-500/50 border border-purple-400/30">
               Start Revolution
               <ArrowRight className="w-8 h-8 ml-4" />
             </Button>
-            <Button variant="outline" className="border-gray-500 text-gray-200 hover:bg-gray-800/50 px-16 py-8 text-2xl rounded-full backdrop-blur-sm hover:border-purple-500/50 transition-all duration-500 hover:scale-105">
+            <Button variant="outline" className="border-gray-500 text-gray-200 hover:bg-gray-800/50 px-8 sm:px-16 py-4 sm:py-8 text-lg sm:text-2xl rounded-full backdrop-blur-sm hover:border-purple-500/50 transition-all duration-500 hover:scale-105">
               Explore Features
             </Button>
           </div>
           
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto opacity-60">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto opacity-60">
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400">5min</div>
+              <div className="text-2xl sm:text-3xl font-bold text-purple-400">5min</div>
               <div className="text-gray-400">Setup Time</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-pink-400">Zero</div>
+              <div className="text-2xl sm:text-3xl font-bold text-pink-400">Zero</div>
               <div className="text-gray-400">Coding Required</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">∞</div>
+              <div className="text-2xl sm:text-3xl font-bold text-blue-400">∞</div>
               <div className="text-gray-400">Possibilities</div>
             </div>
           </div>

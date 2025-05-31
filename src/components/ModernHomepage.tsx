@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +6,7 @@ import { Link } from 'react-router-dom';
 import EnhancedNavbar from './EnhancedNavbar';
 import FloatingElements from './FloatingElements';
 import FeatureSections from './FeatureSections';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 const ModernHomepage = () => {
   return (
@@ -68,19 +68,39 @@ const ModernHomepage = () => {
         </div>
 
         {/* Enhanced Tags with animations */}
-        <div className="flex justify-center gap-3 mt-12 animate-fade-in delay-800">
-          <span className="bg-gray-800/50 border border-gray-700 px-4 py-2 rounded-full text-sm text-gray-300 backdrop-blur-sm hover:scale-105 transition-all duration-300 hover:bg-gray-700/50">
-            🏗️ Pre-built
-          </span>
-          <span className="bg-gray-800/50 border border-gray-700 px-4 py-2 rounded-full text-sm text-gray-300 backdrop-blur-sm hover:scale-105 transition-all duration-300 hover:bg-gray-700/50">
-            ⚡ Run
-          </span>
-          <span className="bg-purple-500/20 border border-purple-500/30 px-4 py-2 rounded-full text-sm text-purple-300 backdrop-blur-sm hover:scale-105 transition-all duration-300 hover:bg-purple-500/30 shadow-lg shadow-purple-500/20">
-            Data-Driven (D2)
-          </span>
-          <span className="bg-gray-800/50 border border-gray-700 px-4 py-2 rounded-full text-sm text-gray-300 backdrop-blur-sm hover:scale-105 transition-all duration-300 hover:bg-gray-700/50">
-            Dashboard
-          </span>
+        <div className="flex justify-center mt-12 animate-fade-in delay-800">
+          <div className="w-full max-w-xl px-2 sm:px-0">
+            <div className="rounded-3xl bg-white/10 border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-md w-full">
+              <Tabs defaultValue="prebuilt" className="w-full">
+                <TabsList className="w-full flex rounded-2xl bg-white/5 border border-white/10 p-1 mb-4 gap-2">
+                  <TabsTrigger value="prebuilt" className="flex-1 rounded-xl text-base font-semibold text-white py-3 px-2 sm:py-4 sm:px-0 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:via-pink-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Pre-built</TabsTrigger>
+                  <TabsTrigger value="run" className="flex-1 rounded-xl text-base font-semibold text-white py-3 px-2 sm:py-4 sm:px-0 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-cyan-400 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Run</TabsTrigger>
+                  <TabsTrigger value="d2" className="flex-1 rounded-xl text-base font-semibold text-white py-3 px-2 sm:py-4 sm:px-0 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-700 data-[state=active]:via-pink-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Data (D2)</TabsTrigger>
+                  <TabsTrigger value="dashboard" className="flex-1 rounded-xl text-base font-semibold text-white py-3 px-2 sm:py-4 sm:px-0 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-800 data-[state=active]:via-gray-700 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Dashboard</TabsTrigger>
+                </TabsList>
+                <TabsContent value="prebuilt">
+                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
+                    <strong>Pre-built:</strong> Ready-to-use modules and templates to accelerate your workflow and reduce setup time.
+                  </div>
+                </TabsContent>
+                <TabsContent value="run">
+                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
+                    <strong>Run:</strong> Lightning-fast execution and seamless integration for instant productivity.
+                  </div>
+                </TabsContent>
+                <TabsContent value="d2">
+                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
+                    <strong>Data-Driven (D2):</strong> Make smarter decisions with analytics and insights powered by real-time data.
+                  </div>
+                </TabsContent>
+                <TabsContent value="dashboard">
+                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
+                    <strong>Dashboard:</strong> Visualize, track, and manage everything in one simple, unified interface.
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
         </div>
 
         {/* Enhanced Dashboard Preview */}

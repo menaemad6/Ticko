@@ -25,14 +25,6 @@ const EnhancedNavbar = () => {
           <span>Home</span>
         </Button>
         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
-          <CreditCard className="w-4 h-4" />
-          <span>Payment</span>
-        </Button>
-        <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
-          <BarChart3 className="w-4 h-4" />
-          <span>Analytics</span>
-        </Button>
-        <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
           <GraduationCap className="w-4 h-4" />
           <span>Education</span>
         </Button>
@@ -40,17 +32,11 @@ const EnhancedNavbar = () => {
 
       {/* Right section */}
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white transition-all duration-300">
-          <Moon className="w-4 h-4" />
-        </Button>
+
         
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-600 rounded-full flex items-center justify-center shadow-lg">
             <User className="w-4 h-4 text-gray-300" />
-          </div>
-          <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-400">+Pro</span>
-            <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">0</Badge>
           </div>
         </div>
         
