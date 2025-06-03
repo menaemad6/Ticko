@@ -96,7 +96,6 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
   const handleSave = () => {
     try {
       localStorage.setItem('taskCanvasPreferences', JSON.stringify(preferences));
-      onPreferencesChange?.(preferences);
       toast({
         title: "Preferences saved",
         description: "Your canvas preferences have been saved successfully.",
