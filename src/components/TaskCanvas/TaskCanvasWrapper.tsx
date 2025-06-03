@@ -6,6 +6,7 @@ import { TaskSidebar } from './Sidebar';
 import TaskCanvasFlow from './TaskCanvasFlow';
 
 export default function TaskCanvasWrapper() {
+  const [isActionInProgress, setIsActionInProgress] = React.useState(false);
   const [quickActionHandler, setQuickActionHandler] = React.useState<((action: string) => void) | null>(null);
   const [templateHandler, setTemplateHandler] = React.useState<((templateName: string) => void) | null>(null);
 
@@ -23,6 +24,7 @@ export default function TaskCanvasWrapper() {
         <TaskSidebar 
           onQuickAction={quickActionHandler || undefined}
           onTemplateSelect={templateHandler || undefined}
+          isActionInProgress={isActionInProgress}
         />
         <SidebarInset className="flex-1">
           <ReactFlowProvider>
