@@ -183,7 +183,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                         Choose a template to quickly create a set of tasks.
                       </SheetDescription>
                     </SheetHeader>
-                    <TaskTemplatesModal onTemplateSelect={handleTemplateSelect} />
+                    <TaskTemplatesModal />
                   </SheetContent>
                 </Sheet>
               </SidebarMenuItem>
