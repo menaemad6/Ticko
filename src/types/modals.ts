@@ -1,5 +1,7 @@
 
 export interface TaskTemplatesModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
   onTemplateSelect?: (templateName: string) => void;
 }
 

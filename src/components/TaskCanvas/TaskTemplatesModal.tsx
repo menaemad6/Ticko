@@ -20,11 +20,7 @@ import {
 } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
-
-interface TaskTemplatesModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { TaskTemplatesModalProps } from '@/types/modals';
 
 interface TaskTemplate {
   id: string;
@@ -44,8 +40,9 @@ interface TaskTemplate {
 }
 
 export const TaskTemplatesModal: React.FC<TaskTemplatesModalProps> = ({ 
-  isOpen, 
-  onClose 
+  isOpen = false, 
+  onClose = () => {},
+  onTemplateSelect
 }) => {
   const { addTask } = useTasks();
   const [isCreating, setIsCreating] = useState(false);
@@ -386,6 +383,11 @@ export const TaskTemplatesModal: React.FC<TaskTemplatesModalProps> = ({
         createdCount++;
       }
       
+      // Call the onTemplateSelect callback if provided
+      if (onTemplateSelect) {
+        onTemplateSelect(template.name);
+      }
+      
       toast.success(`Created ${createdCount} tasks from ${template.name} template`);
       onClose();
     } catch (error) {
@@ -395,6 +397,63 @@ export const TaskTemplatesModal: React.FC<TaskTemplatesModalProps> = ({
       setIsCreating(false);
     }
   };
+
+  // If used within a Sheet, don't render the Dialog wrapper
+  if (!isOpen && onClose === (() => {})) {
+    return (
+      <div className="mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {templates.map((template) => (
+            <Card key={template.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gray-100">
+                    {template.icon}
+                  </div>
+                  <div>
+                    <div className="font-semibold">{template.name}</div>
+                    <Badge variant="secondary" className={template.color}>
+                      {template.tasks.length} tasks
+                    </Badge>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">{template.description}</p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="text-xs font-medium text-gray-500">Includes:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {template.tasks.slice(0, 3).map((task, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {task.nodeType === 'task' && <CheckSquare className="w-3 h-3 mr-1" />}
+                        {task.nodeType === 'milestone' && <Milestone className="w-3 h-3 mr-1" />}
+                        {task.nodeType === 'note' && <StickyNote className="w-3 h-3 mr-1" />}
+                        {task.title}
+                      </Badge>
+                    ))}
+                    {template.tasks.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{template.tasks.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => handleTemplateSelect(template)}
+                  className="w-full"
+                  disabled={isCreating}
+                >
+                  {isCreating ? 'Creating...' : 'Use Template'}
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
