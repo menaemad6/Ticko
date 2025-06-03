@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { introJs } from 'intro.js';
+import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 
 export const useCanvasDemo = () => {
