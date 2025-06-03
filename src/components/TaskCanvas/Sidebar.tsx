@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Sidebar,
@@ -33,7 +34,7 @@ import {
 } from "@/components/ui/sheet"
 import { TaskTemplatesModal } from './TaskTemplatesModal';
 import { ProjectAnalyticsModal } from './ProjectAnalyticsModal';
-import { CanvasPreferencesModal } from './PreferencesModal';
+import { PreferencesModal } from './PreferencesModal';
 import { Button } from '@/components/ui/button';
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
@@ -211,7 +212,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                   Customize the canvas to your liking.
                 </SheetDescription>
               </SheetHeader>
-              <CanvasPreferencesModal />
+              <PreferencesModal />
             </SheetContent>
           </Sheet>
         </SidebarItemGroup>
