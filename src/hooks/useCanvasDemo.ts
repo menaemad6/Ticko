@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import introJs from 'intro.js';
+import { introJs } from 'intro.js';
 import 'intro.js/introjs.css';
 
 export const useCanvasDemo = () => {
@@ -34,7 +34,7 @@ export const useCanvasDemo = () => {
         {
           title: 'Welcome to TaskCanvas! 🎉',
           intro: 'Let me show you around this powerful task management canvas. You can create, organize, and connect your tasks visually.',
-          position: 'bottom'
+          position: 'center'
         },
         {
           element: '[data-demo="sidebar"]',
@@ -64,12 +64,12 @@ export const useCanvasDemo = () => {
           element: '.react-flow',
           title: 'The Canvas',
           intro: 'This is your main workspace. Drag to pan around, scroll to zoom, and click on empty space to deselect items.',
-          position: 'top'
+          position: 'center'
         },
         {
           title: 'Get Started! 🚀',
           intro: 'You\'re all set! Try adding your first task or explore the templates to get started quickly.',
-          position: 'bottom'
+          position: 'center'
         }
       ],
       showProgress: true,

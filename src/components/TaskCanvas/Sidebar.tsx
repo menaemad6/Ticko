@@ -6,12 +6,8 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
+  SidebarItem,
+  SidebarItemGroup,
 } from '@/components/ui/sidebar';
 import { 
   LayoutDashboard, 
@@ -69,73 +65,73 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onAction, isActionInProgres
   };
 
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('addTask')} 
-              disabled={isActionInProgress}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Task</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('arrangeInLayers')} 
-              disabled={isActionInProgress}
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              <span>Arrange in Layers</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('applyFilters')} 
-              disabled={isActionInProgress}
-            >
-              <Filter className="h-4 w-4" />
-              <span>Apply Filters</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <li className="my-2">
-            <Separator className="dark:bg-gray-800" />
-          </li>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('exportCanvas')} 
-              disabled={isActionInProgress}
-            >
-              <FileJson2 className="h-4 w-4" />
-              <span>Export Canvas</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('importCanvas')} 
-              disabled={isActionInProgress}
-            >
-              <FileJson2 className="h-4 w-4" />
-              <span>Import Canvas</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              onClick={() => handleAction('duplicateCanvas')} 
-              disabled={isActionInProgress}
-            >
-              <CopyCheck className="h-4 w-4" />
-              <span>Duplicate Canvas</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <li className="my-2">
-            <Separator className="dark:bg-gray-800" />
-          </li>
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+    <SidebarItemGroup label="Quick Actions">
+      <SidebarItem 
+        onClick={() => handleAction('addTask')} 
+        icon={Plus}
+        disabled={isActionInProgress}
+      >
+        Add Task
+      </SidebarItem>
+      <SidebarItem 
+        onClick={() => handleAction('arrangeInLayers')} 
+        icon={LayoutDashboard}
+        disabled={isActionInProgress}
+      >
+        Arrange in Layers
+      </SidebarItem>
+      {/* <SidebarItem 
+        onClick={() => handleAction('scheduleView')} 
+        icon={ListChecks}
+        disabled={isActionInProgress}
+      >
+        Schedule View
+      </SidebarItem> */}
+      <SidebarItem 
+        onClick={() => handleAction('applyFilters')} 
+        icon={Filter}
+        disabled={isActionInProgress}
+      >
+        Apply Filters
+      </SidebarItem>
+      <Separator className="my-2 dark:bg-gray-800" />
+      <SidebarItem 
+        onClick={() => handleAction('exportCanvas')} 
+        icon={FileJson2}
+        disabled={isActionInProgress}
+      >
+        Export Canvas
+      </SidebarItem>
+      <SidebarItem 
+        onClick={() => handleAction('importCanvas')} 
+        icon={FileJson2}
+        disabled={isActionInProgress}
+      >
+        Import Canvas
+      </SidebarItem>
+      <SidebarItem 
+        onClick={() => handleAction('duplicateCanvas')} 
+        icon={CopyCheck}
+        disabled={isActionInProgress}
+      >
+        Duplicate Canvas
+      </SidebarItem>
+      {/* <SidebarItem 
+        onClick={() => handleAction('exportAsImage')} 
+        icon={Image}
+        disabled={isActionInProgress}
+      >
+        Export as Image
+      </SidebarItem> */}
+      <Separator className="my-2 dark:bg-gray-800" />
+      {/* <SidebarItem 
+        onClick={() => handleAction('toggleFocusMode')} 
+        icon={Lightbulb}
+        disabled={isActionInProgress}
+      >
+        Toggle Focus Mode
+      </SidebarItem> */}
+    </SidebarItemGroup>
   );
 };
 
@@ -164,70 +160,70 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           />
         </div>
         
-        <SidebarGroup>
-          <SidebarGroupLabel>Templates</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <SidebarMenuButton>
-                      <Rocket className="h-4 w-4" />
-                      <span>Task Templates</span>
-                    </SidebarMenuButton>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-full sm:max-w-[420px]">
-                    <SheetHeader>
-                      <SheetTitle>Task Templates</SheetTitle>
-                      <SheetDescription>
-                        Choose a template to quickly create a set of tasks.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <TaskTemplatesModal />
-                  </SheetContent>
-                </Sheet>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarItemGroup label="Templates">
+          <Sheet>
+            <SheetTrigger asChild>
+              <SidebarItem icon={Rocket}>
+                Task Templates
+              </SidebarItem>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:max-w-[420px]">
+              <SheetHeader>
+                <SheetTitle>Task Templates</SheetTitle>
+                <SheetDescription>
+                  Choose a template to quickly create a set of tasks.
+                </SheetDescription>
+              </SheetHeader>
+              <TaskTemplatesModal onTemplateSelect={handleTemplateSelect} />
+            </SheetContent>
+          </Sheet>
+        </SidebarItemGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <SidebarMenuButton>
-                      <Settings className="h-4 w-4" />
-                      <span>Canvas Preferences</span>
-                    </SidebarMenuButton>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-full sm:max-w-[420px]">
-                    <SheetHeader>
-                      <SheetTitle>Canvas Preferences</SheetTitle>
-                      <SheetDescription>
-                        Customize the canvas to your liking.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <PreferencesModal />
-                  </SheetContent>
-                </Sheet>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* <SidebarItemGroup label="Analytics">
+          <Sheet>
+            <SheetTrigger asChild>
+              <SidebarItem icon={BarChart3}>
+                Project Analytics
+              </SidebarItem>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:max-w-[420px]">
+              <SheetHeader>
+                <SheetTitle>Project Analytics</SheetTitle>
+                <SheetDescription>
+                  View analytics for your project.
+                </SheetDescription>
+              </SheetHeader>
+              <ProjectAnalyticsModal />
+            </SheetContent>
+          </Sheet>
+        </SidebarItemGroup> */}
+
+        <SidebarItemGroup label="Settings">
+          <Sheet>
+            <SheetTrigger asChild>
+              <SidebarItem icon={Settings}>
+                Canvas Preferences
+              </SidebarItem>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:max-w-[420px]">
+              <SheetHeader>
+                <SheetTitle>Canvas Preferences</SheetTitle>
+                <SheetDescription>
+                  Customize the canvas to your liking.
+                </SheetDescription>
+              </SheetHeader>
+              <PreferencesModal />
+            </SheetContent>
+          </Sheet>
+        </SidebarItemGroup>
       </SidebarContent>
       
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <HelpCircle className="h-4 w-4" />
-              <span>Help</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <SidebarRail>
+          <SidebarItem icon={HelpCircle}>
+            Help
+          </SidebarItem>
+        </SidebarRail>
       </SidebarFooter>
     </Sidebar>
   );
