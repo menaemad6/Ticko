@@ -33,8 +33,7 @@ export const useCanvasDemo = () => {
       steps: [
         {
           title: 'Welcome to TaskCanvas! 🎉',
-          intro: 'Let me show you around this powerful task management canvas. You can create, organize, and connect your tasks visually.',
-          position: 'center'
+          intro: 'Let me show you around this powerful task management canvas. You can create, organize, and connect your tasks visually.'
         },
         {
           element: '[data-demo="sidebar"]',
@@ -63,13 +62,11 @@ export const useCanvasDemo = () => {
         {
           element: '.react-flow',
           title: 'The Canvas',
-          intro: 'This is your main workspace. Drag to pan around, scroll to zoom, and click on empty space to deselect items.',
-          position: 'center'
+          intro: 'This is your main workspace. Drag to pan around, scroll to zoom, and click on empty space to deselect items.'
         },
         {
           title: 'Get Started! 🚀',
-          intro: 'You\'re all set! Try adding your first task or explore the templates to get started quickly.',
-          position: 'center'
+          intro: 'You\'re all set! Try adding your first task or explore the templates to get started quickly.'
         }
       ],
       showProgress: true,
