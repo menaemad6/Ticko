@@ -18,13 +18,12 @@ const CustomControls: React.FC<CustomControlsProps> = ({
   onAddNode
 }) => {
   return (
-    <Panel position="top-right" className="flex gap-2" data-demo="canvas-controls">
+    <Panel position="top-right" className="flex gap-2">
       <Button
         variant="outline"
         size="icon"
         onClick={onAddNode}
         className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80"
-        data-demo="add-task-btn"
       >
         <Plus className="h-4 w-4" />
       </Button>
