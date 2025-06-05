@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Task } from '@/types/task';
-import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User, CheckSquare } from 'lucide-react';
+import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User, CheckSquare, Bot, Sparkles } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,9 +15,10 @@ interface NodeDetailProps {
   onClose: () => void;
   task: Task | null;
   onEdit?: (task: Task) => void;
+  onGetAIHelp?: (task: Task) => void;
 }
 
-export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetailProps) {
+export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp }: NodeDetailProps) {
   const { deleteTask, updateTask } = useTasks();
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
@@ -30,6 +31,11 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
 
   const handleEdit = () => {
     onEdit?.(task);
+    onClose();
+  };
+
+  const handleAIHelp = () => {
+    onGetAIHelp?.(task);
     onClose();
   };
 
@@ -82,7 +88,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Map status to icon
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'done':
@@ -94,7 +99,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Map status to modal background color
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'done':
@@ -106,9 +110,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Inline status update with proper typing
   const handleStatusChange = async (value: string) => {
-    // Type guard to ensure value is a valid status
     if (value === 'todo' || value === 'in-progress' || value === 'done') {
       if (value !== localTask.status) {
         setLocalTask({ ...localTask, status: value });
@@ -117,9 +119,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Inline priority update with proper typing
   const handlePriorityChange = async (value: string) => {
-    // Type guard to ensure value is a valid priority
     if (value === 'low' || value === 'medium' || value === 'high') {
       if (value !== localTask.priority) {
         setLocalTask({ ...localTask, priority: value });
@@ -128,7 +128,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
     }
   };
 
-  // Inline description update
   const handleDescriptionSave = async () => {
     if (descValue !== localTask.description) {
       setLocalTask({ ...localTask, description: descValue });
@@ -151,7 +150,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                   {task.title}
                 </DialogTitle>
                 <div className="flex flex-wrap items-center gap-2">
-                  {/* Status Select */}
                   <Select value={localTask.status} onValueChange={handleStatusChange}>
                     <SelectTrigger className={`w-[100px] sm:w-[120px] ${getStatusColor(localTask.status)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-blue-400`}>
                       <SelectValue />
@@ -162,7 +160,6 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
                       <SelectItem value="done">Done</SelectItem>
                     </SelectContent>
                   </Select>
-                  {/* Priority Select */}
                   <Select value={localTask.priority} onValueChange={handlePriorityChange}>
                     <SelectTrigger className={`w-[100px] sm:w-[120px] ${getPriorityColor(localTask.priority)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-red-400`}>
                       <SelectValue />
@@ -204,6 +201,28 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit }: NodeDetail
         </DialogHeader>
 
         <div className="space-y-6 px-2 pb-4 sm:px-6 sm:pb-6">
+          {/* AI Help Section - Core Feature */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-4 border-2 border-purple-200 dark:border-purple-700 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full p-2">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-gray-900 dark:text-white">Get AI Help</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Let AI assist you with this task</p>
+                </div>
+              </div>
+              <Button
+                onClick={handleAIHelp}
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                <Bot className="w-5 h-5 mr-2" />
+                Ask AI
+              </Button>
+            </div>
+          </div>
+
           {/* Description Section */}
           <div className="bg-white/70 dark:bg-gray-800/70 rounded-xl p-3 sm:p-4 shadow border border-gray-100 dark:border-gray-800 relative">
             <h4 className="text-base font-semibold mb-2 text-gray-800 dark:text-gray-200 tracking-tight flex items-center justify-between">

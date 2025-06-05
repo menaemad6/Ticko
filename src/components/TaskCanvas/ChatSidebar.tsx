@@ -17,6 +17,15 @@ import { cn } from '@/lib/utils';
 import { useState as useReactState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
+interface ChatSidebarProps {
+  forceOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  registerMethods?: (methods: {
+    openChat: () => void;
+    sendMessage: (message: string) => void;
+  }) => void;
+}
+
 function isArabic(text: string) {
   // Simple check for Arabic Unicode range
   return /[\u0600-\u06FF]/.test(text);
@@ -59,7 +68,7 @@ function CodeWithCopy({ className, children, ...props }: React.HTMLAttributes<HT
   );
 }
 
-export default function ChatSidebar() {
+export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }: ChatSidebarProps) {
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -92,6 +101,34 @@ export default function ChatSidebar() {
 
   // Track if chats have been fetched from Supabase
   const [chatsFetched, setChatsFetched] = useState(false);
+
+  // Handle forced opening from parent
+  useEffect(() => {
+    if (forceOpen !== undefined) {
+      setOpen(forceOpen);
+    }
+  }, [forceOpen]);
+
+  // Notify parent of open state changes
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
+
+  // Register methods with parent component
+  useEffect(() => {
+    if (registerMethods) {
+      registerMethods({
+        openChat: () => setOpen(true),
+        sendMessage: (message: string) => {
+          setInput(message);
+          // Trigger send immediately
+          setTimeout(() => {
+            handleSend();
+          }, 100);
+        }
+      });
+    }
+  }, [registerMethods]);
 
   // On sidebar open, fetch chats and track when fetch completes
   useEffect(() => {
