@@ -1,19 +1,14 @@
-
 import React, { useState, useCallback } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { TaskSidebar } from './Sidebar';
 import TaskCanvasFlow from './TaskCanvasFlow';
 import ChatSidebar from './ChatSidebar';
-import { useCanvasDemo } from '@/hooks/useCanvasDemo';
 
 export default function TaskCanvas() {
   const [isActionInProgress, setIsActionInProgress] = useState(false);
   const [quickActionHandler, setQuickActionHandler] = useState<((action: string) => void) | null>(null);
   const [templateHandler, setTemplateHandler] = useState<((templateName: string) => void) | null>(null);
-  
-  // Initialize demo functionality
-  useCanvasDemo();
 
   const registerQuickActionHandler = useCallback((handler: (action: string) => void) => {
     setQuickActionHandler(() => handler);
@@ -38,13 +33,11 @@ export default function TaskCanvas() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <div data-demo="sidebar">
-          <TaskSidebar 
-            onQuickAction={handleQuickAction}
-            onTemplateSelect={handleTemplateSelect}
-            isActionInProgress={isActionInProgress}
-          />
-        </div>
+        <TaskSidebar 
+          onQuickAction={handleQuickAction}
+          onTemplateSelect={handleTemplateSelect}
+          isActionInProgress={isActionInProgress}
+        />
         <SidebarInset className="flex-1">
           <ReactFlowProvider>
             <TaskCanvasFlow 
