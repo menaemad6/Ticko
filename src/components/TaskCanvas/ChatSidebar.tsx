@@ -16,6 +16,7 @@ import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { useState as useReactState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 interface ChatSidebarProps {
   forceOpen?: boolean;
@@ -75,6 +76,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   const [sending, setSending] = useState(false);
   const [newChatTitle, setNewChatTitle] = useState('');
   const [actionMode, setActionMode] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
@@ -120,11 +122,9 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
       registerMethods({
         openChat: () => setOpen(true),
         sendMessage: (message: string) => {
-          setInput(message);
-          // Trigger send immediately
-          setTimeout(() => {
-            handleSend();
-          }, 100);
+          // Store the message to be sent automatically
+          setPendingMessage(message);
+          setOpen(true);
         }
       });
     }
@@ -172,6 +172,18 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
     // eslint-disable-next-line
   }, [selectedChatId]);
 
+  // Auto-send pending message when chat is ready
+  useEffect(() => {
+    if (pendingMessage && selectedChatId && !sending && !loading) {
+      setInput(pendingMessage);
+      setPendingMessage(null);
+      // Send the message automatically
+      setTimeout(() => {
+        handleSendMessage(pendingMessage);
+      }, 100);
+    }
+  }, [pendingMessage, selectedChatId, sending, loading]);
+
   // Scroll to bottom when messages change or chat is opened
   useEffect(() => {
     if (endOfMessagesRef.current) {
@@ -180,19 +192,20 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   }, [messages, sending, selectedChatId]);
 
   // Handle sending a message
-  const handleSend = async () => {
-    if (!input.trim() || sending || !selectedChatId) return;
+  const handleSendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input.trim();
+    if (!textToSend || sending || !selectedChatId) return;
+    
     setSending(true);
     
     // Save user message to Supabase and update UI only with the result
-    const userMsg = await sendMessage(selectedChatId, 'user', input);
-    const userInput = input;
+    const userMsg = await sendMessage(selectedChatId, 'user', textToSend);
     setInput('');
     
     try {
       if (actionMode) {
         // Process as task action
-        const result = await processTaskActions(userInput);
+        const result = await processTaskActions(textToSend);
         
         if (result.success) {
           await sendMessage(selectedChatId, 'ai', `✅ ${result.message}`);
@@ -205,7 +218,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         const currentChat = chats.find(chat => chat.id === selectedChatId);
         if (currentChat && currentChat.title === 'New Chat' && userMsg) {
           // Prompt Gemini for a chat title
-          const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${userInput}". Return ONLY the name, no other words or explanation.`;
+          const titlePrompt = `Suggest a short, descriptive chat title for this conversation. The first message is: "${textToSend}". Return ONLY the name, no other words or explanation.`;
           const aiTitle = await sendMessageToGemini(titlePrompt);
           // Update chat title in Supabase
           await supabase.from('chats').update({ title: aiTitle }).eq('id', selectedChatId);
@@ -214,7 +227,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         }
         
         // Get AI response
-        const aiText = await sendMessageToGemini(userInput);
+        const aiText = await sendMessageToGemini(textToSend);
         // Save AI message to Supabase and update UI only with the result
         await sendMessage(selectedChatId, 'ai', aiText);
       }
@@ -225,6 +238,8 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
     
     setSending(false);
   };
+
+  const handleSend = () => handleSendMessage();
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -275,230 +290,245 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   }
 
   return (
-    <div className="fixed top-0 right-0 h-full w-[90vw] max-w-md z-40 flex flex-col shadow-2xl" style={{ pointerEvents: 'auto' }}>
-      {/* Glassmorphism background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-purple-100/60 dark:from-gray-900/80 dark:via-gray-950/80 dark:to-purple-950/60 backdrop-blur-2xl rounded-l-3xl border-l border-white/20" />
-      {/* Sidebar Content */}
-      <div className="relative flex flex-col h-full w-full">
-        {/* Header */}
-        <div className="p-6 border-b border-white/20 flex items-center gap-4 relative z-10">
-          <Avatar className="w-12 h-12 shadow-lg ring-2 ring-primary/30">
-            <AvatarImage src="/ai-avatar.png" alt="AI" />
-            <AvatarFallback>AI</AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
-            <div className="text-xs text-muted-foreground">
-              {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 ml-auto">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
-                  title="Open chat history"
-                  aria-label="Open chat history"
-                  onClick={() => setModalOpen(true)}
-                >
-                  <History className="w-6 h-6" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Open chat history</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="icon"
-                  className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
-                  title="Close chat sidebar"
-                  aria-label="Close chat sidebar"
-                  onClick={() => setOpen(false)}
-                >
-                  <X className="w-6 h-6" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Close chat sidebar</TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-
-        {/* Action Mode Toggle */}
-        <div className="px-6 py-3 border-b border-white/20 bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm">
-          <div className="flex items-center space-x-3">
-            <Zap className={cn("w-5 h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
-            <Label htmlFor="action-mode" className="text-sm font-medium cursor-pointer flex-1">
-              Action Mode
-            </Label>
-            <Switch
-              id="action-mode"
-              checked={actionMode}
-              onCheckedChange={setActionMode}
-              className="data-[state=checked]:bg-yellow-500"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground mt-1 ml-8">
-            {actionMode 
-              ? "AI will perform task actions directly" 
-              : "Regular conversation mode"
-            }
-          </p>
-        </div>
-
-        <Separator className="opacity-30" />
-        
-        {/* Messages */}
-        <ScrollArea className="flex-1 p-6 space-y-6 z-10">
-          <div ref={scrollRef} className="space-y-6">
-            {messages.map((msg) => {
-              const isMsgArabic = isArabic(msg.content);
-              return (
-                <div key={msg.id} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  {msg.role === 'ai' && (
-                    <Avatar className="w-9 h-9 shadow-md">
-                      <AvatarImage src="/ai-avatar.png" alt="AI" />
-                      <AvatarFallback>AI</AvatarFallback>
-                    </Avatar>
-                  )}
-                  <Card
-                    className={cn(
-                      'px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium',
-                      'overflow-x-auto',
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground rounded-br-3xl rounded-tl-3xl rounded-bl-3xl'
-                        : 'bg-white/80 dark:bg-gray-900/80 text-foreground rounded-bl-3xl rounded-tr-3xl rounded-br-3xl'
-                    )}
-                    style={{ backdropFilter: 'blur(2px)', maxWidth: '70vw' }}
-                  >
-                    <div
-                      className={cn(
-                        'markdown-content w-full max-w-full overflow-x-auto',
-                        isMsgArabic && 'font-arabic'
-                      )}
-                      dir={isMsgArabic ? 'rtl' : 'ltr'}
-                      style={{ maxWidth: '100%' }}
-                    >
-                      <ReactMarkdown
-                        components={{
-                          p: ({ node, ...props }) => (
-                            <p
-                              className={cn(
-                                'whitespace-pre-wrap break-words mb-4 last:mb-0',
-                                isMsgArabic && 'text-right'
-                              )}
-                              dir={isMsgArabic ? 'rtl' : 'ltr'}
-                              {...props}
-                            />
-                          ),
-                          strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                          table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-4"><table className="w-full border-collapse" {...props} /></div>,
-                          thead: ({ node, ...props }) => <thead className="bg-primary/5" {...props} />,
-                          tbody: ({ node, ...props }) => <tbody {...props} />,
-                          tr: ({ node, ...props }) => <tr className="border-b border-gray-200 dark:border-gray-700" {...props} />,
-                          th: ({ node, ...props }) => <th className="py-2 px-4 text-left font-medium" {...props} />,
-                          td: ({ node, ...props }) => <td className="py-2 px-4" {...props} />,
-                          ul: ({ node, ...props }) => (
-                            <ul
-                              className={cn(
-                                'mb-4',
-                                isMsgArabic ? 'pr-6' : 'pl-6',
-                                isMsgArabic ? 'list-disc-rtl' : 'list-disc'
-                              )}
-                              {...props}
-                            />
-                          ),
-                          ol: ({ node, ...props }) => (
-                            <ol
-                              className={cn(
-                                'mb-4',
-                                isMsgArabic ? 'pr-6' : 'pl-6',
-                                isMsgArabic ? 'list-decimal-rtl' : 'list-decimal'
-                              )}
-                              {...props}
-                            />
-                          ),
-                          li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                          a: ({ node, href, ...props }) => <a href={href} className="text-primary underline" target="_blank" rel="noopener noreferrer" {...props} />,
-                          blockquote: ({ node, ...props }) => (
-                            <blockquote
-                              className={cn(
-                                'py-1 my-4 italic',
-                                isMsgArabic
-                                  ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-4'
-                                  : 'border-l-4 border-gray-300 dark:border-gray-600 pl-4'
-                              )}
-                              {...props}
-                            />
-                          ),
-                          code: CodeWithCopy,
-                          h1: ({ node, ...props }) => <h1 className={cn('text-2xl font-bold my-4', isMsgArabic && 'text-right')} {...props} />,
-                          h2: ({ node, ...props }) => <h2 className={cn('text-xl font-bold my-3', isMsgArabic && 'text-right')} {...props} />,
-                          h3: ({ node, ...props }) => <h3 className={cn('text-lg font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
-                          h4: ({ node, ...props }) => <h4 className={cn('text-base font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
-                          img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-4" {...props} />
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    </div>
-                  </Card>
-                  {msg.role === 'user' && (
-                    <Avatar className="w-9 h-9 shadow-md">
-                      <AvatarImage src="/user-avatar.png" alt="You" />
-                      <AvatarFallback>U</AvatarFallback>
-                    </Avatar>
-                  )}
-                </div>
-              );
-            })}
-            {(loading || sending) && (
-              <div className="flex items-end gap-3 justify-start">
-                <Avatar className="w-9 h-9 shadow-md">
+    <div className="fixed top-0 right-0 h-full z-40 flex" style={{ pointerEvents: 'auto' }}>
+      <ResizablePanelGroup direction="horizontal" className="w-full">
+        <ResizablePanel 
+          defaultSize={100} 
+          minSize={30} 
+          maxSize={80}
+          className="min-w-[300px] max-w-[800px]"
+        >
+          <div className="h-full w-full flex flex-col shadow-2xl">
+            {/* Glassmorphism background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-purple-100/60 dark:from-gray-900/80 dark:via-gray-950/80 dark:to-purple-950/60 backdrop-blur-2xl rounded-l-3xl border-l border-white/20" />
+            
+            {/* Sidebar Content */}
+            <div className="relative flex flex-col h-full w-full">
+              {/* Header */}
+              <div className="p-6 border-b border-white/20 flex items-center gap-4 relative z-10">
+                <Avatar className="w-12 h-12 shadow-lg ring-2 ring-primary/30">
                   <AvatarImage src="/ai-avatar.png" alt="AI" />
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
-                <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-white/80 dark:bg-gray-900/80 text-foreground rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2" style={{ backdropFilter: 'blur(2px)' }}>
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
-                </Card>
+                <div className="flex-1">
+                  <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
+                  <div className="text-xs text-muted-foreground">
+                    {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 ml-auto">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                        title="Open chat history"
+                        aria-label="Open chat history"
+                        onClick={() => setModalOpen(true)}
+                      >
+                        <History className="w-6 h-6" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Open chat history</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="icon"
+                        className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                        title="Close chat sidebar"
+                        aria-label="Close chat sidebar"
+                        onClick={() => setOpen(false)}
+                      >
+                        <X className="w-6 h-6" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Close chat sidebar</TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
-            )}
-            {error && (
-              <div className="text-red-500 text-sm mt-2">{error}</div>
-            )}
-            <div ref={endOfMessagesRef} />
+
+              {/* Action Mode Toggle */}
+              <div className="px-6 py-3 border-b border-white/20 bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm">
+                <div className="flex items-center space-x-3">
+                  <Zap className={cn("w-5 h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
+                  <Label htmlFor="action-mode" className="text-sm font-medium cursor-pointer flex-1">
+                    Action Mode
+                  </Label>
+                  <Switch
+                    id="action-mode"
+                    checked={actionMode}
+                    onCheckedChange={setActionMode}
+                    className="data-[state=checked]:bg-yellow-500"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 ml-8">
+                  {actionMode 
+                    ? "AI will perform task actions directly" 
+                    : "Regular conversation mode"
+                  }
+                </p>
+              </div>
+
+              <Separator className="opacity-30" />
+              
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-6 space-y-6 z-10">
+                <div ref={scrollRef} className="space-y-6">
+                  {messages.map((msg) => {
+                    const isMsgArabic = isArabic(msg.content);
+                    return (
+                      <div key={msg.id} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.role === 'ai' && (
+                          <Avatar className="w-9 h-9 shadow-md">
+                            <AvatarImage src="/ai-avatar.png" alt="AI" />
+                            <AvatarFallback>AI</AvatarFallback>
+                          </Avatar>
+                        )}
+                        <Card
+                          className={cn(
+                            'px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium',
+                            'overflow-x-auto',
+                            msg.role === 'user'
+                              ? 'bg-blue-600 dark:bg-blue-700 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-gray-200 dark:border-gray-700'
+                          )}
+                          style={{ maxWidth: '70vw' }}
+                        >
+                          <div
+                            className={cn(
+                              'markdown-content w-full max-w-full overflow-x-auto',
+                              isMsgArabic && 'font-arabic'
+                            )}
+                            dir={isMsgArabic ? 'rtl' : 'ltr'}
+                            style={{ maxWidth: '100%' }}
+                          >
+                            <ReactMarkdown
+                              components={{
+                                p: ({ node, ...props }) => (
+                                  <p
+                                    className={cn(
+                                      'whitespace-pre-wrap break-words mb-4 last:mb-0',
+                                      isMsgArabic && 'text-right'
+                                    )}
+                                    dir={isMsgArabic ? 'rtl' : 'ltr'}
+                                    {...props}
+                                  />
+                                ),
+                                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
+                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-4"><table className="w-full border-collapse" {...props} /></div>,
+                                thead: ({ node, ...props }) => <thead className="bg-primary/5" {...props} />,
+                                tbody: ({ node, ...props }) => <tbody {...props} />,
+                                tr: ({ node, ...props }) => <tr className="border-b border-gray-200 dark:border-gray-700" {...props} />,
+                                th: ({ node, ...props }) => <th className="py-2 px-4 text-left font-medium" {...props} />,
+                                td: ({ node, ...props }) => <td className="py-2 px-4" {...props} />,
+                                ul: ({ node, ...props }) => (
+                                  <ul
+                                    className={cn(
+                                      'mb-4',
+                                      isMsgArabic ? 'pr-6' : 'pl-6',
+                                      isMsgArabic ? 'list-disc-rtl' : 'list-disc'
+                                    )}
+                                    {...props}
+                                  />
+                                ),
+                                ol: ({ node, ...props }) => (
+                                  <ol
+                                    className={cn(
+                                      'mb-4',
+                                      isMsgArabic ? 'pr-6' : 'pl-6',
+                                      isMsgArabic ? 'list-decimal-rtl' : 'list-decimal'
+                                    )}
+                                    {...props}
+                                  />
+                                ),
+                                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                a: ({ node, href, ...props }) => <a href={href} className="text-primary underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                                blockquote: ({ node, ...props }) => (
+                                  <blockquote
+                                    className={cn(
+                                      'py-1 my-4 italic',
+                                      isMsgArabic
+                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-4'
+                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-4'
+                                    )}
+                                    {...props}
+                                  />
+                                ),
+                                code: CodeWithCopy,
+                                h1: ({ node, ...props }) => <h1 className={cn('text-2xl font-bold my-4', isMsgArabic && 'text-right')} {...props} />,
+                                h2: ({ node, ...props }) => <h2 className={cn('text-xl font-bold my-3', isMsgArabic && 'text-right')} {...props} />,
+                                h3: ({ node, ...props }) => <h3 className={cn('text-lg font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
+                                h4: ({ node, ...props }) => <h4 className={cn('text-base font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
+                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-4" {...props} />
+                              }}
+                            >
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        </Card>
+                        {msg.role === 'user' && (
+                          <Avatar className="w-9 h-9 shadow-md">
+                            <AvatarImage src="/user-avatar.png" alt="You" />
+                            <AvatarFallback>U</AvatarFallback>
+                          </Avatar>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {(loading || sending) && (
+                    <div className="flex items-end gap-3 justify-start">
+                      <Avatar className="w-9 h-9 shadow-md">
+                        <AvatarImage src="/ai-avatar.png" alt="AI" />
+                        <AvatarFallback>AI</AvatarFallback>
+                      </Avatar>
+                      <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-gray-200 dark:border-gray-700">
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
+                      </Card>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="text-red-500 text-sm mt-2">{error}</div>
+                  )}
+                  <div ref={endOfMessagesRef} />
+                </div>
+              </ScrollArea>
+              
+              {/* Input */}
+              <div className="p-6 border-t border-white/20 bg-white/60 dark:bg-gray-900/60 flex items-center gap-3 backdrop-blur-xl z-10">
+                <Input
+                  placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
+                  className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  disabled={sending || loading || !selectedChatId}
+                  autoFocus
+                />
+                <Button
+                  variant="default"
+                  size="icon"
+                  className={cn(
+                    "rounded-full shadow-lg",
+                    actionMode && "bg-yellow-500 hover:bg-yellow-600"
+                  )}
+                  onClick={handleSend}
+                  disabled={sending || loading || !input.trim() || !selectedChatId}
+                >
+                  {(sending || loading) ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+                </Button>
+              </div>
+            </div>
           </div>
-        </ScrollArea>
+        </ResizablePanel>
         
-        {/* Input */}
-        <div className="p-6 border-t border-white/20 bg-white/60 dark:bg-gray-900/60 flex items-center gap-3 backdrop-blur-xl z-10">
-          <Input
-            placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
-            className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleInputKeyDown}
-            disabled={sending || loading || !selectedChatId}
-            autoFocus
-          />
-          <Button
-            variant="default"
-            size="icon"
-            className={cn(
-              "rounded-full shadow-lg",
-              actionMode && "bg-yellow-500 hover:bg-yellow-600"
-            )}
-            onClick={handleSend}
-            disabled={sending || loading || !input.trim() || !selectedChatId}
-          >
-            {(sending || loading) ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
-          </Button>
-        </div>
-      </div>
+        <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/20 transition-colors" />
+      </ResizablePanelGroup>
       
       {/* Modal for Chats */}
       {modalOpen && (
+        // ... keep existing code (modal content remains the same)
         <>
           {/* Backdrop */}
           <div
