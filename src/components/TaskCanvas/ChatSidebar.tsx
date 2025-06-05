@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -290,12 +291,12 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   }
 
   return (
-    <div className="fixed top-0 right-0 h-full z-40 flex" style={{ pointerEvents: 'auto' }}>
-      <ResizablePanelGroup direction="horizontal" className="w-full">
+    <div className="fixed top-0 right-0 h-full z-40" style={{ pointerEvents: 'auto' }}>
+      <ResizablePanelGroup direction="horizontal" className="h-full">
         <ResizablePanel 
           defaultSize={100} 
-          minSize={30} 
-          maxSize={80}
+          minSize={25} 
+          maxSize={70}
           className="min-w-[300px] max-w-[800px]"
         >
           <div className="h-full w-full flex flex-col shadow-2xl">
@@ -523,7 +524,10 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
           </div>
         </ResizablePanel>
         
-        <ResizableHandle withHandle className="w-2 bg-border hover:bg-primary/20 transition-colors" />
+        <ResizableHandle 
+          withHandle 
+          className="w-2 bg-white/20 hover:bg-primary/30 transition-colors border-r border-white/30 flex items-center justify-center group"
+        />
       </ResizablePanelGroup>
       
       {/* Modal for Chats */}
