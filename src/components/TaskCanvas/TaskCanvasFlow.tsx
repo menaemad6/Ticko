@@ -53,13 +53,15 @@ interface TaskCanvasFlowProps {
   registerTemplateHandler: (handler: (templateName: string) => void) => void;
   isActionInProgress?: boolean;
   onActionStateChange?: (inProgress: boolean) => void;
+  onGetAIHelp?: (task: Task) => void;
 }
 
 export default function TaskCanvasFlow({ 
   registerQuickActionHandler, 
   registerTemplateHandler,
   isActionInProgress = false,
-  onActionStateChange
+  onActionStateChange,
+  onGetAIHelp
 }: TaskCanvasFlowProps) {
   const { tasks, getFlowNodes, getFlowEdges, updateTask, addTask, loading, refreshTasks, deleteAllTasks } = useTasks();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -547,10 +549,6 @@ export default function TaskCanvasFlow({
           />
         )}
         
-        {/* {!focusMode && (
-          <Controls className="bg-white/70 backdrop-blur-md dark:bg-gray-900/70 rounded-lg border dark:border-gray-800" />
-        )} */}
-        
         {!focusMode && (
           <CustomControls 
             onZoomIn={handleZoomIn}
@@ -559,19 +557,6 @@ export default function TaskCanvasFlow({
             onAddNode={handleAddNode}
           />
         )}
-        
-        {/* {!focusMode && (
-          <div className="absolute left-4 bottom-4">
-            <Button
-              onClick={handleAddNode}
-              disabled={isActionInProgress}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Task
-            </Button>
-          </div>
-        )} */}
 
       </ReactFlow>
       
@@ -580,6 +565,7 @@ export default function TaskCanvasFlow({
         onClose={() => setIsDetailOpen(false)}
         task={selectedTask}
         onEdit={handleEditTask}
+        onGetAIHelp={onGetAIHelp}
       />
       
       <TaskForm
