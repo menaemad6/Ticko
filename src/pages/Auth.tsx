@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -55,7 +56,6 @@ const Auth = () => {
     setLoading(false);
   };
 
-  // Google login handler
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
@@ -72,146 +72,203 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-950 via-gray-900 to-purple-950 text-white overflow-hidden relative flex flex-col">
-      {/* Enhanced Background decorative elements */}
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 text-slate-900 dark:text-white overflow-hidden relative flex flex-col">
+      {/* Modern geometric background patterns */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        <div className="absolute top-20 right-20 w-32 h-32 bg-cyan-400/10 rounded-full blur-2xl animate-bounce"></div>
-        <div className="absolute bottom-20 left-20 w-24 h-24 bg-pink-400/10 rounded-full blur-2xl animate-bounce delay-700"></div>
-        {/* Enhanced grid overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-gradient-to-br from-purple-400/20 to-pink-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-orange-600/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+        
+        {/* Grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
       </div>
+      
       <FloatingElements />
-      {/* Navbar should not be centered, should match homepage */}
+      
+      {/* Navbar */}
       <div className="relative z-20 w-full">
         <EnhancedNavbar />
       </div>
-      {/* Auth card container */}
-      <div className="flex-1 flex items-center justify-center w-full px-2 sm:px-4 md:px-0 py-8 relative z-10">
-        <Card className="w-full max-w-md bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-purple-900/80 border border-white/10 shadow-2xl shadow-purple-900/30 backdrop-blur-2xl rounded-3xl px-3 py-6 sm:px-6 sm:py-8 md:px-10 md:py-12 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/30 animate-fade-in group">
-          {/* Animated accent icon */}
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 shadow-lg flex items-center justify-center animate-blob">
-              <svg className="w-8 h-8 text-white opacity-80 animate-spin-slow" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+      
+      {/* Main content */}
+      <div className="flex-1 flex items-center justify-center w-full px-4 py-8 relative z-10">
+        <Card className="w-full max-w-md bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/50 rounded-2xl overflow-hidden">
+          {/* Header with icon */}
+          <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <Sparkles className="w-8 h-8 text-white" />
             </div>
+            <CardTitle className="text-2xl font-bold text-white mb-2">
+              {tab === 'signin' ? 'Welcome back' : 'Create account'}
+            </CardTitle>
+            <p className="text-blue-100 text-sm">
+              {tab === 'signin' ? 'Sign in to your account' : 'Start your journey with us'}
+            </p>
           </div>
-          <CardHeader className="space-y-1 text-center p-0 mb-4 sm:mb-6">
-            <CardTitle className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse">{tab === 'signin' ? 'Sign In' : 'Create Account'}</CardTitle>
-            <p className="text-gray-400 text-base font-medium">to continue to Visual Task Board</p>
-          </CardHeader>
-          <Tabs defaultValue="signin" value={tab} onValueChange={v => setTab(v as 'signin' | 'signup')}>
-            <TabsList className="w-full flex rounded-2xl bg-white/5 border border-white/10 p-1 mb-4 sm:mb-6 gap-2">
-              <TabsTrigger value="signin" className="flex-1 rounded-xl text-base font-semibold text-white py-2 sm:py-3 px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:via-pink-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" className="flex-1 rounded-xl text-base font-semibold text-white py-2 sm:py-3 px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-cyan-400 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Sign Up</TabsTrigger>
-            </TabsList>
-            <div className="flex flex-col gap-2 mb-4 sm:mb-6">
+
+          <CardContent className="p-8">
+            <Tabs defaultValue="signin" value={tab} onValueChange={v => setTab(v as 'signin' | 'signup')}>
+              <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+                <TabsTrigger 
+                  value="signin" 
+                  className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700"
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="signup" 
+                  className="rounded-lg font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-700"
+                >
+                  Sign Up
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Google Sign In Button */}
               <Button
                 type="button"
                 variant="outline"
-                className="w-full flex gap-2 items-center justify-center font-semibold text-base bg-white/10 hover:bg-white/20 border border-white/20 shadow-md transition-all py-3 rounded-xl text-white"
+                className="w-full h-12 mb-6 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200 font-medium"
                 onClick={handleGoogleLogin}
                 disabled={loading}
               >
-                <FcGoogle className="w-6 h-6" /> Continue with Google
+                <FcGoogle className="w-5 h-5 mr-3" />
+                Continue with Google
               </Button>
-            </div>
-            <div className="flex items-center gap-2 mb-4 sm:mb-6">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs text-gray-400 font-semibold tracking-wide">or</span>
-              <div className="flex-1 h-px bg-white/10" />
-            </div>
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} autoComplete="on">
-                <CardContent className="space-y-4 sm:space-y-6 p-0">
-                  <div className="relative">
+
+              {/* Divider */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-slate-300 dark:border-slate-600" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400 font-medium">
+                    Or continue with email
+                  </span>
+                </div>
+              </div>
+
+              <TabsContent value="signin" className="space-y-0">
+                <form onSubmit={handleSignIn} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Email address
+                    </Label>
                     <Input
-                      id="email"
+                      id="signin-email"
                       type="email"
-                      placeholder="Email"
+                      placeholder="Enter your email"
                       required
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="peer h-12 px-4 rounded-lg border border-white/10 bg-white/5 shadow-sm focus:ring-2 focus:ring-purple-500 transition-all text-base placeholder:opacity-70 text-white"
+                      className="h-12 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl transition-colors"
                       autoComplete="email"
                     />
                   </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      required
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      className="peer h-12 px-4 rounded-lg border border-white/10 bg-white/5 shadow-sm focus:ring-2 focus:ring-purple-500 transition-all text-base pr-12 placeholder:opacity-70 text-white"
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-400 focus:outline-none"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      onClick={() => setShowPassword(v => !v)}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="signin-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter your password"
+                        required
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="h-12 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl pr-12 transition-colors"
+                        autoComplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
-                </CardContent>
-                <CardFooter className="mt-6 sm:mt-8 p-0">
-                  <Button type="submit" className="w-full py-3 text-lg font-bold rounded-xl bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg transition-all" disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : null}
-                    Sign In
+
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign in'
+                    )}
                   </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} autoComplete="on">
-                <CardContent className="space-y-4 sm:space-y-6 p-0">
-                  <div className="relative">
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup" className="space-y-0">
+                <form onSubmit={handleSignUp} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Email address
+                    </Label>
                     <Input
-                      id="email"
+                      id="signup-email"
                       type="email"
-                      placeholder="Email"
+                      placeholder="Enter your email"
                       required
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="peer h-12 px-4 rounded-lg border border-white/10 bg-white/5 shadow-sm focus:ring-2 focus:ring-purple-500 transition-all text-base placeholder:opacity-70 text-white"
+                      className="h-12 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl transition-colors"
                       autoComplete="email"
                     />
                   </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password (min. 6 characters)"
-                      required
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      className="peer h-12 px-4 rounded-lg border border-white/10 bg-white/5 shadow-sm focus:ring-2 focus:ring-purple-500 transition-all text-base pr-12 placeholder:opacity-70 text-white"
-                      autoComplete="new-password"
-                      minLength={6}
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-400 focus:outline-none"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      onClick={() => setShowPassword(v => !v)}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Create a password (min. 6 characters)"
+                        required
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="h-12 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl pr-12 transition-colors"
+                        autoComplete="new-password"
+                        minLength={6}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </div>
-                </CardContent>
-                <CardFooter className="mt-6 sm:mt-8 p-0">
-                  <Button type="submit" className="w-full py-3 text-lg font-bold rounded-xl bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg transition-all" disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : null}
-                    Create Account
+
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      'Create account'
+                    )}
                   </Button>
-                </CardFooter>
-              </form>
-            </TabsContent>
-          </Tabs>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
         </Card>
       </div>
     </div>
