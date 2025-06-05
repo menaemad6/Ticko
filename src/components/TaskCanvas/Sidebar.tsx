@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { 
@@ -429,21 +430,6 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             </SidebarGroupContent>
           </SidebarGroup>
 
-
-
-          {/* Task Management */}
-          {/* <Separator />
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Task Management
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <QuickActions onAction={onQuickAction || (() => {})} disabled={isActionInProgress} />
-            </SidebarGroupContent>
-          </SidebarGroup> */}
-
-
-
           <Separator />
 
           {/* Project Tools */}
@@ -455,13 +441,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               {projectActions.map((action) => {
                 const IconComponent = action.icon;
                 return (
-                  <Button
+                  <div
                     key={action.id}
-                    variant="ghost"
-                    size="sm"
                     onClick={() => handleToolAction(action.id)}
-                    disabled={isActionInProgress}
-                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className={`w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center rounded cursor-pointer transition-colors ${
+                      isActionInProgress ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
                     <div className="p-1.5 rounded bg-indigo-500 text-white">
                       <IconComponent className="w-3 h-3" />
@@ -470,7 +455,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                       <div className="text-sm font-medium">{action.label}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
                     </div>
-                  </Button>
+                  </div>
                 );
               })}
             </SidebarGroupContent>
@@ -487,13 +472,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               {viewActions.map((action) => {
                 const IconComponent = action.icon;
                 return (
-                  <Button
+                  <div
                     key={action.id}
-                    variant="ghost"
-                    size="sm"
                     onClick={() => handleToolAction(action.id)}
-                    disabled={isActionInProgress}
-                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    className={`w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center rounded cursor-pointer transition-colors ${
+                      isActionInProgress ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
                     <div className="p-1.5 rounded bg-gray-500 text-white">
                       <IconComponent className="w-3 h-3" />
@@ -502,7 +486,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                       <div className="text-sm font-medium">{action.label}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">{action.description}</div>
                     </div>
-                  </Button>
+                  </div>
                 );
               })}
             </SidebarGroupContent>
@@ -519,13 +503,12 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               {toolActions.map((action) => {
                 const IconComponent = action.icon;
                 return (
-                  <Button
+                  <div
                     key={action.id}
-                    variant="ghost"
-                    size="sm"
                     onClick={() => handleToolAction(action.id)}
-                    disabled={isActionInProgress}
-                    className="w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex-nowrap min-w-0"
+                    className={`w-full justify-start gap-3 h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center rounded cursor-pointer transition-colors flex-nowrap min-w-0 ${
+                      isActionInProgress ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
                     <div className="p-1.5 rounded bg-cyan-500 text-white flex-shrink-0">
                       <IconComponent className="w-3 h-3" />
@@ -534,7 +517,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
                       <div className="text-sm font-medium truncate">{action.label}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{action.description}</div>
                     </div>
-                  </Button>
+                  </div>
                 );
               })}
             </SidebarGroupContent>
