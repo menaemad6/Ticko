@@ -1,14 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Task } from '@/types/task';
-import { Calendar, Clock, Flag, Tag, Edit, Trash2, MapPin, User, CheckSquare, Bot, Sparkles } from 'lucide-react';
+import { Calendar, Flag, Tag, Edit, Trash2, CheckSquare, Bot, Sparkles, Trophy } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Milestone as MilestoneIcon, StickyNote } from 'lucide-react';
+import { useCelebration } from '@/hooks/useCelebration';
 
 interface NodeDetailProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface NodeDetailProps {
 
 export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp }: NodeDetailProps) {
   const { deleteTask, updateTask } = useTasks();
+  const { celebrate } = useCelebration();
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
   const [descValue, setDescValue] = useState(task?.description || '');
@@ -37,6 +39,14 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
   const handleAIHelp = () => {
     onGetAIHelp?.(task);
     onClose();
+  };
+
+  const handleFinish = async () => {
+    if (localTask.status !== 'done') {
+      setLocalTask({ ...localTask, status: 'done' });
+      await updateTask(localTask.id, { ...localTask, status: 'done' });
+      celebrate('task-complete');
+    }
   };
 
   const handleDelete = async () => {
@@ -58,55 +68,33 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'done':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400';
       case 'in-progress':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-400';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400';
       default:
-        return 'bg-green-100 text-green-800 border-green-200';
-    }
-  };
-
-  const getNodeTypeIcon = (nodeType: string) => {
-    switch (nodeType) {
-      case 'milestone':
-        return <MilestoneIcon className="w-7 h-7 text-purple-600 dark:text-purple-400" />;
-      case 'note':
-        return <StickyNote className="w-7 h-7 text-amber-500 dark:text-amber-400" />;
-      default:
-        return <CheckSquare className="w-7 h-7 text-blue-600 dark:text-blue-400" />;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'done':
-        return <CheckSquare className="w-7 h-7 text-green-600 dark:text-green-400" />;
-      case 'in-progress':
-        return <Clock className="w-7 h-7 text-blue-600 dark:text-blue-400" />;
-      default:
-        return <Flag className="w-7 h-7 text-gray-500 dark:text-gray-300" />;
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400';
     }
   };
 
   const getStatusBg = (status: string) => {
     switch (status) {
       case 'done':
-        return 'bg-green-50 dark:bg-green-900/80';
+        return 'bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-950/20 dark:via-green-950/20 dark:to-teal-950/20';
       case 'in-progress':
-        return 'bg-blue-50 dark:bg-blue-900/80';
+        return 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/20 dark:via-indigo-950/20 dark:to-purple-950/20';
       default:
-        return 'bg-gray-50 dark:bg-gray-900/80';
+        return 'bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-950/20 dark:via-gray-950/20 dark:to-zinc-950/20';
     }
   };
 
@@ -138,84 +126,100 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`w-full max-w-full sm:max-w-2xl max-h-[80vh] overflow-y-auto backdrop-blur-xl shadow-2xl rounded-none sm:rounded-2xl border-0 p-0 md:p-0 ${getStatusBg(localTask.status)}`}>
-        <DialogHeader className="space-y-4 pt-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between p-4 sm:p-6 pb-0 gap-4 sm:gap-0">
-            <div className="flex items-center gap-4 flex-1 w-full">
-              <div className="drop-shadow-lg select-none flex items-center justify-center">
-                {getStatusIcon(localTask.status)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg sm:text-2xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight truncate">
-                  {task.title}
-                </DialogTitle>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Select value={localTask.status} onValueChange={handleStatusChange}>
-                    <SelectTrigger className={`w-[100px] sm:w-[120px] ${getStatusColor(localTask.status)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-blue-400`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todo">To Do</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={localTask.priority} onValueChange={handlePriorityChange}>
-                    <SelectTrigger className={`w-[100px] sm:w-[120px] ${getPriorityColor(localTask.priority)} font-semibold px-3 py-1 text-xs rounded-full shadow-sm uppercase tracking-wide border-none focus:ring-2 focus:ring-red-400`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Badge variant="outline" className="capitalize px-3 py-1 text-xs rounded-full border-gray-300 dark:border-gray-700">
-                    {localTask.nodeType}
-                  </Badge>
+      <DialogContent className={`w-full max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl shadow-2xl rounded-3xl border-0 p-0 ${getStatusBg(localTask.status)}`}>
+        <DialogHeader className="space-y-6 pt-8">
+          <div className="flex flex-col gap-6 p-8 pb-0">
+            {/* Header Section */}
+            <div className="flex items-start justify-between gap-6">
+              <div className="flex items-start gap-4 flex-1 min-w-0">
+                <div className="w-12 h-12 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg flex items-center justify-center">
+                  <CheckSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <DialogTitle className="text-3xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
+                    {task.title}
+                  </DialogTitle>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Select value={localTask.status} onValueChange={handleStatusChange}>
+                      <SelectTrigger className={`w-32 ${getStatusColor(localTask.status)} font-semibold px-4 py-2 text-sm rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-blue-400`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">To Do</SelectItem>
+                        <SelectItem value="in-progress">In Progress</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={localTask.priority} onValueChange={handlePriorityChange}>
+                      <SelectTrigger className={`w-32 ${getPriorityColor(localTask.priority)} font-semibold px-4 py-2 text-sm rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-red-400`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Badge variant="outline" className="capitalize px-4 py-2 text-sm rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+                      {localTask.nodeType}
+                    </Badge>
+                  </div>
                 </div>
               </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEdit}
+                  className="hover:bg-blue-50 hover:border-blue-300 shadow-lg rounded-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 shadow-lg rounded-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEdit}
-                className="hover:bg-blue-50 hover:border-blue-300 shadow-md"
-              >
-                <Edit className="w-4 h-4 mr-1" />
-                Edit
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 shadow-md"
-              >
-                <Trash2 className="w-4 h-4 mr-1" />
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </Button>
-            </div>
+
+            {/* Finish Button - Only show if task is not done */}
+            {localTask.status !== 'done' && (
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleFinish}
+                  className="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-bold px-12 py-4 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-200 text-lg"
+                >
+                  <Trophy className="w-6 h-6 mr-3" />
+                  Finish Task
+                </Button>
+              </div>
+            )}
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 px-2 pb-4 sm:px-6 sm:pb-6">
-          {/* AI Help Section - Core Feature */}
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-4 border-2 border-purple-200 dark:border-purple-700 shadow-lg">
+        <div className="space-y-6 px-8 pb-8">
+          {/* AI Help Section */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-2xl p-6 border border-purple-100 dark:border-purple-800 shadow-lg backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-r from-purple-500 to-blue-500 rounded-full p-2">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900 dark:text-white">Get AI Help</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Let AI assist you with this task</p>
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">Get AI Help</h4>
+                  <p className="text-gray-600 dark:text-gray-300">Let AI assist you with this task</p>
                 </div>
               </div>
               <Button
                 onClick={handleAIHelp}
-                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold px-6 py-2 rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <Bot className="w-5 h-5 mr-2" />
                 Ask AI
@@ -224,32 +228,32 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
           </div>
 
           {/* Description Section */}
-          <div className="bg-white/70 dark:bg-gray-800/70 rounded-xl p-3 sm:p-4 shadow border border-gray-100 dark:border-gray-800 relative">
-            <h4 className="text-base font-semibold mb-2 text-gray-800 dark:text-gray-200 tracking-tight flex items-center justify-between">
+          <div className="bg-white/60 dark:bg-gray-800/60 rounded-2xl p-6 shadow-lg backdrop-blur-sm border border-gray-100 dark:border-gray-800">
+            <h4 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center justify-between">
               Description
               {!editingDescription ? (
-                <Button size="icon" variant="ghost" className="ml-2" onClick={() => { setEditingDescription(true); setDescValue(task.description || ''); }}>
+                <Button size="icon" variant="ghost" className="rounded-xl" onClick={() => { setEditingDescription(true); setDescValue(task.description || ''); }}>
                   <Edit className="w-4 h-4" />
                 </Button>
               ) : null}
             </h4>
             {!editingDescription ? (
-              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed break-words">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
                 {localTask.description || 'No description provided'}
               </p>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 <textarea
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-2 text-base text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 resize-none min-h-[80px]"
+                  className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 resize-none min-h-[100px] text-lg"
                   value={descValue}
                   onChange={e => setDescValue(e.target.value)}
                   autoFocus
                 />
-                <div className="flex gap-2 justify-end">
-                  <Button size="sm" onClick={handleDescriptionSave}>
+                <div className="flex gap-3 justify-end">
+                  <Button onClick={handleDescriptionSave} className="rounded-xl">
                     Save
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditingDescription(false)}>
+                  <Button variant="outline" onClick={() => setEditingDescription(false)} className="rounded-xl">
                     Cancel
                   </Button>
                 </div>
@@ -258,51 +262,44 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
           </div>
 
           {/* Due Date */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-100 dark:border-blue-900 shadow-sm">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Due Date:</span>
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {task.dueDate
-                ? new Date(task.dueDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                : 'No due date set'}
-            </span>
+          <div className="flex items-center gap-4 bg-blue-50 dark:bg-blue-950/40 rounded-2xl p-6 border border-blue-100 dark:border-blue-900 shadow-lg backdrop-blur-sm">
+            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-xl flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <span className="font-semibold text-gray-700 dark:text-gray-200 text-lg">Due Date</span>
+              <p className="text-gray-600 dark:text-gray-300">
+                {task.dueDate
+                  ? new Date(task.dueDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })
+                  : 'No due date set'}
+              </p>
+            </div>
           </div>
 
           {/* Tags */}
           {task.tags && task.tags.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-purple-500" />
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tags</h4>
+            <div className="bg-purple-50 dark:bg-purple-950/40 rounded-2xl p-6 border border-purple-100 dark:border-purple-900 shadow-lg backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-100 dark:bg-purple-800 rounded-xl flex items-center justify-center">
+                  <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h4 className="font-semibold text-gray-700 dark:text-gray-300 text-lg">Tags</h4>
               </div>
-              <div className="flex flex-wrap gap-2 pl-0 sm:pl-6">
+              <div className="flex flex-wrap gap-3">
                 {task.tags.map((tag, index) => (
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300"
+                    className="bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 px-4 py-2 rounded-xl text-sm font-medium"
                   >
                     {tag}
                   </Badge>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Connections */}
-          {task.connections && task.connections.length > 0 && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-orange-500" />
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Connected Tasks</h4>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 pl-0 sm:pl-6">
-                {task.connections.length} connection(s)
-              </p>
             </div>
           )}
         </div>
