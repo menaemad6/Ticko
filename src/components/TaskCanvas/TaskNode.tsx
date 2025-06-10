@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { Badge } from '@/components/ui/badge';
@@ -50,8 +51,10 @@ function TaskNode({ data }: TaskNodeProps) {
   return (
     <div className={cn(
       'p-3 rounded-md border-2 shadow-lg w-64',
-      'transition-shadow hover:shadow-xl',
+      'transition-all duration-300 hover:shadow-xl hover:scale-105',
       statusBg[data.status] || statusBg['todo'],
+      // Add celebration glow for completed tasks
+      data.status === 'done' && 'ring-2 ring-green-400 ring-opacity-50 animate-pulse',
     )}>
       <Handle type="target" position={Position.Top} className="w-3 h-3 rounded-full bg-blue-500" />
       
@@ -62,7 +65,11 @@ function TaskNode({ data }: TaskNodeProps) {
         <div className="flex gap-1">
           <Badge 
             variant="outline"
-            className={cn('text-xs px-2', statusColors[data.status])}
+            className={cn(
+              'text-xs px-2 transition-all duration-200',
+              statusColors[data.status],
+              data.status === 'done' && 'animate-bounce'
+            )}
           >
             {getStatusIcon(data.status)}
             {data.status.replace('-', ' ')}

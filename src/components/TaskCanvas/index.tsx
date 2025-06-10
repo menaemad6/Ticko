@@ -1,12 +1,13 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import { ReactFlowProvider } from '@xyflow/react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { TaskSidebar } from './Sidebar';
 import TaskCanvasFlow from './TaskCanvasFlow';
 import ChatSidebar from './ChatSidebar';
+import CelebrationEffects from '@/components/CelebrationEffects';
 import { Task } from '@/types/task';
 import { useAIHelp } from '@/hooks/useAIHelp';
+import { useCelebration } from '@/hooks/useCelebration';
 
 export default function TaskCanvas() {
   const [isActionInProgress, setIsActionInProgress] = useState(false);
@@ -21,6 +22,7 @@ export default function TaskCanvas() {
   } | null>(null);
 
   const { requestAIHelp } = useAIHelp();
+  const { celebration, hideCelebration } = useCelebration();
 
   const registerQuickActionHandler = useCallback((handler: (action: string) => void) => {
     setQuickActionHandler(() => handler);
@@ -85,6 +87,13 @@ export default function TaskCanvas() {
           forceOpen={isChatOpen}
           onOpenChange={setIsChatOpen}
           registerMethods={registerChatMethods}
+        />
+        
+        {/* Celebration Effects */}
+        <CelebrationEffects
+          show={celebration.show}
+          type={celebration.type as 'task-complete' | 'milestone' | 'achievement'}
+          onComplete={hideCelebration}
         />
       </div>
     </SidebarProvider>

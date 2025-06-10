@@ -5,10 +5,12 @@ import { Task, FlowNode, FlowEdge } from '@/types/task';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { MarkerType } from '@xyflow/react';
+import { useCelebration } from './useCelebration';
 
 export const useTasks = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { celebrate } = useCelebration();
 
   const { data: tasks = [], isLoading: loading, refetch: refreshTasks } = useQuery({
     queryKey: ['tasks', user?.id],
@@ -102,6 +104,7 @@ export const useTasks = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      celebrate('task-created');
       toast.success('Task added successfully');
     },
     onError: (error) => {
@@ -138,8 +141,14 @@ export const useTasks = () => {
       
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      
+      // Check if task was marked as complete
+      if (variables.taskData.status === 'done') {
+        celebrate('task-complete');
+        toast.success('🎉 Task completed! Great job!');
+      }
     },
     onError: (error) => {
       toast.error('Failed to update task');
@@ -161,6 +170,7 @@ export const useTasks = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] });
+      celebrate('task-deleted');
       toast.success('Task deleted successfully');
     },
     onError: (error) => {
