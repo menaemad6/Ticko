@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -291,24 +290,24 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   }
 
   return (
-    <div className="fixed top-0 right-0 h-full z-40" style={{ pointerEvents: 'auto' }}>
-      <ResizablePanelGroup direction="horizontal" className="h-full">
+    <div className="fixed top-0 right-0 h-full z-40 w-full pointer-events-none">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
         {/* Invisible spacer panel that grows/shrinks */}
-        <ResizablePanel defaultSize={20} minSize={0} maxSize={80} />
+        <ResizablePanel defaultSize={75} minSize={0} maxSize={95} className="pointer-events-none" />
         
         <ResizableHandle 
           withHandle 
-          className="w-2 bg-white/30 hover:bg-primary/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize"
+          className="w-2 bg-white/30 hover:bg-primary/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto"
         />
         
         <ResizablePanel 
-          defaultSize={80} 
-          minSize={20} 
+          defaultSize={25} 
+          minSize={5} 
           maxSize={100}
-          className="min-w-[300px]"
+          className="min-w-[250px] pointer-events-auto"
         >
-          <div className="h-full w-full flex flex-col shadow-2xl">
-            {/* Glassmorphism background */}
+          <div className="h-full w-full flex flex-col shadow-2xl relative">
+            {/* Glassmorphism background that resizes with the panel */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-purple-100/60 dark:from-gray-900/80 dark:via-gray-950/80 dark:to-purple-950/60 backdrop-blur-2xl rounded-l-3xl border-l border-white/20" />
             
             {/* Sidebar Content */}
@@ -319,7 +318,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   <AvatarImage src="/ai-avatar.png" alt="AI" />
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
                   <div className="text-xs text-muted-foreground">
                     {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
@@ -389,7 +388,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     return (
                       <div key={msg.id} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'ai' && (
-                          <Avatar className="w-9 h-9 shadow-md">
+                          <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/ai-avatar.png" alt="AI" />
                             <AvatarFallback>AI</AvatarFallback>
                           </Avatar>
@@ -397,12 +396,11 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                         <Card
                           className={cn(
                             'px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium',
-                            'overflow-x-auto',
+                            'overflow-x-auto min-w-0',
                             msg.role === 'user'
                               ? 'bg-blue-600 dark:bg-blue-700 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl'
                               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-gray-200 dark:border-gray-700'
                           )}
-                          style={{ maxWidth: '70vw' }}
                         >
                           <div
                             className={cn(
@@ -477,7 +475,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                           </div>
                         </Card>
                         {msg.role === 'user' && (
-                          <Avatar className="w-9 h-9 shadow-md">
+                          <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/user-avatar.png" alt="You" />
                             <AvatarFallback>U</AvatarFallback>
                           </Avatar>
@@ -487,7 +485,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   })}
                   {(loading || sending) && (
                     <div className="flex items-end gap-3 justify-start">
-                      <Avatar className="w-9 h-9 shadow-md">
+                      <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                         <AvatarImage src="/ai-avatar.png" alt="AI" />
                         <AvatarFallback>AI</AvatarFallback>
                       </Avatar>
@@ -508,7 +506,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               <div className="p-6 border-t border-white/20 bg-white/60 dark:bg-gray-900/60 flex items-center gap-3 backdrop-blur-xl z-10">
                 <Input
                   placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
-                  className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base"
+                  className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base min-w-0"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -519,7 +517,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   variant="default"
                   size="icon"
                   className={cn(
-                    "rounded-full shadow-lg",
+                    "rounded-full shadow-lg flex-shrink-0",
                     actionMode && "bg-yellow-500 hover:bg-yellow-600"
                   )}
                   onClick={handleSend}
@@ -535,7 +533,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
       
       {/* Modal for Chats */}
       {modalOpen && (
-        // ... keep existing code (modal content remains the same)
+        // ... keep existing code (modal content remains exactly the same)
         <>
           {/* Backdrop */}
           <div
