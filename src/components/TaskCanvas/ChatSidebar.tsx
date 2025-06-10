@@ -291,19 +291,19 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   }
 
   return (
-    <div className="fixed top-0 right-0 h-full z-40 w-[600px]" style={{ pointerEvents: 'auto' }}>
-      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
-        {/* Empty panel to allow resizing from the left */}
-        <ResizablePanel defaultSize={0} minSize={0} maxSize={0} className="w-0" />
+    <div className="fixed top-0 right-0 h-full z-40" style={{ pointerEvents: 'auto' }}>
+      <ResizablePanelGroup direction="horizontal" className="h-full">
+        {/* Invisible spacer panel that grows/shrinks */}
+        <ResizablePanel defaultSize={20} minSize={0} maxSize={80} />
         
         <ResizableHandle 
           withHandle 
-          className="w-2 bg-white/20 hover:bg-primary/30 transition-colors border-r border-white/30 flex items-center justify-center group relative"
+          className="w-2 bg-white/30 hover:bg-primary/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize"
         />
         
         <ResizablePanel 
-          defaultSize={100} 
-          minSize={50} 
+          defaultSize={80} 
+          minSize={20} 
           maxSize={100}
           className="min-w-[300px]"
         >
