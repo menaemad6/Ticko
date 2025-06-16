@@ -13,19 +13,19 @@ const FeatureSections = () => {
         <div className="text-center mb-24 relative z-10">
           <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-full mb-8 backdrop-blur-xl border border-purple-500/20">
             <Sparkles className="w-8 h-8 text-purple-400 mr-3" />
-            <span className="text-purple-300 font-medium text-lg">Revolutionary Technology</span>
+            <span className="text-purple-300 font-medium text-lg">Modern Technology Stack</span>
           </div>
           <h2 className="text-6xl md:text-8xl font-bold mb-12 leading-tight">
             <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
-              Future-Ready
+              Built with
             </span>
             <br />
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Innovation
+              Modern Tools
             </span>
           </h2>
           <p className="text-2xl text-gray-300 max-w-5xl mx-auto leading-relaxed">
-            Experience next-generation performance management with AI-powered insights, quantum-speed processing, and enterprise-grade security that adapts to your needs.
+            Task Weaver combines the power of React, TypeScript, and Supabase to deliver a modern, scalable task management solution.
           </p>
         </div>
 
@@ -33,57 +33,57 @@ const FeatureSections = () => {
           {[
             {
               icon: Brain,
-              title: "Neural Intelligence",
-              description: "Advanced AI that learns from your patterns and predicts future needs with 99.9% accuracy.",
+              title: "Visual Task Management",
+              description: "Intuitive drag-and-drop interface for organizing and managing tasks visually.",
               accent: "from-purple-400 to-violet-500",
               iconBg: "bg-gradient-to-br from-purple-500/30 to-violet-600/20",
               border: "border-purple-400/30",
-              features: ["Self-learning algorithms", "Predictive analytics", "Real-time optimization"]
+              features: ["Drag-and-drop interface", "Visual task organization", "Real-time updates"]
             },
             {
               icon: CloudLightning,
-              title: "Quantum Processing",
-              description: "Lightning-fast computation powered by quantum algorithms for unprecedented performance.",
+              title: "Task Organization",
+              description: "Efficiently organize and categorize tasks with customizable labels and priorities.",
               accent: "from-blue-400 to-cyan-500",
               iconBg: "bg-gradient-to-br from-blue-500/30 to-cyan-600/20",
               border: "border-blue-400/30",
-              features: ["Quantum encryption", "Instant processing", "Infinite scalability"]
+              features: ["Custom labels", "Priority levels", "Task categories"]
             },
             {
               icon: Shield,
-              title: "Zero-Trust Security",
-              description: "Military-grade protection with blockchain verification and quantum-resistant encryption.",
+              title: "Secure & Reliable",
+              description: "Built on Supabase for enterprise-grade security and reliability.",
               accent: "from-green-400 to-emerald-500",
               iconBg: "bg-gradient-to-br from-green-500/30 to-emerald-600/20",
               border: "border-green-400/30",
-              features: ["Blockchain verified", "Quantum encryption", "Real-time monitoring"]
+              features: ["Secure authentication", "Data encryption", "Reliable storage"]
             },
             {
               icon: Infinity,
-              title: "Infinite Scale",
-              description: "Seamlessly handle millions of operations with our revolutionary architecture.",
+              title: "Scalable Architecture",
+              description: "Built to scale with your team's needs using modern web technologies.",
               accent: "from-cyan-400 to-blue-500",
               iconBg: "bg-gradient-to-br from-cyan-500/30 to-blue-600/20",
               border: "border-cyan-400/30",
-              features: ["Auto-scaling", "Global distribution", "Zero downtime"]
+              features: ["Cloud-based", "Auto-scaling", "High performance"]
             },
             {
               icon: Eye,
-              title: "Omniscient Analytics",
-              description: "See everything, understand everything, predict everything with our all-seeing analytics.",
+              title: "Task Analytics",
+              description: "Track progress and gain insights into your team's productivity.",
               accent: "from-pink-400 to-rose-500",
               iconBg: "bg-gradient-to-br from-pink-500/30 to-rose-600/20",
               border: "border-pink-400/30",
-              features: ["360° visibility", "Predictive insights", "Real-time dashboards"]
+              features: ["Progress tracking", "Team insights", "Performance metrics"]
             },
             {
               icon: Cpu,
-              title: "Edge Computing",
-              description: "Process data at the speed of thought with distributed edge computing networks.",
+              title: "Modern Tech Stack",
+              description: "Built with React, TypeScript, and Supabase for optimal performance.",
               accent: "from-orange-400 to-red-500",
               iconBg: "bg-gradient-to-br from-orange-500/30 to-red-600/20",
               border: "border-orange-400/30",
-              features: ["Edge optimization", "Latency reduction", "Local processing"]
+              features: ["React & TypeScript", "Supabase backend", "Modern UI/UX"]
             }
           ].map((feature, index) => (
             <div key={index} className="group relative">
@@ -120,26 +120,26 @@ const FeatureSections = () => {
           <div className="text-center mb-20">
             <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-full mb-8 backdrop-blur-xl border border-green-500/20">
               <Award className="w-8 h-8 text-green-400 mr-3" />
-              <span className="text-green-300 font-medium text-lg">Trusted Globally</span>
+              <span className="text-green-300 font-medium text-lg">Key Benefits</span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-7xl font-bold mb-8">
               <span className="bg-gradient-to-r from-green-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">
-                World-Class
+                Why Choose
               </span>
               <br />
               <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Performance
+                Task Weaver
               </span>
             </h2>
-            <p className="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-4xl mx-auto">Numbers that speak louder than words</p>
+            <p className="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-4xl mx-auto">Features that make task management easier</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12">
             {[
-              { value: "99.99%", label: "Uptime SLA", icon: Award, color: "text-green-400", bg: "from-green-500/20 to-emerald-500/10" },
-              { value: "10B+", label: "Operations/Day", icon: Database, color: "text-blue-400", bg: "from-blue-500/20 to-cyan-500/10" },
-              { value: "195+", label: "Countries", icon: Globe, color: "text-purple-400", bg: "from-purple-500/20 to-violet-500/10" },
-              { value: "<1ms", label: "Response Time", icon: Zap, color: "text-pink-400", bg: "from-pink-500/20 to-rose-500/10" }
+              { value: "100%", label: "Visual Interface", icon: Award, color: "text-green-400", bg: "from-green-500/20 to-emerald-500/10" },
+              { value: "Flexible", label: "Organization", icon: Database, color: "text-blue-400", bg: "from-blue-500/20 to-cyan-500/10" },
+              { value: "Secure", label: "Authentication", icon: Globe, color: "text-purple-400", bg: "from-purple-500/20 to-violet-500/10" },
+              { value: "Modern", label: "Tech Stack", icon: Zap, color: "text-pink-400", bg: "from-pink-500/20 to-rose-500/10" }
             ].map((metric, index) => (
               <div key={index} className="text-center group hover:scale-110 transition-all duration-500">
                 <div className={`w-28 h-28 bg-gradient-to-br ${metric.bg} rounded-3xl flex items-center justify-center mx-auto mb-8 backdrop-blur-sm group-hover:shadow-2xl border border-white/10 transition-all duration-500`} style={{
@@ -162,36 +162,36 @@ const FeatureSections = () => {
         <div className="text-center mb-24">
           <div className="inline-flex items-center justify-center p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full mb-8 backdrop-blur-xl border border-blue-500/20">
             <Rocket className="w-8 h-8 text-blue-400 mr-3" />
-            <span className="text-blue-300 font-medium text-lg">Next-Gen Technology</span>
+            <span className="text-blue-300 font-medium text-lg">Core Features</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-8xl font-bold mb-12">
             <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-              Revolutionary
+              Powerful
             </span>
             <br />
             <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Innovation
+              Features
             </span>
           </h2>
           <p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-5xl mx-auto">
-            Technologies that redefine the boundaries of what's possible
+            Everything you need for effective task management
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
           {[
             {
-              title: "Quantum AI Processing",
-              description: "Harness the power of quantum computing combined with artificial intelligence for calculations that were previously impossible.",
-              features: ["Quantum entanglement processing", "AI-driven optimization", "Real-time quantum encryption", "Infinite parallel processing"],
+              title: "Visual Task Canvas",
+              description: "Organize and manage tasks through an intuitive drag-and-drop interface that makes task management visual and efficient.",
+              features: ["Drag-and-drop interface", "Visual organization", "Task relationships", "Custom layouts"],
               icon: Zap,
               gradient: "from-yellow-300 to-orange-400",
               bgGradient: "from-yellow-500/10 to-orange-500/10"
             },
             {
-              title: "Neural Network Evolution",
-              description: "Self-evolving neural networks that continuously improve and adapt to your specific needs without human intervention.",
-              features: ["Self-modifying algorithms", "Evolutionary optimization", "Autonomous learning", "Predictive adaptation"],
+              title: "Task Management",
+              description: "Powerful tools for creating, organizing, and tracking tasks with customizable workflows.",
+              features: ["Task creation", "Priority management", "Progress tracking", "Custom workflows"],
               icon: Brain,
               gradient: "from-purple-300 to-pink-400",
               bgGradient: "from-purple-500/10 to-pink-500/10"
