@@ -410,7 +410,6 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                             dir={isMsgArabic ? 'rtl' : 'ltr'}
                             style={{ maxWidth: '100%' }}
                           >
-                            {/* ... keep existing code (ReactMarkdown component remains exactly the same) */}
                             <ReactMarkdown
                               components={{
                                 p: ({ node, ...props }) => (
@@ -532,97 +531,182 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         </ResizablePanel>
       </ResizablePanelGroup>
       
-      {/* Modal for Chats with updated styling */}
+      {/* Chat History Modal with proper z-index and improved UI */}
       {modalOpen && (
         <>
-          {/* Backdrop */}
+          {/* Fixed Backdrop with proper z-index */}
           <div
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[9999] bg-gradient-to-br from-black/60 via-blue-900/30 to-purple-900/30 backdrop-blur-md"
             onClick={() => setModalOpen(false)}
+            style={{ pointerEvents: 'auto' }}
           />
-          {/* Dropdown Modal with updated colors */}
+          
+          {/* Modal Content with higher z-index */}
           <div
-            className="fixed left-1/2 top-0 z-50 w-full max-w-xl -translate-x-1/2 mt-3 animate-drop-in"
+            className="fixed left-1/2 top-1/2 z-[10000] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 animate-modal-in pointer-events-auto"
             tabIndex={-1}
             style={{ outline: 'none' }}
             onKeyDown={e => { if (e.key === 'Escape') setModalOpen(false); }}
           >
-            <div className="bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-500/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-500/20 rounded-2xl shadow-2xl border border-white/30 backdrop-blur-xl overflow-hidden">
-              <div className="flex items-center px-6 py-4 gap-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
-                <MessageSquare className="w-7 h-7 text-blue-600" />
-                <span className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Chats</span>
-                <div className="flex items-center gap-2 ml-auto">
-                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30" title="New chat" onClick={handleStartNewChat}>
-                    <Plus className="w-6 h-6 text-blue-600" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-red-100 dark:hover:bg-red-900/30" title="Close chats modal" onClick={() => setModalOpen(false)} aria-label="Close chats modal">
-                    <X className="w-6 h-6 text-red-600" />
-                  </Button>
+            <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 dark:from-gray-900/95 dark:via-blue-950/95 dark:to-purple-950/95 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 backdrop-blur-xl overflow-hidden">
+              
+              {/* Enhanced Header */}
+              <div className="relative px-8 py-6 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 border-b border-white/30">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5" />
+                <div className="relative flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-lg">
+                    <MessageSquare className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+                      Chat History
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Manage your conversations
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          size="icon"
+                          className="rounded-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transition-all hover:scale-105 border-0"
+                          onClick={handleStartNewChat}
+                        >
+                          <Plus className="w-5 h-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>New chat</TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                          onClick={() => setModalOpen(false)}
+                        >
+                          <X className="w-6 h-6" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Close</TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
               </div>
-              <div className="px-6 pt-2 pb-2">
-                <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+
+              {/* Enhanced Search Section */}
+              <div className="px-8 py-6 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <Input
-                    placeholder="Search chats"
-                    className="pl-10 pr-3 py-2 rounded-xl shadow-sm border border-white/40 bg-white/90 dark:bg-gray-800/90 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition text-base backdrop-blur-sm"
+                    placeholder="Search through your conversations..."
+                    className="pl-12 pr-4 py-3 rounded-2xl shadow-sm border-white/60 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition text-base"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     autoFocus
                   />
                 </div>
-                <Button
-                  className="w-full mb-4 font-semibold justify-start bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 hover:from-blue-600/20 hover:via-purple-600/20 hover:to-pink-500/20 text-blue-600 rounded-xl py-2 border border-blue-200 dark:border-blue-800"
-                  onClick={handleStartNewChat}
-                >
-                  Start New Chat
-                </Button>
-                <div className="max-h-80 overflow-y-auto space-y-2">
+              </div>
+
+              {/* Enhanced Chat List */}
+              <div className="px-8 pb-8 max-h-96 overflow-y-auto">
+                <div className="space-y-3">
                   {chats
                     .filter(chat => chat.title.toLowerCase().includes(search.toLowerCase()))
                     .map((chat) => (
                       <div
                         key={chat.id}
-                        className={`flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-blue-500/30 hover:shadow-md transition bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm ${selectedChatId === chat.id ? 'border-l-4 border-l-blue-600 shadow-lg bg-blue-50/80 dark:bg-blue-900/20' : ''}`}
-                      >
-                        <Avatar className="w-9 h-9 shadow-sm">
-                          <AvatarImage src="/ai-avatar.png" alt={chat.title} />
-                          <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">{chat.title[0]}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => {
+                        className={cn(
+                          "group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 cursor-pointer",
+                          "bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/40 dark:border-gray-700/40",
+                          "hover:bg-gradient-to-r hover:from-blue-50/80 hover:via-purple-50/80 hover:to-pink-50/80 dark:hover:from-blue-950/50 dark:hover:via-purple-950/50 dark:hover:to-pink-950/50",
+                          "hover:border-blue-300/50 hover:shadow-lg hover:scale-[1.02]",
+                          selectedChatId === chat.id && "ring-2 ring-blue-500/50 bg-gradient-to-r from-blue-50/80 via-purple-50/80 to-pink-50/80 dark:from-blue-950/60 dark:via-purple-950/60 dark:to-pink-950/60 shadow-lg"
+                        )}
+                        onClick={() => {
                           setSelectedChatId(chat.id);
                           setModalOpen(false);
-                        }}>
-                          <div className="font-semibold truncate text-base leading-tight">{chat.title}</div>
+                        }}
+                      >
+                        <Avatar className="w-12 h-12 shadow-lg ring-2 ring-white/50 flex-shrink-0">
+                          <AvatarImage src="/ai-avatar.png" alt={chat.title} />
+                          <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white font-semibold">
+                            {chat.title[0]?.toUpperCase() || 'C'}
+                          </AvatarFallback>
+                        </Avatar>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-lg text-foreground leading-tight mb-1 truncate">
+                            {chat.title}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(chat.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </p>
                         </div>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30"
-                              aria-label="Delete chat"
-                              title="Delete chat"
-                              onClick={() => handleDeleteChat(chat.id)}
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Delete chat</TooltipContent>
-                        </Tooltip>
+
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {selectedChatId === chat.id && (
+                            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" />  
+                          )}
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteChat(chat.id);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete chat</TooltipContent>
+                          </Tooltip>
+                        </div>
                       </div>
                     ))}
+                  
+                  {chats.filter(chat => chat.title.toLowerCase().includes(search.toLowerCase())).length === 0 && (
+                    <div className="text-center py-12">
+                      <MessageSquare className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+                      <p className="text-muted-foreground text-lg font-medium">
+                        {search ? 'No chats found' : 'No conversations yet'}
+                      </p>
+                      <p className="text-muted-foreground/70 text-sm mt-2">
+                        {search ? 'Try adjusting your search terms' : 'Start a new chat to begin'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
+          
+          {/* Enhanced Modal Animation Styles */}
           <style>{`
-            @keyframes drop-in {
-              0% { opacity: 0; transform: translate(-50%, -40px); }
-              100% { opacity: 1; transform: translate(-50%, 0); }
+            @keyframes modal-in {
+              0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.9);
+                backdrop-filter: blur(0px);
+              }
+              100% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1);
+                backdrop-filter: blur(12px);
+              }
             }
-            .animate-drop-in {
-              animation: drop-in 0.35s cubic-bezier(.4,1.7,.6,1) both;
+            .animate-modal-in {
+              animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
             }
           `}</style>
         </>
