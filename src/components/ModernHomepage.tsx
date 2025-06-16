@@ -36,7 +36,7 @@ const ModernHomepage = () => {
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse block">  
               REVOLUTIONIZE YOUR WORKFLOW  
             </span>  
-            <span className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-gray-300 mt-2 block">with <span className="text-purple-400">TASKATY</span></span>  
+            <span className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-gray-300 mt-2 block">with <span className="text-purple-400">Ticko</span></span>  
           </h1>
           
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed animate-fade-in delay-200">
@@ -107,7 +107,7 @@ const ModernHomepage = () => {
               <div className="relative">
                 <img 
                   src="/canvas-demo.png" 
-                  alt="Taskaty Canvas Demo" 
+                  alt="Ticko Canvas Demo" 
                   className="w-full h-auto object-cover rounded-lg shadow-lg" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent flex items-end justify-center pb-6">

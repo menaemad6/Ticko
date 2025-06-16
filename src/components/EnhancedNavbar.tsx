@@ -23,7 +23,7 @@ const EnhancedNavbar = () => {
           <div className="w-4 h-4 bg-white rounded-sm"></div>
         </div>
         <span className="text-xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-          TASKATY
+          Ticko
         </span>
         <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">®</Badge>
       </div>

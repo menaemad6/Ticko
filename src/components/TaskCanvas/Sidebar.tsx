@@ -371,7 +371,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
             {/* Clickable Title */}
             <Link to="/" className="flex-1">
               <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none hover:opacity-80 transition-opacity">
-                Taskaty
+                Ticko
               </h2>
             </Link>
             {!isMobile && (
