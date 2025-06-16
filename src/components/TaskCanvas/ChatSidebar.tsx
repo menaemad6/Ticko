@@ -279,10 +279,10 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   if (!open) {
     return (
       <button
-        className="fixed bottom-[180px] right-4 z-40 bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-lg rounded-full p-3 flex items-center justify-center hover:scale-105 transition-transform border-none"
+        className="fixed bottom-[180px] right-4 z-40 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-2xl rounded-full p-3 flex items-center justify-center hover:scale-105 transition-transform border-2 border-white/20 backdrop-blur-sm"
         onClick={() => setOpen(true)}
         aria-label="Open AI Chat"
-        style={{ boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.18)' }}
+        style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)' }}
       >
         <MessageSquare className="w-7 h-7" />
       </button>
@@ -297,7 +297,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         
         <ResizableHandle 
           withHandle 
-          className="w-2 bg-white/30 hover:bg-primary/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto"
+          className="w-2 bg-gradient-to-b from-blue-600/20 via-purple-600/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-600/40 hover:via-purple-600/40 hover:to-pink-500/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto backdrop-blur-sm"
         />
         
         <ResizablePanel 
@@ -307,19 +307,19 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
           className="min-w-[250px] pointer-events-auto"
         >
           <div className="h-full w-full flex flex-col shadow-2xl relative">
-            {/* Glassmorphism background that resizes with the panel */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/40 to-purple-100/60 dark:from-gray-900/80 dark:via-gray-950/80 dark:to-purple-950/60 backdrop-blur-2xl rounded-l-3xl border-l border-white/20" />
+            {/* Updated Glassmorphism background with theme colors */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-500/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-500/20 backdrop-blur-2xl rounded-l-3xl border-l border-white/30" />
             
             {/* Sidebar Content */}
             <div className="relative flex flex-col h-full w-full">
-              {/* Header */}
-              <div className="p-6 border-b border-white/20 flex items-center gap-4 relative z-10">
-                <Avatar className="w-12 h-12 shadow-lg ring-2 ring-primary/30">
+              {/* Header with updated gradient colors */}
+              <div className="p-6 border-b border-white/30 flex items-center gap-4 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
+                <Avatar className="w-12 h-12 shadow-lg ring-2 ring-blue-500/30">
                   <AvatarImage src="/ai-avatar.png" alt="AI" />
-                  <AvatarFallback>AI</AvatarFallback>
+                  <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-xl text-primary drop-shadow-sm">AI Assistant</div>
+                  <div className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">AI Assistant</div>
                   <div className="text-xs text-muted-foreground">
                     {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
                   </div>
@@ -329,7 +329,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     <TooltipTrigger asChild>
                       <Button
                         size="icon"
-                        className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                        className="rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
                         title="Open chat history"
                         aria-label="Open chat history"
                         onClick={() => setModalOpen(true)}
@@ -343,7 +343,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     <TooltipTrigger asChild>
                       <Button
                         size="icon"
-                        className="rounded-full bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground shadow-md transition-colors"
+                        className="rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
                         title="Close chat sidebar"
                         aria-label="Close chat sidebar"
                         onClick={() => setOpen(false)}
@@ -356,8 +356,8 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                 </div>
               </div>
 
-              {/* Action Mode Toggle */}
-              <div className="px-6 py-3 border-b border-white/20 bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm">
+              {/* Action Mode Toggle with updated colors */}
+              <div className="px-6 py-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
                 <div className="flex items-center space-x-3">
                   <Zap className={cn("w-5 h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
                   <Label htmlFor="action-mode" className="text-sm font-medium cursor-pointer flex-1">
@@ -367,7 +367,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     id="action-mode"
                     checked={actionMode}
                     onCheckedChange={setActionMode}
-                    className="data-[state=checked]:bg-yellow-500"
+                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-600 data-[state=checked]:to-purple-600"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 ml-8">
@@ -380,7 +380,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
 
               <Separator className="opacity-30" />
               
-              {/* Messages */}
+              {/* Messages with updated styling */}
               <ScrollArea className="flex-1 p-6 space-y-6 z-10">
                 <div ref={scrollRef} className="space-y-6">
                   {messages.map((msg) => {
@@ -390,7 +390,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                         {msg.role === 'ai' && (
                           <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/ai-avatar.png" alt="AI" />
-                            <AvatarFallback>AI</AvatarFallback>
+                            <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
                           </Avatar>
                         )}
                         <Card
@@ -398,8 +398,8 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                             'px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium',
                             'overflow-x-auto min-w-0',
                             msg.role === 'user'
-                              ? 'bg-blue-600 dark:bg-blue-700 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl'
-                              : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-gray-200 dark:border-gray-700'
+                              ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl shadow-lg'
+                              : 'bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-white/40 backdrop-blur-sm'
                           )}
                         >
                           <div
@@ -410,6 +410,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                             dir={isMsgArabic ? 'rtl' : 'ltr'}
                             style={{ maxWidth: '100%' }}
                           >
+                            {/* ... keep existing code (ReactMarkdown component remains exactly the same) */}
                             <ReactMarkdown
                               components={{
                                 p: ({ node, ...props }) => (
@@ -477,7 +478,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                         {msg.role === 'user' && (
                           <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/user-avatar.png" alt="You" />
-                            <AvatarFallback>U</AvatarFallback>
+                            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">U</AvatarFallback>
                           </Avatar>
                         )}
                       </div>
@@ -487,26 +488,26 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     <div className="flex items-end gap-3 justify-start">
                       <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
                         <AvatarImage src="/ai-avatar.png" alt="AI" />
-                        <AvatarFallback>AI</AvatarFallback>
+                        <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
                       </Avatar>
-                      <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-gray-200 dark:border-gray-700">
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
+                        <Loader2 className="w-5 h-5 animate-spin mr-2 text-blue-600" />
                         {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
                       </Card>
                     </div>
                   )}
                   {error && (
-                    <div className="text-red-500 text-sm mt-2">{error}</div>
+                    <div className="text-red-500 text-sm mt-2 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">{error}</div>
                   )}
                   <div ref={endOfMessagesRef} />
                 </div>
               </ScrollArea>
               
-              {/* Input */}
-              <div className="p-6 border-t border-white/20 bg-white/60 dark:bg-gray-900/60 flex items-center gap-3 backdrop-blur-xl z-10">
+              {/* Input with updated styling */}
+              <div className="p-6 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-3 backdrop-blur-xl z-10">
                 <Input
                   placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
-                  className="flex-1 rounded-2xl bg-white/80 dark:bg-gray-900/80 border-none shadow-inner px-4 py-3 text-base min-w-0"
+                  className="flex-1 rounded-2xl bg-white/90 dark:bg-gray-900/90 border-white/40 shadow-inner px-4 py-3 text-base min-w-0 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -517,8 +518,8 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   variant="default"
                   size="icon"
                   className={cn(
-                    "rounded-full shadow-lg flex-shrink-0",
-                    actionMode && "bg-yellow-500 hover:bg-yellow-600"
+                    "rounded-full shadow-lg flex-shrink-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 hover:from-blue-700 hover:via-purple-700 hover:to-pink-600 text-white border-0 transition-all hover:scale-105",
+                    actionMode && "from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                   )}
                   onClick={handleSend}
                   disabled={sending || loading || !input.trim() || !selectedChatId}
@@ -531,32 +532,31 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         </ResizablePanel>
       </ResizablePanelGroup>
       
-      {/* Modal for Chats */}
+      {/* Modal for Chats with updated styling */}
       {modalOpen && (
-        // ... keep existing code (modal content remains exactly the same)
         <>
           {/* Backdrop */}
           <div
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
             onClick={() => setModalOpen(false)}
           />
-          {/* Dropdown Modal */}
+          {/* Dropdown Modal with updated colors */}
           <div
             className="fixed left-1/2 top-0 z-50 w-full max-w-xl -translate-x-1/2 mt-3 animate-drop-in"
             tabIndex={-1}
             style={{ outline: 'none' }}
             onKeyDown={e => { if (e.key === 'Escape') setModalOpen(false); }}
           >
-            <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl overflow-hidden">
-              <div className="flex items-center px-6 py-4 gap-3 border-b border-white/20">
-                <MessageSquare className="w-7 h-7 text-primary" />
-                <span className="font-bold text-xl">Chats</span>
+            <div className="bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-500/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-500/20 rounded-2xl shadow-2xl border border-white/30 backdrop-blur-xl overflow-hidden">
+              <div className="flex items-center px-6 py-4 gap-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
+                <MessageSquare className="w-7 h-7 text-blue-600" />
+                <span className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Chats</span>
                 <div className="flex items-center gap-2 ml-auto">
-                  <Button variant="ghost" size="icon" className="rounded-full" title="New chat" onClick={handleStartNewChat}>
-                    <Plus className="w-6 h-6" />
+                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30" title="New chat" onClick={handleStartNewChat}>
+                    <Plus className="w-6 h-6 text-blue-600" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="rounded-full" title="Close chats modal" onClick={() => setModalOpen(false)} aria-label="Close chats modal">
-                    <X className="w-6 h-6" />
+                  <Button variant="ghost" size="icon" className="rounded-full hover:bg-red-100 dark:hover:bg-red-900/30" title="Close chats modal" onClick={() => setModalOpen(false)} aria-label="Close chats modal">
+                    <X className="w-6 h-6 text-red-600" />
                   </Button>
                 </div>
               </div>
@@ -565,14 +565,14 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                   <Input
                     placeholder="Search chats"
-                    className="pl-10 pr-3 py-2 rounded-xl shadow-sm border border-border bg-white/70 dark:bg-gray-800/70 focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition text-base"
+                    className="pl-10 pr-3 py-2 rounded-xl shadow-sm border border-white/40 bg-white/90 dark:bg-gray-800/90 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition text-base backdrop-blur-sm"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     autoFocus
                   />
                 </div>
                 <Button
-                  className="w-full mb-4 font-semibold justify-start bg-primary/10 hover:bg-primary/20 text-primary rounded-xl py-2"
+                  className="w-full mb-4 font-semibold justify-start bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 hover:from-blue-600/20 hover:via-purple-600/20 hover:to-pink-500/20 text-blue-600 rounded-xl py-2 border border-blue-200 dark:border-blue-800"
                   onClick={handleStartNewChat}
                 >
                   Start New Chat
@@ -583,11 +583,11 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     .map((chat) => (
                       <div
                         key={chat.id}
-                        className={`flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-primary/30 hover:shadow-md transition bg-white/70 dark:bg-gray-800/70 ${selectedChatId === chat.id ? 'border-l-4 border-l-primary/90 shadow-lg bg-primary/10 dark:bg-primary/20' : ''}`}
+                        className={`flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-blue-500/30 hover:shadow-md transition bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm ${selectedChatId === chat.id ? 'border-l-4 border-l-blue-600 shadow-lg bg-blue-50/80 dark:bg-blue-900/20' : ''}`}
                       >
                         <Avatar className="w-9 h-9 shadow-sm">
                           <AvatarImage src="/ai-avatar.png" alt={chat.title} />
-                          <AvatarFallback>{chat.title[0]}</AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">{chat.title[0]}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => {
                           setSelectedChatId(chat.id);
@@ -600,7 +600,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-700"
+                              className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30"
                               aria-label="Delete chat"
                               title="Delete chat"
                               onClick={() => handleDeleteChat(chat.id)}

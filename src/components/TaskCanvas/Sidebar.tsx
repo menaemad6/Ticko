@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarFooter, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { 
   CheckSquare, 
@@ -103,6 +103,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
   const completedTasks = tasks.filter(task => task.status === 'done').length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
+  // ... keep existing code (nodeTypes array)
   const nodeTypes = [
     {
       type: 'task' as const,
@@ -127,6 +128,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
     }
   ];
 
+  // ... keep existing code (templates, actions arrays)
   const templates = [
     { name: 'Sprint Planning', nodes: 5, color: 'bg-green-100 text-green-800', description: 'Agile sprint workflow' },
     { name: 'Project Roadmap', nodes: 10, color: 'bg-blue-100 text-blue-800', description: 'Full project lifecycle' },
@@ -293,6 +295,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
     }
   ];
 
+  // ... keep existing code (all handler functions)
   const handleTemplateClick = (templateName: string) => {
     if (!isActionInProgress) {
       onTemplateSelect?.(templateName);
@@ -359,12 +362,18 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         collapsible="offcanvas"
         style={isMobile ? ({ ['--sidebar-width']: '90vw' } as Record<string, string>) : undefined}
       >
-        <SidebarHeader className="p-4 border-b bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-t-xl shadow-sm relative">
+        <SidebarHeader className="p-4 border-b bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20 backdrop-blur-xl relative">
           <div className="flex items-center gap-3 mb-4">
-            <img src="/placeholder.svg" alt="Logo" className="w-8 h-8 rounded shadow-sm border border-gray-200 dark:border-gray-800 bg-white" />
-            <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none">
-              Taskaty
-            </h2>
+            {/* Logo */}
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">T</span>
+            </div>
+            {/* Clickable Title */}
+            <Link to="/" className="flex-1">
+              <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none hover:opacity-80 transition-opacity">
+                Taskaty
+              </h2>
+            </Link>
             {!isMobile && (
               <div className="ml-auto">
                 <SidebarTrigger
@@ -384,7 +393,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
               <User className="w-4 h-4" />
               <span className="truncate">{user?.email}</span>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 flex flex-col gap-2 border border-white/20">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium">Progress</span>
                 <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{completionRate}%</span>
@@ -397,7 +406,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           </div>
         </SidebarHeader>
 
-        <SidebarContent className="p-4 space-y-6 bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-b-xl shadow-sm border-t border-gray-200 dark:border-gray-800 custom-scrollbar">
+        <SidebarContent className="p-4 space-y-6 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5 dark:from-blue-600/10 dark:via-purple-600/10 dark:to-pink-600/10 backdrop-blur-xl custom-scrollbar">
           {/* Node Types */}
           <SidebarGroup>
             <SidebarGroupLabel className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -560,7 +569,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-4 border-t bg-gradient-to-r from-blue-50/80 via-white/80 to-purple-50/80 dark:from-gray-950/80 dark:via-gray-900/80 dark:to-purple-950/80 rounded-b-xl shadow-sm border-t border-gray-200 dark:border-gray-800">
+        <SidebarFooter className="p-4 border-t bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20 backdrop-blur-xl">
           <div className="space-y-3">
             <Button
               variant="ghost"
