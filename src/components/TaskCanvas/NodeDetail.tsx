@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -138,21 +139,21 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl border-0 p-0 m-2 sm:m-4 ${getStatusBg(localTask.status)}`}>
+      <DialogContent className={`w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl border-0 p-0 m-2 sm:m-4 bg-background`}>
         <div className="flex flex-col h-full max-h-[95vh] sm:max-h-[90vh]">
-          <DialogHeader className="space-y-4 sm:space-y-6 pt-4 sm:pt-8 flex-shrink-0">
+          <DialogHeader className="space-y-4 sm:space-y-6 pt-4 sm:pt-8 px-4 sm:px-8 flex-shrink-0">
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-6">
               <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0 w-full">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg flex items-center justify-center flex-shrink-0">
-                  <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-sidebar-primary/10 dark:bg-sidebar-primary/20 backdrop-blur-sm shadow-lg flex items-center justify-center flex-shrink-0 border border-sidebar-border">
+                  <CheckSquare className="w-5 h-5 sm:w-6 sm:h-6 text-sidebar-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 leading-tight break-words">
+                  <DialogTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-sidebar-foreground mb-2 sm:mb-3 leading-tight break-words">
                     {task.title}
                   </DialogTitle>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <Select value={localTask.status} onValueChange={handleStatusChange}>
-                      <SelectTrigger className={`w-28 sm:w-32 ${getStatusColor(localTask.status)} font-semibold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-blue-400`}>
+                      <SelectTrigger className={`w-28 sm:w-32 ${getStatusColor(localTask.status)} font-semibold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-sidebar-primary/50`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -162,7 +163,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                       </SelectContent>
                     </Select>
                     <Select value={localTask.priority} onValueChange={handlePriorityChange}>
-                      <SelectTrigger className={`w-28 sm:w-32 ${getPriorityColor(localTask.priority)} font-semibold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-red-400`}>
+                      <SelectTrigger className={`w-28 sm:w-32 ${getPriorityColor(localTask.priority)} font-semibold px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl shadow-sm border-0 focus:ring-2 focus:ring-destructive/50`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -171,7 +172,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                         <SelectItem value="high">High</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Badge variant="outline" className="capitalize px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-gray-200 dark:border-gray-700">
+                    <Badge variant="outline" className="capitalize px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg sm:rounded-xl bg-sidebar-accent text-sidebar-accent-foreground border-sidebar-border">
                       {localTask.nodeType}
                     </Badge>
                   </div>
@@ -182,7 +183,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                   variant="outline"
                   size="sm"
                   onClick={handleEdit}
-                  className="hover:bg-blue-50 hover:border-blue-300 shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 flex-1 sm:flex-none"
+                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border flex-1 sm:flex-none"
                 >
                   <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   <span className="text-xs sm:text-sm">Edit</span>
@@ -192,7 +193,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                   size="sm"
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 flex-1 sm:flex-none"
+                  className="hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border flex-1 sm:flex-none"
                 >
                   <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                   <span className="text-xs sm:text-sm">{isDeleting ? 'Deleting...' : 'Delete'}</span>
@@ -205,7 +206,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
               <div className="flex justify-center relative">
                 <div className="relative group">
                   {/* Animated background elements */}
-                  <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></div>
+                  <div className="absolute -inset-2 bg-gradient-to-r from-sidebar-primary via-blue-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></div>
                   <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl blur-sm opacity-30 group-hover:opacity-50 animate-pulse transition-opacity duration-700"></div>
                   
                   <Button
@@ -254,56 +255,104 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
             )}
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 sm:space-y-6 px-4 sm:px-8 pb-4 sm:pb-8">
-            {/* AI Help Section */}
-            <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-100 dark:border-purple-800 shadow-lg backdrop-blur-sm">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 sm:space-y-8 px-4 sm:px-8 pb-4 sm:pb-8">
+            {/* Enhanced AI Help Section */}
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-sidebar-primary/5 via-blue-500/5 to-purple-500/5 dark:from-sidebar-primary/10 dark:via-blue-500/10 dark:to-purple-500/10 border border-sidebar-border shadow-2xl backdrop-blur-sm">
+              {/* Animated background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-sidebar-primary/5 via-transparent to-blue-500/5 animate-pulse"></div>
+              
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-sidebar-primary/10 to-transparent rounded-full blur-2xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-xl"></div>
+              
+              <div className="relative p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                  <div className="flex items-start gap-4 sm:gap-6">
+                    {/* Enhanced AI Icon */}
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-sidebar-primary to-blue-500 rounded-2xl blur opacity-75 animate-pulse"></div>
+                      <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-sidebar-primary via-blue-500 to-purple-500 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-2xl">
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-2xl sm:rounded-3xl"></div>
+                        <Bot className="w-7 h-7 sm:w-8 sm:h-8 text-white relative z-10" />
+                        {/* Floating sparkles */}
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                        <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-sidebar-primary to-blue-600 bg-clip-text text-transparent">
+                          AI Assistant
+                        </h4>
+                        <Sparkles className="w-5 h-5 text-sidebar-primary animate-pulse" />
+                      </div>
+                      <p className="text-sm sm:text-base text-sidebar-foreground/80 leading-relaxed">
+                        Get intelligent suggestions, task breakdowns, and personalized productivity tips powered by advanced AI
+                      </p>
+                      
+                      {/* Feature highlights */}
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        <div className="flex items-center gap-1 px-3 py-1 bg-sidebar-accent/50 rounded-full text-xs font-medium text-sidebar-accent-foreground">
+                          <Star className="w-3 h-3" />
+                          Smart Analysis
+                        </div>
+                        <div className="flex items-center gap-1 px-3 py-1 bg-sidebar-accent/50 rounded-full text-xs font-medium text-sidebar-accent-foreground">
+                          <Zap className="w-3 h-3" />
+                          Instant Help
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Get AI Help</h4>
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">Let AI assist you with this task</p>
+                  
+                  {/* Enhanced CTA Button */}
+                  <div className="relative w-full sm:w-auto">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-sidebar-primary via-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                    <Button
+                      onClick={handleAIHelp}
+                      className="relative w-full sm:w-auto bg-gradient-to-r from-sidebar-primary via-blue-500 to-purple-500 hover:from-sidebar-primary/90 hover:via-blue-600 hover:to-purple-600 text-white font-bold px-8 sm:px-10 py-3 sm:py-4 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-0 overflow-hidden group"
+                    >
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-[shimmer_3s_infinite]"></div>
+                      
+                      <div className="relative flex items-center justify-center gap-3">
+                        <Bot className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-12 transition-transform duration-300" />
+                        <span className="text-sm sm:text-base font-semibold">Get AI Help</span>
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                      </div>
+                    </Button>
                   </div>
                 </div>
-                <Button
-                  onClick={handleAIHelp}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200 w-full sm:w-auto"
-                >
-                  <Bot className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                  <span className="text-sm sm:text-base">Ask AI</span>
-                </Button>
               </div>
             </div>
 
             {/* Description Section */}
-            <div className="bg-white/60 dark:bg-gray-800/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm border border-gray-100 dark:border-gray-800">
-              <h4 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200 flex items-center justify-between">
+            <div className="bg-sidebar-accent/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm border border-sidebar-border">
+              <h4 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 text-sidebar-foreground flex items-center justify-between">
                 Description
                 {!editingDescription ? (
-                  <Button size="icon" variant="ghost" className="rounded-lg sm:rounded-xl h-8 w-8 sm:h-10 sm:w-10" onClick={() => { setEditingDescription(true); setDescValue(task.description || ''); }}>
+                  <Button size="icon" variant="ghost" className="rounded-lg sm:rounded-xl h-8 w-8 sm:h-10 sm:w-10 hover:bg-sidebar-accent" onClick={() => { setEditingDescription(true); setDescValue(task.description || ''); }}>
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 ) : null}
               </h4>
               {!editingDescription ? (
-                <p className="text-sm sm:text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed break-words">
+                <p className="text-sm sm:text-base md:text-lg text-sidebar-foreground/80 leading-relaxed break-words">
                   {localTask.description || 'No description provided'}
                 </p>
               ) : (
                 <div className="flex flex-col gap-3">
                   <textarea
-                    className="w-full rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 sm:p-4 text-sm sm:text-base md:text-lg text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 resize-none min-h-[80px] sm:min-h-[100px]"
+                    className="w-full rounded-lg sm:rounded-xl border border-sidebar-border bg-sidebar-background p-3 sm:p-4 text-sm sm:text-base md:text-lg text-sidebar-foreground focus:ring-2 focus:ring-sidebar-primary/50 resize-none min-h-[80px] sm:min-h-[100px]"
                     value={descValue}
                     onChange={e => setDescValue(e.target.value)}
                     autoFocus
                   />
                   <div className="flex gap-2 sm:gap-3 justify-end">
-                    <Button onClick={handleDescriptionSave} className="rounded-lg sm:rounded-xl text-sm sm:text-base px-4 sm:px-6">
+                    <Button onClick={handleDescriptionSave} className="rounded-lg sm:rounded-xl text-sm sm:text-base px-4 sm:px-6 bg-sidebar-primary hover:bg-sidebar-primary/90">
                       Save
                     </Button>
-                    <Button variant="outline" onClick={() => setEditingDescription(false)} className="rounded-lg sm:rounded-xl text-sm sm:text-base px-4 sm:px-6">
+                    <Button variant="outline" onClick={() => setEditingDescription(false)} className="rounded-lg sm:rounded-xl text-sm sm:text-base px-4 sm:px-6 border-sidebar-border hover:bg-sidebar-accent">
                       Cancel
                     </Button>
                   </div>
@@ -312,13 +361,13 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
             </div>
 
             {/* Due Date */}
-            <div className="flex items-center gap-3 sm:gap-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-blue-100 dark:border-blue-900 shadow-lg backdrop-blur-sm">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 dark:bg-blue-800 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center gap-3 sm:gap-4 bg-sidebar-accent/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sidebar-border shadow-lg backdrop-blur-sm">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sidebar-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 border border-sidebar-border">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-sidebar-primary" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="font-semibold text-gray-700 dark:text-gray-200 text-sm sm:text-base md:text-lg block">Due Date</span>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 break-words">
+                <span className="font-semibold text-sidebar-foreground text-sm sm:text-base md:text-lg block">Due Date</span>
+                <p className="text-sm sm:text-base text-sidebar-foreground/70 break-words">
                   {task.dueDate
                     ? new Date(task.dueDate).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -332,19 +381,19 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
 
             {/* Tags */}
             {task.tags && task.tags.length > 0 && (
-              <div className="bg-purple-50 dark:bg-purple-950/40 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-purple-100 dark:border-purple-900 shadow-lg backdrop-blur-sm">
+              <div className="bg-sidebar-accent/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-sidebar-border shadow-lg backdrop-blur-sm">
                 <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 dark:bg-purple-800 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Tag className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-sidebar-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 border border-sidebar-border">
+                    <Tag className="w-4 h-4 sm:w-5 sm:h-5 text-sidebar-primary" />
                   </div>
-                  <h4 className="font-semibold text-gray-700 dark:text-gray-300 text-sm sm:text-base md:text-lg">Tags</h4>
+                  <h4 className="font-semibold text-sidebar-foreground text-sm sm:text-base md:text-lg">Tags</h4>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:gap-3">
                   {task.tags.map((tag, index) => (
                     <Badge
                       key={index}
                       variant="secondary"
-                      className="bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium break-words"
+                      className="bg-sidebar-primary/10 text-sidebar-primary hover:bg-sidebar-primary/20 border-sidebar-border px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium break-words"
                     >
                       {tag}
                     </Badge>
