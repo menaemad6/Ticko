@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -17,7 +18,6 @@ import { cn } from '@/lib/utils';
 import { useState as useReactState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChatSidebarProps {
   forceOpen?: boolean;
@@ -78,11 +78,9 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
   const [newChatTitle, setNewChatTitle] = useState('');
   const [actionMode, setActionMode] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
-  const [sidebarWidth, setSidebarWidth] = useState(25); // Track sidebar width for mobile
   const scrollRef = useRef<HTMLDivElement>(null);
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
-  const isMobile = useIsMobile();
 
   const {
     chats,
@@ -292,263 +290,21 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
     );
   }
 
-  // Mobile version - use a simple fixed width overlay instead of resizable panels
-  if (isMobile) {
-    return (
-      <div className="fixed top-0 right-0 h-full z-40 w-full pointer-events-none">
-        {/* Background overlay */}
-        <div 
-          className="absolute inset-0 bg-black/20 backdrop-blur-sm pointer-events-auto"
-          onClick={() => setOpen(false)}
-        />
-        
-        {/* Sidebar content - takes most of the screen on mobile */}
-        <div className="absolute top-0 right-0 h-full w-[90vw] max-w-md pointer-events-auto">
-          <div className="h-full w-full flex flex-col shadow-2xl relative">
-            {/* Updated Glassmorphism background with theme colors */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-500/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-500/20 backdrop-blur-2xl rounded-l-3xl border-l border-white/30" />
-            
-            {/* Sidebar Content - reuse the same content structure */}
-            <div className="relative flex flex-col h-full w-full">
-              {/* Header */}
-              <div className="p-3 sm:p-4 border-b border-white/30 flex items-center gap-2 sm:gap-3 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
-                <Avatar className="w-8 h-8 sm:w-10 sm:h-10 shadow-lg ring-2 ring-blue-500/30">
-                  <AvatarImage src="/ai-avatar.png" alt="AI" />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs sm:text-sm">AI</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-sm sm:text-lg bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">AI Assistant</div>
-                  <div className="text-xs text-muted-foreground">
-                    {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
-                        title="Open chat history"
-                        aria-label="Open chat history"
-                        onClick={() => setModalOpen(true)}
-                      >
-                        <History className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Open chat history</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="icon"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
-                        title="Close chat sidebar"
-                        aria-label="Close chat sidebar"
-                        onClick={() => setOpen(false)}
-                      >
-                        <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Close chat sidebar</TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-
-              {/* Action Mode Toggle */}
-              <div className="px-3 py-2 sm:px-4 sm:py-2.5 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <Zap className={cn("w-4 h-4 sm:w-5 sm:h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
-                  <Label htmlFor="action-mode" className="text-xs sm:text-sm font-medium cursor-pointer flex-1">
-                    Action Mode
-                  </Label>
-                  <Switch
-                    id="action-mode"
-                    checked={actionMode}
-                    onCheckedChange={setActionMode}
-                    className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-600 data-[state=checked]:to-purple-600"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 ml-6 sm:ml-8">
-                  {actionMode 
-                    ? "AI will perform task actions directly" 
-                    : "Regular conversation mode"
-                  }
-                </p>
-              </div>
-
-              <Separator className="opacity-30" />
-              
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-2 sm:p-4 space-y-4 sm:space-y-6 z-10">
-                <div ref={scrollRef} className="space-y-3 sm:space-y-4">
-                  {messages.map((msg) => {
-                    const isMsgArabic = isArabic(msg.content);
-                    return (
-                      <div key={msg.id} className={`flex items-end gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {msg.role === 'ai' && (
-                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 shadow-md flex-shrink-0">
-                            <AvatarImage src="/ai-avatar.png" alt="AI" />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
-                          </Avatar>
-                        )}
-                        <Card
-                          className={cn(
-                            'px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%] shadow-xl border-0 text-sm sm:text-base font-medium',
-                            'overflow-x-auto min-w-0',
-                            msg.role === 'user'
-                              ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl shadow-lg'
-                              : 'bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-white/40 backdrop-blur-sm'
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              'markdown-content w-full max-w-full overflow-x-auto',
-                              isMsgArabic && 'font-arabic'
-                            )}
-                            dir={isMsgArabic ? 'rtl' : 'ltr'}
-                            style={{ maxWidth: '100%' }}
-                          >
-                            <ReactMarkdown
-                              components={{
-                                p: ({ node, ...props }) => (
-                                  <p
-                                    className={cn(
-                                      'whitespace-pre-wrap break-words mb-2 sm:mb-3 last:mb-0',
-                                      isMsgArabic && 'text-right'
-                                    )}
-                                    dir={isMsgArabic ? 'rtl' : 'ltr'}
-                                    {...props}
-                                  />
-                                ),
-                                strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-2 sm:my-3"><table className="w-full border-collapse" {...props} /></div>,
-                                thead: ({ node, ...props }) => <thead className="bg-primary/5" {...props} />,
-                                tbody: ({ node, ...props }) => <tbody {...props} />,
-                                tr: ({ node, ...props }) => <tr className="border-b border-gray-200 dark:border-gray-700" {...props} />,
-                                th: ({ node, ...props }) => <th className="py-1 px-2 sm:py-2 sm:px-4 text-left font-medium text-xs sm:text-sm" {...props} />,
-                                td: ({ node, ...props }) => <td className="py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm" {...props} />,
-                                ul: ({ node, ...props }) => (
-                                  <ul
-                                    className={cn(
-                                      'mb-2 sm:mb-3',
-                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
-                                      isMsgArabic ? 'list-disc-rtl' : 'list-disc'
-                                    )}
-                                    {...props}
-                                  />
-                                ),
-                                ol: ({ node, ...props }) => (
-                                  <ol
-                                    className={cn(
-                                      'mb-2 sm:mb-3',
-                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
-                                      isMsgArabic ? 'list-decimal-rtl' : 'list-decimal'
-                                    )}
-                                    {...props}
-                                  />
-                                ),
-                                li: ({ node, ...props }) => <li className="mb-0.5 sm:mb-1" {...props} />,
-                                a: ({ node, href, ...props }) => <a href={href} className="text-primary underline" target="_blank" rel="noopener noreferrer" {...props} />,
-                                blockquote: ({ node, ...props }) => (
-                                  <blockquote
-                                    className={cn(
-                                      'py-1 my-2 sm:my-3 italic text-sm sm:text-base',
-                                      isMsgArabic
-                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-2 sm:pr-4'
-                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-2 sm:pl-4'
-                                    )}
-                                    {...props}
-                                  />
-                                ),
-                                code: CodeWithCopy,
-                                h1: ({ node, ...props }) => <h1 className={cn('text-lg sm:text-xl font-bold my-2 sm:my-3', isMsgArabic && 'text-right')} {...props} />,
-                                h2: ({ node, ...props }) => <h2 className={cn('text-base sm:text-lg font-bold my-2 sm:my-3', isMsgArabic && 'text-right')} {...props} />,
-                                h3: ({ node, ...props }) => <h3 className={cn('text-sm sm:text-base font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
-                                h4: ({ node, ...props }) => <h4 className={cn('text-sm sm:text-base font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
-                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-2 sm:my-3" {...props} />
-                              }}
-                            >
-                              {msg.content}
-                            </ReactMarkdown>
-                          </div>
-                        </Card>
-                        {msg.role === 'user' && (
-                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 shadow-md flex-shrink-0">
-                            <AvatarImage src="/user-avatar.png" alt="You" />
-                            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs">U</AvatarFallback>
-                          </Avatar>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {(loading || sending) && (
-                    <div className="flex items-end gap-2 sm:gap-3 justify-start">
-                      <Avatar className="w-6 h-6 sm:w-8 sm:h-8 shadow-md flex-shrink-0">
-                        <AvatarImage src="/ai-avatar.png" alt="AI" />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
-                      </Avatar>
-                      <Card className="px-3 py-2 sm:px-4 sm:py-3 max-w-[85%] sm:max-w-[80%] shadow-xl border-0 text-sm sm:text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
-                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2 text-blue-600 flex-shrink-0" />
-                        <span className="text-xs sm:text-sm">
-                          {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
-                        </span>
-                      </Card>
-                    </div>
-                  )}
-                  {error && (
-                    <div className="text-red-500 text-xs sm:text-sm mt-2 bg-red-50 dark:bg-red-900/20 p-2 sm:p-3 rounded-lg border border-red-200 dark:border-red-800">{error}</div>
-                  )}
-                  <div ref={endOfMessagesRef} />
-                </div>
-              </ScrollArea>
-              
-              {/* Input */}
-              <div className="p-3 sm:p-4 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-2 sm:gap-3 backdrop-blur-xl z-10">
-                <Input
-                  placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
-                  className="flex-1 rounded-2xl bg-white/90 dark:bg-gray-900/90 border-white/40 shadow-inner px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base min-w-0 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={handleInputKeyDown}
-                  disabled={sending || loading || !selectedChatId}
-                  autoFocus
-                />
-                <Button
-                  variant="default"
-                  size="icon"
-                  className={cn(
-                    "w-10 h-10 sm:w-11 sm:h-11 rounded-full shadow-lg flex-shrink-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 hover:from-blue-700 hover:via-purple-700 hover:to-pink-600 text-white border-0 transition-all hover:scale-105",
-                    actionMode && "from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
-                  )}
-                  onClick={handleSend}
-                  disabled={sending || loading || !input.trim() || !selectedChatId}
-                >
-                  {(sending || loading) ? <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" /> : <Send className="w-5 h-5 sm:w-6 sm:h-6" />}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Desktop version - use the resizable panels
   return (
     <div className="fixed top-0 right-0 h-full z-40 w-full pointer-events-none">
       <ResizablePanelGroup direction="horizontal" className="h-full w-full">
         {/* Invisible spacer panel that grows/shrinks */}
-        <ResizablePanel 
-          defaultSize={75} 
-          minSize={0} 
-          maxSize={95} 
-          className="pointer-events-none" 
-          onResize={(size) => setSidebarWidth(100 - size)}
-        />
+        <ResizablePanel defaultSize={75} minSize={0} maxSize={95} className="pointer-events-none" />
         
         <ResizableHandle 
           withHandle 
-          className="w-2 bg-gradient-to-b from-blue-600/20 via-purple-600/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-600/40 hover:via-purple-600/40 hover:to-pink-500/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto backdrop-blur-sm"
+          className="w-2 bg-gradient-to-b from-blue-600/20 via-purple-600/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-600/40 hover:via-purple-600/40 hover:to-pink-500/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto backdrop-blur-sm touch-pan-x"
+          style={{ 
+            touchAction: 'pan-x',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none'
+          }}
         />
         
         <ResizablePanel 
