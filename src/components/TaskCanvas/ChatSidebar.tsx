@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -53,9 +54,9 @@ function CodeWithCopy({ className, children, ...props }: React.HTMLAttributes<HT
   }
   // Block code
   return (
-    <pre className="relative bg-gray-100 dark:bg-primary-300 p-4 rounded-lg overflow-x-auto my-4 w-full max-w-full min-w-0">
+    <pre className="relative bg-gray-100 dark:bg-primary-300 p-2 md:p-4 rounded-lg overflow-x-auto my-2 md:my-4 w-full max-w-full min-w-0">
       <button
-        className="absolute top-2 right-2 z-10 px-2 py-1 text-xs rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 opacity-80 hover:opacity-100 transition"
+        className="absolute top-1 right-1 md:top-2 md:right-2 z-10 px-1.5 py-0.5 md:px-2 md:py-1 text-xs rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 opacity-80 hover:opacity-100 transition"
         onClick={handleCopy}
         type="button"
         tabIndex={-1}
@@ -297,14 +298,20 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
         
         <ResizableHandle 
           withHandle 
-          className="w-2 bg-gradient-to-b from-blue-600/20 via-purple-600/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-600/40 hover:via-purple-600/40 hover:to-pink-500/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto backdrop-blur-sm"
+          className="w-2 bg-gradient-to-b from-blue-600/20 via-purple-600/20 to-pink-500/20 hover:bg-gradient-to-b hover:from-blue-600/40 hover:via-purple-600/40 hover:to-pink-500/40 transition-colors border-l border-white/40 flex items-center justify-center cursor-col-resize pointer-events-auto backdrop-blur-sm touch-pan-x"
+          style={{ 
+            touchAction: 'pan-x',
+            WebkitTouchCallout: 'none',
+            WebkitUserSelect: 'none',
+            userSelect: 'none'
+          }}
         />
         
         <ResizablePanel 
           defaultSize={25} 
           minSize={5} 
           maxSize={100}
-          className="min-w-[250px] pointer-events-auto"
+          className="min-w-[280px] sm:min-w-[320px] pointer-events-auto"
         >
           <div className="h-full w-full flex flex-col shadow-2xl relative">
             {/* Updated Glassmorphism background with theme colors */}
@@ -313,28 +320,28 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
             {/* Sidebar Content */}
             <div className="relative flex flex-col h-full w-full">
               {/* Header with updated gradient colors */}
-              <div className="p-6 border-b border-white/30 flex items-center gap-4 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
-                <Avatar className="w-12 h-12 shadow-lg ring-2 ring-blue-500/30">
+              <div className="p-3 sm:p-4 md:p-6 border-b border-white/30 flex items-center gap-2 sm:gap-3 md:gap-4 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
+                <Avatar className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 shadow-lg ring-2 ring-blue-500/30">
                   <AvatarImage src="/ai-avatar.png" alt="AI" />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
+                  <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs sm:text-sm">AI</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">AI Assistant</div>
+                  <div className="font-bold text-sm sm:text-lg md:text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">AI Assistant</div>
                   <div className="text-xs text-muted-foreground">
                     {actionMode ? 'Task management mode' : 'Ask anything about your tasks'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 ml-auto">
+                <div className="flex items-center gap-1 sm:gap-2 ml-auto">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         size="icon"
-                        className="rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
                         title="Open chat history"
                         aria-label="Open chat history"
                         onClick={() => setModalOpen(true)}
                       >
-                        <History className="w-6 h-6" />
+                        <History className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Open chat history</TooltipContent>
@@ -343,12 +350,12 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     <TooltipTrigger asChild>
                       <Button
                         size="icon"
-                        className="rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90 text-white shadow-md hover:shadow-lg transition-all hover:scale-105 border-0"
                         title="Close chat sidebar"
                         aria-label="Close chat sidebar"
                         onClick={() => setOpen(false)}
                       >
-                        <X className="w-6 h-6" />
+                        <X className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Close chat sidebar</TooltipContent>
@@ -357,10 +364,10 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               </div>
 
               {/* Action Mode Toggle with updated colors */}
-              <div className="px-6 py-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
-                <div className="flex items-center space-x-3">
-                  <Zap className={cn("w-5 h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
-                  <Label htmlFor="action-mode" className="text-sm font-medium cursor-pointer flex-1">
+              <div className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <Zap className={cn("w-4 h-4 sm:w-5 sm:h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
+                  <Label htmlFor="action-mode" className="text-xs sm:text-sm font-medium cursor-pointer flex-1">
                     Action Mode
                   </Label>
                   <Switch
@@ -370,7 +377,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-600 data-[state=checked]:to-purple-600"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 ml-8">
+                <p className="text-xs text-muted-foreground mt-1 ml-6 sm:ml-8">
                   {actionMode 
                     ? "AI will perform task actions directly" 
                     : "Regular conversation mode"
@@ -381,21 +388,21 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               <Separator className="opacity-30" />
               
               {/* Messages with updated styling */}
-              <ScrollArea className="flex-1 p-6 space-y-6 z-10">
-                <div ref={scrollRef} className="space-y-6">
+              <ScrollArea className="flex-1 p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6 z-10">
+                <div ref={scrollRef} className="space-y-3 sm:space-y-4 md:space-y-6">
                   {messages.map((msg) => {
                     const isMsgArabic = isArabic(msg.content);
                     return (
-                      <div key={msg.id} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div key={msg.id} className={`flex items-end gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'ai' && (
-                          <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
+                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/ai-avatar.png" alt="AI" />
-                            <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
+                            <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
                           </Avatar>
                         )}
                         <Card
                           className={cn(
-                            'px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium',
+                            'px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 max-w-[85%] sm:max-w-[80%] md:max-w-[70%] shadow-xl border-0 text-sm sm:text-base font-medium',
                             'overflow-x-auto min-w-0',
                             msg.role === 'user'
                               ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl shadow-lg'
@@ -415,7 +422,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                 p: ({ node, ...props }) => (
                                   <p
                                     className={cn(
-                                      'whitespace-pre-wrap break-words mb-4 last:mb-0',
+                                      'whitespace-pre-wrap break-words mb-2 sm:mb-3 md:mb-4 last:mb-0',
                                       isMsgArabic && 'text-right'
                                     )}
                                     dir={isMsgArabic ? 'rtl' : 'ltr'}
@@ -423,17 +430,17 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                   />
                                 ),
                                 strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-4"><table className="w-full border-collapse" {...props} /></div>,
+                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-2 sm:my-3 md:my-4"><table className="w-full border-collapse" {...props} /></div>,
                                 thead: ({ node, ...props }) => <thead className="bg-primary/5" {...props} />,
                                 tbody: ({ node, ...props }) => <tbody {...props} />,
                                 tr: ({ node, ...props }) => <tr className="border-b border-gray-200 dark:border-gray-700" {...props} />,
-                                th: ({ node, ...props }) => <th className="py-2 px-4 text-left font-medium" {...props} />,
-                                td: ({ node, ...props }) => <td className="py-2 px-4" {...props} />,
+                                th: ({ node, ...props }) => <th className="py-1 px-2 sm:py-2 sm:px-4 text-left font-medium text-xs sm:text-sm" {...props} />,
+                                td: ({ node, ...props }) => <td className="py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm" {...props} />,
                                 ul: ({ node, ...props }) => (
                                   <ul
                                     className={cn(
-                                      'mb-4',
-                                      isMsgArabic ? 'pr-6' : 'pl-6',
+                                      'mb-2 sm:mb-3 md:mb-4',
+                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
                                       isMsgArabic ? 'list-disc-rtl' : 'list-disc'
                                     )}
                                     {...props}
@@ -442,32 +449,32 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                 ol: ({ node, ...props }) => (
                                   <ol
                                     className={cn(
-                                      'mb-4',
-                                      isMsgArabic ? 'pr-6' : 'pl-6',
+                                      'mb-2 sm:mb-3 md:mb-4',
+                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
                                       isMsgArabic ? 'list-decimal-rtl' : 'list-decimal'
                                     )}
                                     {...props}
                                   />
                                 ),
-                                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                                li: ({ node, ...props }) => <li className="mb-0.5 sm:mb-1" {...props} />,
                                 a: ({ node, href, ...props }) => <a href={href} className="text-primary underline" target="_blank" rel="noopener noreferrer" {...props} />,
                                 blockquote: ({ node, ...props }) => (
                                   <blockquote
                                     className={cn(
-                                      'py-1 my-4 italic',
+                                      'py-1 my-2 sm:my-3 md:my-4 italic text-sm sm:text-base',
                                       isMsgArabic
-                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-4'
-                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-4'
+                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-2 sm:pr-4'
+                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-2 sm:pl-4'
                                     )}
                                     {...props}
                                   />
                                 ),
                                 code: CodeWithCopy,
-                                h1: ({ node, ...props }) => <h1 className={cn('text-2xl font-bold my-4', isMsgArabic && 'text-right')} {...props} />,
-                                h2: ({ node, ...props }) => <h2 className={cn('text-xl font-bold my-3', isMsgArabic && 'text-right')} {...props} />,
-                                h3: ({ node, ...props }) => <h3 className={cn('text-lg font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
-                                h4: ({ node, ...props }) => <h4 className={cn('text-base font-bold my-2', isMsgArabic && 'text-right')} {...props} />,
-                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-4" {...props} />
+                                h1: ({ node, ...props }) => <h1 className={cn('text-lg sm:text-xl md:text-2xl font-bold my-2 sm:my-3 md:my-4', isMsgArabic && 'text-right')} {...props} />,
+                                h2: ({ node, ...props }) => <h2 className={cn('text-base sm:text-lg md:text-xl font-bold my-2 sm:my-3', isMsgArabic && 'text-right')} {...props} />,
+                                h3: ({ node, ...props }) => <h3 className={cn('text-sm sm:text-base md:text-lg font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
+                                h4: ({ node, ...props }) => <h4 className={cn('text-sm sm:text-base font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
+                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-2 sm:my-3 md:my-4" {...props} />
                               }}
                             >
                               {msg.content}
@@ -475,38 +482,40 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                           </div>
                         </Card>
                         {msg.role === 'user' && (
-                          <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
+                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
                             <AvatarImage src="/user-avatar.png" alt="You" />
-                            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white">U</AvatarFallback>
+                            <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs">U</AvatarFallback>
                           </Avatar>
                         )}
                       </div>
                     );
                   })}
                   {(loading || sending) && (
-                    <div className="flex items-end gap-3 justify-start">
-                      <Avatar className="w-9 h-9 shadow-md flex-shrink-0">
+                    <div className="flex items-end gap-2 sm:gap-3 justify-start">
+                      <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
                         <AvatarImage src="/ai-avatar.png" alt="AI" />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white">AI</AvatarFallback>
+                        <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
                       </Avatar>
-                      <Card className="px-5 py-3 max-w-[70%] shadow-xl border-0 text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
-                        <Loader2 className="w-5 h-5 animate-spin mr-2 text-blue-600" />
-                        {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
+                      <Card className="px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 max-w-[85%] sm:max-w-[80%] md:max-w-[70%] shadow-xl border-0 text-sm sm:text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2 text-blue-600 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm md:text-base">
+                          {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
+                        </span>
                       </Card>
                     </div>
                   )}
                   {error && (
-                    <div className="text-red-500 text-sm mt-2 bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-800">{error}</div>
+                    <div className="text-red-500 text-xs sm:text-sm mt-2 bg-red-50 dark:bg-red-900/20 p-2 sm:p-3 rounded-lg border border-red-200 dark:border-red-800">{error}</div>
                   )}
                   <div ref={endOfMessagesRef} />
                 </div>
               </ScrollArea>
               
               {/* Input with updated styling */}
-              <div className="p-6 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-3 backdrop-blur-xl z-10">
+              <div className="p-3 sm:p-4 md:p-6 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-2 sm:gap-3 backdrop-blur-xl z-10">
                 <Input
                   placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
-                  className="flex-1 rounded-2xl bg-white/90 dark:bg-gray-900/90 border-white/40 shadow-inner px-4 py-3 text-base min-w-0 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+                  className="flex-1 rounded-2xl bg-white/90 dark:bg-gray-900/90 border-white/40 shadow-inner px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base min-w-0 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -517,13 +526,13 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                   variant="default"
                   size="icon"
                   className={cn(
-                    "rounded-full shadow-lg flex-shrink-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 hover:from-blue-700 hover:via-purple-700 hover:to-pink-600 text-white border-0 transition-all hover:scale-105",
+                    "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full shadow-lg flex-shrink-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 hover:from-blue-700 hover:via-purple-700 hover:to-pink-600 text-white border-0 transition-all hover:scale-105",
                     actionMode && "from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                   )}
                   onClick={handleSend}
                   disabled={sending || loading || !input.trim() || !selectedChatId}
                 >
-                  {(sending || loading) ? <Loader2 className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+                  {(sending || loading) ? <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" /> : <Send className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </Button>
               </div>
             </div>
@@ -543,37 +552,37 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
           
           {/* Modal Content with higher z-index */}
           <div
-            className="fixed left-1/2 top-1/2 z-[10000] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 animate-modal-in pointer-events-auto"
+            className="fixed left-1/2 top-1/2 z-[10000] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 animate-modal-in pointer-events-auto px-4"
             tabIndex={-1}
             style={{ outline: 'none' }}
             onKeyDown={e => { if (e.key === 'Escape') setModalOpen(false); }}
           >
-            <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 dark:from-gray-900/95 dark:via-blue-950/95 dark:to-purple-950/95 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 backdrop-blur-xl overflow-hidden">
+            <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 dark:from-gray-900/95 dark:via-blue-950/95 dark:to-purple-950/95 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 backdrop-blur-xl overflow-hidden max-h-[90vh] flex flex-col">
               
               {/* Enhanced Header */}
-              <div className="relative px-8 py-6 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 border-b border-white/30">
+              <div className="relative px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 border-b border-white/30 flex-shrink-0">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5" />
-                <div className="relative flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-lg">
-                    <MessageSquare className="w-8 h-8 text-white" />
+                <div className="relative flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 shadow-lg">
+                    <MessageSquare className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">
                       Chat History
                     </h2>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                       Manage your conversations
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button 
                           size="icon"
-                          className="rounded-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transition-all hover:scale-105 border-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg transition-all hover:scale-105 border-0"
                           onClick={handleStartNewChat}
                         >
-                          <Plus className="w-5 h-5" />
+                          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>New chat</TooltipContent>
@@ -584,10 +593,10 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                          className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
                           onClick={() => setModalOpen(false)}
                         >
-                          <X className="w-6 h-6" />
+                          <X className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Close</TooltipContent>
@@ -597,12 +606,12 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               </div>
 
               {/* Enhanced Search Section */}
-              <div className="px-8 py-6 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30">
+              <div className="px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-pink-50/50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 flex-shrink-0">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
                   <Input
                     placeholder="Search through your conversations..."
-                    className="pl-12 pr-4 py-3 rounded-2xl shadow-sm border-white/60 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition text-base"
+                    className="pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 rounded-2xl shadow-sm border-white/60 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition text-sm sm:text-base"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     autoFocus
@@ -611,15 +620,15 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               </div>
 
               {/* Enhanced Chat List */}
-              <div className="px-8 pb-8 max-h-96 overflow-y-auto">
-                <div className="space-y-3">
+              <div className="px-4 pb-4 sm:px-6 sm:pb-6 md:px-8 md:pb-8 flex-1 overflow-y-auto">
+                <div className="space-y-2 sm:space-y-3">
                   {chats
                     .filter(chat => chat.title.toLowerCase().includes(search.toLowerCase()))
                     .map((chat) => (
                       <div
                         key={chat.id}
                         className={cn(
-                          "group relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 cursor-pointer",
+                          "group relative flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl transition-all duration-200 cursor-pointer",
                           "bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/40 dark:border-gray-700/40",
                           "hover:bg-gradient-to-r hover:from-blue-50/80 hover:via-purple-50/80 hover:to-pink-50/80 dark:hover:from-blue-950/50 dark:hover:via-purple-950/50 dark:hover:to-pink-950/50",
                           "hover:border-blue-300/50 hover:shadow-lg hover:scale-[1.02]",
@@ -630,18 +639,18 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                           setModalOpen(false);
                         }}
                       >
-                        <Avatar className="w-12 h-12 shadow-lg ring-2 ring-white/50 flex-shrink-0">
+                        <Avatar className="w-10 h-10 sm:w-12 sm:h-12 shadow-lg ring-2 ring-white/50 flex-shrink-0">
                           <AvatarImage src="/ai-avatar.png" alt={chat.title} />
-                          <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white font-semibold">
+                          <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white font-semibold text-xs sm:text-sm">
                             {chat.title[0]?.toUpperCase() || 'C'}
                           </AvatarFallback>
                         </Avatar>
                         
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg text-foreground leading-tight mb-1 truncate">
+                          <h3 className="font-semibold text-sm sm:text-base md:text-lg text-foreground leading-tight mb-1 truncate">
                             {chat.title}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs sm:text-sm text-muted-foreground">
                             {new Date(chat.created_at).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -650,7 +659,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           {selectedChatId === chat.id && (
                             <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" />  
                           )}
@@ -660,13 +669,13 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="rounded-full text-red-500 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
+                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full text-red-500 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 transition-all hover:scale-110"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDeleteChat(chat.id);
                                 }}
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>Delete chat</TooltipContent>
@@ -676,12 +685,12 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     ))}
                   
                   {chats.filter(chat => chat.title.toLowerCase().includes(search.toLowerCase())).length === 0 && (
-                    <div className="text-center py-12">
-                      <MessageSquare className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-                      <p className="text-muted-foreground text-lg font-medium">
+                    <div className="text-center py-8 sm:py-12">
+                      <MessageSquare className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/50 mx-auto mb-3 sm:mb-4" />
+                      <p className="text-muted-foreground text-base sm:text-lg font-medium">
                         {search ? 'No chats found' : 'No conversations yet'}
                       </p>
-                      <p className="text-muted-foreground/70 text-sm mt-2">
+                      <p className="text-muted-foreground/70 text-xs sm:text-sm mt-2">
                         {search ? 'Try adjusting your search terms' : 'Start a new chat to begin'}
                       </p>
                     </div>
