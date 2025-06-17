@@ -221,8 +221,8 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                       ${isFinishing ? 'scale-110 animate-pulse' : 'hover:scale-105 active:scale-95'}
                     `}
                   >
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-shimmer"></div>
+                    {/* Shimmer effect using CSS animation */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-[shimmer_2s_infinite]"></div>
                     
                     {/* Floating particles effect */}
                     <div className="absolute inset-0 overflow-hidden rounded-2xl">
@@ -357,14 +357,11 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
         </div>
       </DialogContent>
       
-      {/* Custom styles for shimmer animation */}
-      <style jsx>{`
+      {/* Custom styles for shimmer animation using Tailwind's arbitrary values */}
+      <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%) skewX(-12deg); }
           100% { transform: translateX(200%) skewX(-12deg); }
-        }
-        .animate-shimmer {
-          animation: shimmer 2s infinite;
         }
       `}</style>
     </Dialog>
