@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { useState as useReactState } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import './sidebar-scrollbar.css';
 
 interface ChatSidebarProps {
   forceOpen?: boolean;
@@ -320,7 +320,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
             {/* Sidebar Content */}
             <div className="relative flex flex-col h-full w-full">
               {/* Header with updated gradient colors */}
-              <div className="p-3 sm:p-4 md:p-6 border-b border-white/30 flex items-center gap-2 sm:gap-3 md:gap-4 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
+              <div className="p-2 sm:p-3 md:p-4 border-b border-white/30 flex items-center gap-2 sm:gap-3 relative z-10 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5">
                 <Avatar className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 shadow-lg ring-2 ring-blue-500/30">
                   <AvatarImage src="/ai-avatar.png" alt="AI" />
                   <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs sm:text-sm">AI</AvatarFallback>
@@ -364,7 +364,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               </div>
 
               {/* Action Mode Toggle with updated colors */}
-              <div className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-6 md:py-3 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
+              <div className="px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-2.5 border-b border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 backdrop-blur-sm">
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   <Zap className={cn("w-4 h-4 sm:w-5 sm:h-5", actionMode ? "text-yellow-500" : "text-gray-400")} />
                   <Label htmlFor="action-mode" className="text-xs sm:text-sm font-medium cursor-pointer flex-1">
@@ -387,23 +387,23 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
 
               <Separator className="opacity-30" />
               
-              {/* Messages with updated styling */}
-              <ScrollArea className="flex-1 p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6 z-10">
-                <div ref={scrollRef} className="space-y-3 sm:space-y-4 md:space-y-6">
+              {/* Messages with updated styling and modern scrollbar */}
+              <ScrollArea className="flex-1 p-1 sm:p-2 md:p-3 space-y-3 sm:space-y-4 z-10 custom-scrollbar">
+                <div ref={scrollRef} className="space-y-2 sm:space-y-3 md:space-y-4">
                   {messages.map((msg) => {
                     const isMsgArabic = isArabic(msg.content);
                     return (
-                      <div key={msg.id} className={`flex items-end gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div key={msg.id} className={`flex items-end gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.role === 'ai' && (
-                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
+                          <Avatar className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 shadow-md flex-shrink-0">
                             <AvatarImage src="/ai-avatar.png" alt="AI" />
                             <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
                           </Avatar>
                         )}
                         <Card
                           className={cn(
-                            'px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 max-w-[85%] sm:max-w-[80%] md:max-w-[70%] shadow-xl border-0 text-sm sm:text-base font-medium',
-                            'overflow-x-auto min-w-0',
+                            'px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 max-w-[90%] sm:max-w-[85%] md:max-w-[82%] lg:max-w-[80%] xl:max-w-[78%] shadow-xl border-0 text-sm sm:text-base font-medium',
+                            'overflow-x-auto min-w-0 custom-scrollbar',
                             msg.role === 'user'
                               ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white rounded-br-3xl rounded-tl-3xl rounded-bl-3xl shadow-lg'
                               : 'bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl border border-white/40 backdrop-blur-sm'
@@ -411,7 +411,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                         >
                           <div
                             className={cn(
-                              'markdown-content w-full max-w-full overflow-x-auto',
+                              'markdown-content w-full max-w-full overflow-x-auto custom-scrollbar',
                               isMsgArabic && 'font-arabic'
                             )}
                             dir={isMsgArabic ? 'rtl' : 'ltr'}
@@ -422,7 +422,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                 p: ({ node, ...props }) => (
                                   <p
                                     className={cn(
-                                      'whitespace-pre-wrap break-words mb-2 sm:mb-3 md:mb-4 last:mb-0',
+                                      'whitespace-pre-wrap break-words mb-1.5 sm:mb-2 md:mb-3 last:mb-0',
                                       isMsgArabic && 'text-right'
                                     )}
                                     dir={isMsgArabic ? 'rtl' : 'ltr'}
@@ -430,17 +430,17 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                   />
                                 ),
                                 strong: ({ node, ...props }) => <strong className="font-bold" {...props} />,
-                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-2 sm:my-3 md:my-4"><table className="w-full border-collapse" {...props} /></div>,
+                                table: ({ node, ...props }) => <div className="overflow-x-auto w-full my-2 sm:my-3 custom-scrollbar"><table className="w-full border-collapse" {...props} /></div>,
                                 thead: ({ node, ...props }) => <thead className="bg-primary/5" {...props} />,
                                 tbody: ({ node, ...props }) => <tbody {...props} />,
                                 tr: ({ node, ...props }) => <tr className="border-b border-gray-200 dark:border-gray-700" {...props} />,
-                                th: ({ node, ...props }) => <th className="py-1 px-2 sm:py-2 sm:px-4 text-left font-medium text-xs sm:text-sm" {...props} />,
-                                td: ({ node, ...props }) => <td className="py-1 px-2 sm:py-2 sm:px-4 text-xs sm:text-sm" {...props} />,
+                                th: ({ node, ...props }) => <th className="py-1 px-2 sm:py-1.5 sm:px-3 text-left font-medium text-xs sm:text-sm" {...props} />,
+                                td: ({ node, ...props }) => <td className="py-1 px-2 sm:py-1.5 sm:px-3 text-xs sm:text-sm" {...props} />,
                                 ul: ({ node, ...props }) => (
                                   <ul
                                     className={cn(
-                                      'mb-2 sm:mb-3 md:mb-4',
-                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
+                                      'mb-1.5 sm:mb-2 md:mb-3',
+                                      isMsgArabic ? 'pr-3 sm:pr-4' : 'pl-3 sm:pl-4',
                                       isMsgArabic ? 'list-disc-rtl' : 'list-disc'
                                     )}
                                     {...props}
@@ -449,32 +449,32 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                                 ol: ({ node, ...props }) => (
                                   <ol
                                     className={cn(
-                                      'mb-2 sm:mb-3 md:mb-4',
-                                      isMsgArabic ? 'pr-4 sm:pr-6' : 'pl-4 sm:pl-6',
+                                      'mb-1.5 sm:mb-2 md:mb-3',
+                                      isMsgArabic ? 'pr-3 sm:pr-4' : 'pl-3 sm:pl-4',
                                       isMsgArabic ? 'list-decimal-rtl' : 'list-decimal'
                                     )}
                                     {...props}
                                   />
                                 ),
-                                li: ({ node, ...props }) => <li className="mb-0.5 sm:mb-1" {...props} />,
+                                li: ({ node, ...props }) => <li className="mb-0.5" {...props} />,
                                 a: ({ node, href, ...props }) => <a href={href} className="text-primary underline" target="_blank" rel="noopener noreferrer" {...props} />,
                                 blockquote: ({ node, ...props }) => (
                                   <blockquote
                                     className={cn(
-                                      'py-1 my-2 sm:my-3 md:my-4 italic text-sm sm:text-base',
+                                      'py-1 my-1.5 sm:my-2 md:my-3 italic text-sm sm:text-base',
                                       isMsgArabic
-                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-2 sm:pr-4'
-                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-2 sm:pl-4'
+                                        ? 'border-r-4 border-gray-300 dark:border-gray-600 pr-2 sm:pr-3'
+                                        : 'border-l-4 border-gray-300 dark:border-gray-600 pl-2 sm:pl-3'
                                     )}
                                     {...props}
                                   />
                                 ),
                                 code: CodeWithCopy,
-                                h1: ({ node, ...props }) => <h1 className={cn('text-lg sm:text-xl md:text-2xl font-bold my-2 sm:my-3 md:my-4', isMsgArabic && 'text-right')} {...props} />,
-                                h2: ({ node, ...props }) => <h2 className={cn('text-base sm:text-lg md:text-xl font-bold my-2 sm:my-3', isMsgArabic && 'text-right')} {...props} />,
-                                h3: ({ node, ...props }) => <h3 className={cn('text-sm sm:text-base md:text-lg font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
-                                h4: ({ node, ...props }) => <h4 className={cn('text-sm sm:text-base font-bold my-1 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
-                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-2 sm:my-3 md:my-4" {...props} />
+                                h1: ({ node, ...props }) => <h1 className={cn('text-lg sm:text-xl md:text-2xl font-bold my-1.5 sm:my-2 md:my-3', isMsgArabic && 'text-right')} {...props} />,
+                                h2: ({ node, ...props }) => <h2 className={cn('text-base sm:text-lg md:text-xl font-bold my-1.5 sm:my-2', isMsgArabic && 'text-right')} {...props} />,
+                                h3: ({ node, ...props }) => <h3 className={cn('text-sm sm:text-base md:text-lg font-bold my-1 sm:my-1.5', isMsgArabic && 'text-right')} {...props} />,
+                                h4: ({ node, ...props }) => <h4 className={cn('text-sm sm:text-base font-bold my-1 sm:my-1.5', isMsgArabic && 'text-right')} {...props} />,
+                                img: ({ node, ...props }) => <img className="max-w-full h-auto rounded-lg my-1.5 sm:my-2 md:my-3" {...props} />
                               }}
                             >
                               {msg.content}
@@ -482,7 +482,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                           </div>
                         </Card>
                         {msg.role === 'user' && (
-                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
+                          <Avatar className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 shadow-md flex-shrink-0">
                             <AvatarImage src="/user-avatar.png" alt="You" />
                             <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs">U</AvatarFallback>
                           </Avatar>
@@ -491,12 +491,12 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
                     );
                   })}
                   {(loading || sending) && (
-                    <div className="flex items-end gap-2 sm:gap-3 justify-start">
-                      <Avatar className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 shadow-md flex-shrink-0">
+                    <div className="flex items-end gap-1.5 sm:gap-2 justify-start">
+                      <Avatar className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 shadow-md flex-shrink-0">
                         <AvatarImage src="/ai-avatar.png" alt="AI" />
                         <AvatarFallback className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white text-xs">AI</AvatarFallback>
                       </Avatar>
-                      <Card className="px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 max-w-[85%] sm:max-w-[80%] md:max-w-[70%] shadow-xl border-0 text-sm sm:text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
+                      <Card className="px-2.5 py-2 sm:px-3 sm:py-2.5 md:px-4 md:py-3 max-w-[90%] sm:max-w-[85%] md:max-w-[82%] lg:max-w-[80%] xl:max-w-[78%] shadow-xl border-0 text-sm sm:text-base font-medium bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-100 rounded-bl-3xl rounded-tr-3xl rounded-br-3xl flex items-center gap-2 border border-white/40 backdrop-blur-sm">
                         <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin mr-2 text-blue-600 flex-shrink-0" />
                         <span className="text-xs sm:text-sm md:text-base">
                           {actionMode ? 'Processing task action...' : 'Gemini is typing...'}
@@ -512,7 +512,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
               </ScrollArea>
               
               {/* Input with updated styling */}
-              <div className="p-3 sm:p-4 md:p-6 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-2 sm:gap-3 backdrop-blur-xl z-10">
+              <div className="p-2 sm:p-3 md:p-4 border-t border-white/30 bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-500/5 flex items-center gap-1.5 sm:gap-2 backdrop-blur-xl z-10">
                 <Input
                   placeholder={actionMode ? "Tell me what to do with your tasks..." : "Type your message..."}
                   className="flex-1 rounded-2xl bg-white/90 dark:bg-gray-900/90 border-white/40 shadow-inner px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base min-w-0 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
@@ -557,7 +557,7 @@ export default function ChatSidebar({ forceOpen, onOpenChange, registerMethods }
             style={{ outline: 'none' }}
             onKeyDown={e => { if (e.key === 'Escape') setModalOpen(false); }}
           >
-            <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 dark:from-gray-900/95 dark:via-blue-950/95 dark:to-purple-950/95 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 backdrop-blur-xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="bg-gradient-to-br from-white/95 via-blue-50/95 to-purple-50/95 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-purple-950/30 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 backdrop-blur-xl overflow-hidden max-h-[90vh] flex flex-col">
               
               {/* Enhanced Header */}
               <div className="relative px-4 py-4 sm:px-6 sm:py-5 md:px-8 md:py-6 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-500/10 border-b border-white/30 flex-shrink-0">
