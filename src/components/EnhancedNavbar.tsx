@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Home, Layout, User, LogOut } from 'lucide-react';
+import { Home, Layout, User, LogOut, BarChart3 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -36,12 +37,22 @@ const EnhancedNavbar = () => {
             <span>Home</span>
           </Button>
         </Link>
-        <Link to="/canvas">
-          <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
-            <Layout className="w-4 h-4" />
-            <span>Canvas</span>
-          </Button>
-        </Link>
+        {user && (
+          <>
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4" />
+                <span>Dashboard</span>
+              </Button>
+            </Link>
+            <Link to="/canvas">
+              <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300 flex items-center space-x-2">
+                <Layout className="w-4 h-4" />
+                <span>Canvas</span>
+              </Button>
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Right section */}
