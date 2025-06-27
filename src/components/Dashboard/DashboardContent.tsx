@@ -27,14 +27,38 @@ export function DashboardContent() {
     }
   };
 
+  const getViewTitle = () => {
+    switch (view) {
+      case 'calendar':
+        return 'Calendar';
+      case 'tasks':
+        return 'Tasks';
+      case 'analytics':
+        return 'Analytics';
+      case 'settings':
+        return 'Settings';
+      default:
+        return 'Dashboard';
+    }
+  };
+
   return (
-    <SidebarInset className="flex-1 bg-gradient-to-br from-slate-900/50 to-purple-900/20 backdrop-blur-xl">
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b border-purple-800/30 px-6 backdrop-blur-xl bg-slate-900/20">
-        <SidebarTrigger className="text-purple-300 hover:text-white hover:bg-purple-800/30" />
+    <SidebarInset className="flex-1 bg-gradient-to-br from-white/80 to-purple-50/40 backdrop-blur-xl">
+      <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/50 px-6 bg-white/50 backdrop-blur-xl">
+        <SidebarTrigger className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 rounded-lg" />
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent capitalize">
-            {view === 'overview' ? 'Dashboard' : view}
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {getViewTitle()}
           </h1>
+          <div className="h-6 w-px bg-gradient-to-b from-transparent via-slate-300 to-transparent"></div>
+          <div className="text-sm text-slate-500 font-medium">
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </div>
         </div>
       </header>
       
