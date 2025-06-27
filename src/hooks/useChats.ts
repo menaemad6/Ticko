@@ -1,22 +1,20 @@
-
 import { useCallback, useState } from 'react';
 import { supabase, Chat, Message } from '@/integrations/supabase/client';
 
 export function useChats() {
   const [chats, setChats] = useState<Chat[]>([]);
-  const [currentChat, setCurrentChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch all chats for the current user
   const fetchChats = useCallback(async () => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       setError('User not authenticated');
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
     const { data, error: chatError } = await supabase
@@ -26,37 +24,33 @@ export function useChats() {
       .order('created_at', { ascending: false });
     if (chatError) setError(chatError.message);
     setChats(data || []);
-    setIsLoading(false);
+    setLoading(false);
   }, []);
 
   // Create a new chat
-  const createNewChat = useCallback(async (title?: string) => {
-    setIsLoading(true);
+  const createChat = useCallback(async (title: string) => {
+    setLoading(true);
     setError(null);
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
       setError('User not authenticated');
-      setIsLoading(false);
+      setLoading(false);
       return null;
     }
-    const chatTitle = title || `Chat ${new Date().toLocaleDateString()}`;
     const { data, error: insertError } = await supabase
       .from('chats')
-      .insert([{ user_id: user.id, title: chatTitle }])
+      .insert([{ user_id: user.id, title }])
       .select()
       .single();
     if (insertError) setError(insertError.message);
-    if (data) {
-      setChats((prev) => [data, ...prev]);
-      setCurrentChat(data);
-    }
-    setIsLoading(false);
+    if (data) setChats((prev) => [data, ...prev]);
+    setLoading(false);
     return data;
   }, []);
 
   // Fetch all messages for a chat
   const fetchMessages = useCallback(async (chat_id: string) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     const { data, error: msgError } = await supabase
       .from('messages')
@@ -65,68 +59,34 @@ export function useChats() {
       .order('created_at', { ascending: true });
     if (msgError) setError(msgError.message);
     setMessages(data || []);
-    setIsLoading(false);
+    setLoading(false);
   }, []);
 
-  // Send a message - simplified to match ChatSidebar usage
-  const sendMessage = useCallback(async (content: string) => {
-    if (!currentChat) {
-      console.error('No current chat selected');
-      return null;
-    }
-    
-    setIsLoading(true);
+  // Send a message (user or ai)
+  const sendMessage = useCallback(async (chat_id: string, role: 'user' | 'ai', content: string) => {
+    setLoading(true);
     setError(null);
-    
-    // Add user message
-    const { data: userMessage, error: userError } = await supabase
+    const { data, error: insertError } = await supabase
       .from('messages')
-      .insert([{ chat_id: currentChat.id, role: 'user', content }])
+      .insert([{ chat_id, role, content }])
       .select()
       .single();
-    
-    if (userError) {
-      setError(userError.message);
-      setIsLoading(false);
-      return null;
-    }
-    
-    if (userMessage) {
-      setMessages((prev) => [...prev, userMessage]);
-    }
-    
-    // Simulate AI response (you can replace this with actual AI integration)
-    setTimeout(async () => {
-      const aiResponse = `I received your message: "${content}". This is a placeholder response.`;
-      const { data: aiMessage, error: aiError } = await supabase
-        .from('messages')
-        .insert([{ chat_id: currentChat.id, role: 'assistant', content: aiResponse }])
-        .select()
-        .single();
-      
-      if (aiError) {
-        setError(aiError.message);
-      } else if (aiMessage) {
-        setMessages((prev) => [...prev, aiMessage]);
-      }
-      setIsLoading(false);
-    }, 1000);
-    
-    return userMessage;
-  }, [currentChat]);
+    if (insertError) setError(insertError.message);
+    if (data) setMessages((prev) => [...prev, data]);
+    setLoading(false);
+    return data;
+  }, []);
 
   return {
     chats,
-    currentChat,
     messages,
-    isLoading,
+    loading,
     error,
     fetchChats,
-    createNewChat,
+    createChat,
     fetchMessages,
     sendMessage,
     setChats,
     setMessages,
-    setCurrentChat,
   };
-}
+} 
