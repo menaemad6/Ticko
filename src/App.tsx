@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Canvas from "./pages/Canvas";
 import Dashboard from "./pages/Dashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -67,15 +68,17 @@ const AppRouter = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <TooltipProvider>
-        <div className="min-h-screen w-full">
-          <Toaster />
-          <Sonner />
-          <AppRouter />
-        </div>
-      </TooltipProvider>
-    </BrowserRouter>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <BrowserRouter>
+        <TooltipProvider>
+          <div className="min-h-screen w-full">
+            <Toaster />
+            <Sonner />
+            <AppRouter />
+          </div>
+        </TooltipProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
