@@ -6,7 +6,7 @@ import {
   CheckSquare, 
   BarChart3, 
   Settings, 
-  Canvas as CanvasIcon,
+  PenTool,
   Home
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -51,7 +51,7 @@ const quickActions = [
   {
     title: 'Canvas',
     url: '/canvas',
-    icon: CanvasIcon,
+    icon: PenTool,
     external: true,
   },
   {
