@@ -6,7 +6,6 @@ import { CalendarView } from './CalendarView';
 import { OverviewView } from './OverviewView';
 import { TasksView } from './TasksView';
 import { AnalyticsView } from './AnalyticsView';
-import { SettingsView } from './SettingsView';
 
 export function DashboardContent() {
   const [searchParams] = useSearchParams();
@@ -20,8 +19,6 @@ export function DashboardContent() {
         return <TasksView />;
       case 'analytics':
         return <AnalyticsView />;
-      case 'settings':
-        return <SettingsView />;
       default:
         return <OverviewView />;
     }
@@ -35,23 +32,21 @@ export function DashboardContent() {
         return 'Tasks';
       case 'analytics':
         return 'Analytics';
-      case 'settings':
-        return 'Settings';
       default:
         return 'Dashboard';
     }
   };
 
   return (
-    <SidebarInset className="flex-1 bg-gradient-to-br from-white/80 to-purple-50/40 backdrop-blur-xl">
-      <header className="flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/50 px-6 bg-white/50 backdrop-blur-xl">
-        <SidebarTrigger className="text-slate-600 hover:text-slate-900 hover:bg-slate-100/50 rounded-lg" />
+    <SidebarInset className="flex-1 bg-background">
+      <header className="flex h-16 shrink-0 items-center gap-4 border-b border-border/40 px-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg" />
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-800 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-foreground">
             {getViewTitle()}
           </h1>
-          <div className="h-6 w-px bg-gradient-to-b from-transparent via-slate-300 to-transparent"></div>
-          <div className="text-sm text-slate-500 font-medium">
+          <div className="h-6 w-px bg-border"></div>
+          <div className="text-sm text-muted-foreground font-medium">
             {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 

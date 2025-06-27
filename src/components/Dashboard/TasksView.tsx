@@ -1,53 +1,90 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useTasks } from '@/hooks/useTasks';
 import { CheckCircle, Clock, AlertCircle, Plus, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { TaskForm } from '@/components/TaskForm';
+import { Task } from '@/types/task';
 
 export function TasksView() {
-  const { tasks } = useTasks();
+  const { tasks, updateTask } = useTasks();
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
 
   const taskColumns = [
     {
       status: 'todo' as const,
       title: 'To Do',
       icon: AlertCircle,
-      color: 'border-red-200/50 bg-gradient-to-br from-red-50/50 to-red-100/30',
-      badgeColor: 'bg-red-100 text-red-700 border-red-200',
-      headerColor: 'bg-gradient-to-r from-red-50 to-red-100/50',
+      color: 'border-red-200/50 bg-red-50/50 dark:border-red-800/50 dark:bg-red-900/10',
+      badgeColor: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
+      headerColor: 'bg-red-50/50 dark:bg-red-900/20',
     },
     {
       status: 'in-progress' as const,
       title: 'In Progress',
       icon: Clock,
-      color: 'border-orange-200/50 bg-gradient-to-br from-orange-50/50 to-orange-100/30',
-      badgeColor: 'bg-orange-100 text-orange-700 border-orange-200',
-      headerColor: 'bg-gradient-to-r from-orange-50 to-orange-100/50',
+      color: 'border-orange-200/50 bg-orange-50/50 dark:border-orange-800/50 dark:bg-orange-900/10',
+      badgeColor: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800',
+      headerColor: 'bg-orange-50/50 dark:bg-orange-900/20',
     },
     {
       status: 'done' as const,
       title: 'Done',
       icon: CheckCircle,
-      color: 'border-green-200/50 bg-gradient-to-br from-green-50/50 to-green-100/30',
-      badgeColor: 'bg-green-100 text-green-700 border-green-200',
-      headerColor: 'bg-gradient-to-r from-green-50 to-green-100/50',
+      color: 'border-green-200/50 bg-green-50/50 dark:border-green-800/50 dark:bg-green-900/10',
+      badgeColor: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
+      headerColor: 'bg-green-50/50 dark:bg-green-900/20',
     },
   ];
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
       case 'medium':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
+        return 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
       case 'low':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
       default:
-        return 'bg-purple-100 text-purple-700 border-purple-200';
+        return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
     }
+  };
+
+  const handleDragStart = (e: React.DragEvent, task: Task) => {
+    setDraggedTask(task);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, newStatus: Task['status']) => {
+    e.preventDefault();
+    if (draggedTask && draggedTask.status !== newStatus) {
+      updateTask(draggedTask.id, { status: newStatus });
+    }
+    setDraggedTask(null);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleTaskSave = (taskData: any) => {
+    if (selectedTask) {
+      updateTask(selectedTask.id, taskData);
+    }
+    setIsTaskModalOpen(false);
+    setSelectedTask(null);
   };
 
   return (
@@ -55,20 +92,17 @@ export function TasksView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold text-foreground">
             Task Management
           </h2>
-          <p className="text-slate-600 mt-1">Organize and track your tasks across different stages</p>
+          <p className="text-muted-foreground mt-1">Organize and track your tasks across different stages</p>
         </div>
         <div className="flex items-center space-x-3">
-          <Button 
-            variant="outline" 
-            className="border-slate-300 hover:bg-slate-50 hover:border-slate-400"
-          >
+          <Button variant="outline" className="border-border hover:bg-accent">
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button asChild className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg">
+          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg">
             <Link to="/canvas">
               <Plus className="w-4 h-4 mr-2" />
               New Task
@@ -84,9 +118,9 @@ export function TasksView() {
           const Icon = column.icon;
           
           return (
-            <Card key={column.status} className={`bg-white/80 backdrop-blur-sm border-slate-200/50 shadow-xl shadow-purple-100/50 rounded-2xl overflow-hidden ${column.color}`}>
-              <CardHeader className={`${column.headerColor} border-b border-slate-200/50`}>
-                <CardTitle className="text-slate-800 flex items-center justify-between">
+            <Card key={column.status} className={`bg-card border-border shadow-lg ${column.color}`}>
+              <CardHeader className={`${column.headerColor} border-b border-border`}>
+                <CardTitle className="text-foreground flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Icon className="w-6 h-6" />
                     <span className="text-lg font-bold">{column.title}</span>
@@ -96,9 +130,13 @@ export function TasksView() {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-3 max-h-96 overflow-y-auto">
+              <CardContent 
+                className="p-4 space-y-3 max-h-96 overflow-y-auto"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, column.status)}
+              >
                 {columnTasks.length === 0 ? (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Icon className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p className="text-sm font-medium mb-1">No {column.title.toLowerCase()} tasks</p>
                     <p className="text-xs">Tasks will appear here</p>
@@ -107,10 +145,15 @@ export function TasksView() {
                   columnTasks.map((task) => (
                     <div 
                       key={task.id}
-                      className="p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-slate-200/50 hover:shadow-md hover:bg-white/80 transition-all duration-200 cursor-pointer group"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task)}
+                      onClick={() => handleTaskClick(task)}
+                      className={`p-4 rounded-xl bg-card border border-border hover:shadow-md transition-all duration-200 cursor-pointer group ${
+                        draggedTask?.id === task.id ? 'opacity-50' : ''
+                      }`}
                     >
                       <div className="flex items-start justify-between mb-3">
-                        <h4 className="font-semibold text-slate-800 text-sm group-hover:text-purple-600 transition-colors">
+                        <h4 className="font-semibold text-foreground text-sm group-hover:text-primary transition-colors">
                           {task.title}
                         </h4>
                         <Badge variant="outline" className={getPriorityColor(task.priority)}>
@@ -119,13 +162,13 @@ export function TasksView() {
                       </div>
                       
                       {task.description && (
-                        <p className="text-slate-600 text-xs mb-3 line-clamp-2">
+                        <p className="text-muted-foreground text-xs mb-3 line-clamp-2">
                           {task.description}
                         </p>
                       )}
                       
                       {task.dueDate && (
-                        <p className="text-purple-600 text-xs mb-3 font-medium">
+                        <p className="text-primary text-xs mb-3 font-medium">
                           Due: {new Date(task.dueDate).toLocaleDateString()}
                         </p>
                       )}
@@ -136,7 +179,7 @@ export function TasksView() {
                             <Badge 
                               key={index}
                               variant="outline" 
-                              className="text-xs bg-purple-50 border-purple-200 text-purple-700"
+                              className="text-xs bg-muted text-muted-foreground border-border"
                             >
                               {tag}
                             </Badge>
@@ -144,7 +187,7 @@ export function TasksView() {
                           {task.tags.length > 3 && (
                             <Badge 
                               variant="outline" 
-                              className="text-xs bg-slate-50 border-slate-200 text-slate-600"
+                              className="text-xs bg-muted text-muted-foreground border-border"
                             >
                               +{task.tags.length - 3}
                             </Badge>
@@ -159,6 +202,21 @@ export function TasksView() {
           );
         })}
       </div>
+
+      {/* Task Detail Modal */}
+      <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <TaskForm
+            isOpen={isTaskModalOpen}
+            onClose={() => {
+              setIsTaskModalOpen(false);
+              setSelectedTask(null);
+            }}
+            onSave={handleTaskSave}
+            task={selectedTask}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

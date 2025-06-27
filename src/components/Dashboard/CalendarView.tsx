@@ -29,13 +29,13 @@ export function CalendarView() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
       case 'medium':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
+        return 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
       case 'low':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
       default:
-        return 'bg-purple-100 text-purple-700 border-purple-200';
+        return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
     }
   };
 
@@ -65,14 +65,14 @@ export function CalendarView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold text-foreground">
             Calendar Overview
           </h2>
-          <p className="text-slate-600 mt-1">Manage your schedule and track your tasks</p>
+          <p className="text-muted-foreground mt-1">Manage your schedule and track your tasks</p>
         </div>
         <Button 
           onClick={goToToday}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
         >
           Today
         </Button>
@@ -80,11 +80,11 @@ export function CalendarView() {
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Calendar */}
-        <Card className="xl:col-span-3 bg-white/80 backdrop-blur-sm border-slate-200/50 shadow-xl shadow-purple-100/50 rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200/50">
+        <Card className="xl:col-span-3 bg-card border-border shadow-lg">
+          <CardHeader className="bg-muted/50 border-b border-border">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-slate-800 flex items-center space-x-3">
-                <CalendarDays className="w-6 h-6 text-purple-500" />
+              <CardTitle className="text-foreground flex items-center space-x-3">
+                <CalendarDays className="w-6 h-6 text-primary" />
                 <span className="text-2xl font-bold">
                   {format(currentDate, 'MMMM yyyy')}
                 </span>
@@ -94,7 +94,7 @@ export function CalendarView() {
                   variant="outline"
                   size="icon"
                   onClick={() => navigateMonth('prev')}
-                  className="h-10 w-10 rounded-full border-slate-300 hover:bg-purple-50 hover:border-purple-300"
+                  className="h-10 w-10 rounded-full border-border hover:bg-accent"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -102,7 +102,7 @@ export function CalendarView() {
                   variant="outline"
                   size="icon"
                   onClick={() => navigateMonth('next')}
-                  className="h-10 w-10 rounded-full border-slate-300 hover:bg-purple-50 hover:border-purple-300"
+                  className="h-10 w-10 rounded-full border-border hover:bg-accent"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -121,23 +121,23 @@ export function CalendarView() {
                 months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                 month: "space-y-4",
                 caption: "flex justify-center pt-1 relative items-center",
-                caption_label: "text-lg font-semibold text-slate-700",
+                caption_label: "text-lg font-semibold text-foreground",
                 nav: "space-x-1 flex items-center",
-                nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-purple-50 rounded-full",
+                nav_button: "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-accent rounded-full",
                 nav_button_previous: "absolute left-1",
                 nav_button_next: "absolute right-1",
                 table: "w-full border-collapse space-y-1",
                 head_row: "flex",
-                head_cell: "text-slate-500 rounded-md w-12 font-medium text-sm",
+                head_cell: "text-muted-foreground rounded-md w-12 font-medium text-sm",
                 row: "flex w-full mt-2",
-                cell: "h-12 w-12 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-purple-50/50 [&:has([aria-selected])]:bg-purple-50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-12 w-12 p-0 font-normal aria-selected:opacity-100 hover:bg-purple-50 rounded-lg transition-colors",
+                cell: "h-12 w-12 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                day: "h-12 w-12 p-0 font-normal aria-selected:opacity-100 hover:bg-accent rounded-lg transition-colors",
                 day_range_end: "day-range-end",
-                day_selected: "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 focus:bg-gradient-to-r focus:from-purple-500 focus:to-pink-500 shadow-lg",
-                day_today: "bg-slate-100 text-slate-900 font-semibold",
-                day_outside: "day-outside text-slate-400 opacity-50 aria-selected:bg-purple-50/50 aria-selected:text-slate-400 aria-selected:opacity-30",
-                day_disabled: "text-slate-400 opacity-50",
-                day_range_middle: "aria-selected:bg-purple-50 aria-selected:text-slate-700",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary shadow-lg",
+                day_today: "bg-accent text-accent-foreground font-semibold",
+                day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+                day_disabled: "text-muted-foreground opacity-50",
+                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
                 day_hidden: "invisible",
               }}
               modifiers={{
@@ -148,30 +148,30 @@ export function CalendarView() {
         </Card>
 
         {/* Tasks for Selected Date */}
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50 shadow-xl shadow-purple-100/50 rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b border-slate-200/50">
-            <CardTitle className="text-slate-800 text-lg">
+        <Card className="bg-card border-border shadow-lg">
+          <CardHeader className="bg-muted/50 border-b border-border">
+            <CardTitle className="text-foreground text-lg">
               {format(selectedDate, 'MMM dd, yyyy')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 max-h-96 overflow-y-auto">
             {tasksForSelectedDate.length === 0 ? (
               <div className="text-center py-8">
-                <CalendarDays className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-500 font-medium mb-2">No tasks scheduled</p>
-                <p className="text-slate-400 text-sm">Your day is free!</p>
+                <CalendarDays className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground font-medium mb-2">No tasks scheduled</p>
+                <p className="text-muted-foreground text-sm">Your day is free!</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {tasksForSelectedDate.map((task) => (
                   <div 
                     key={task.id}
-                    className="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-purple-50/50 border border-slate-200/50 hover:shadow-md transition-all duration-200"
+                    className="p-4 rounded-xl bg-muted/20 border border-border hover:shadow-md transition-all duration-200"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         {getStatusIcon(task.status)}
-                        <h4 className="font-semibold text-slate-800 text-sm">{task.title}</h4>
+                        <h4 className="font-semibold text-foreground text-sm">{task.title}</h4>
                       </div>
                       <Badge variant="outline" className={getPriorityColor(task.priority)}>
                         {task.priority}
@@ -179,7 +179,7 @@ export function CalendarView() {
                     </div>
                     
                     {task.description && (
-                      <p className="text-slate-600 text-xs mb-3 line-clamp-2">
+                      <p className="text-muted-foreground text-xs mb-3 line-clamp-2">
                         {task.description}
                       </p>
                     )}
@@ -190,7 +190,7 @@ export function CalendarView() {
                           <Badge 
                             key={index}
                             variant="outline" 
-                            className="text-xs bg-purple-50 border-purple-200 text-purple-700"
+                            className="text-xs bg-muted text-muted-foreground border-border"
                           >
                             {tag}
                           </Badge>

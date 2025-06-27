@@ -68,7 +68,6 @@ export function DashboardSidebar() {
   const location = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const { addTask } = useTasks();
   const currentPath = location.pathname + location.search;
   const isCollapsed = state === 'collapsed';
@@ -87,18 +86,18 @@ export function DashboardSidebar() {
 
   return (
     <>
-      <Sidebar className="border-r border-slate-200/20 bg-gradient-to-b from-slate-50/5 to-purple-50/10 backdrop-blur-2xl">
+      <Sidebar className="border-r border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <SidebarHeader className="p-4">
           <div className="flex items-center justify-between">
             <div className={`flex items-center space-x-3 transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <div className="w-5 h-5 bg-white rounded-md opacity-90"></div>
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-5 h-5 bg-primary-foreground rounded-md opacity-90"></div>
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-xl font-bold text-foreground">
                   Dashboard
                 </span>
-                <Badge variant="outline" className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-sm">
+                <Badge variant="outline" className="text-xs bg-primary text-primary-foreground border-0 shadow-sm">
                   Pro
                 </Badge>
               </div>
@@ -107,7 +106,7 @@ export function DashboardSidebar() {
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
-              className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100/50"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
             >
               {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </Button>
@@ -116,7 +115,7 @@ export function DashboardSidebar() {
 
         <SidebarContent className="px-3">
           <SidebarGroup>
-            <SidebarGroupLabel className={`text-slate-500 text-xs font-semibold uppercase tracking-wider transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+            <SidebarGroupLabel className={`text-muted-foreground text-xs font-semibold uppercase tracking-wider transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
               Navigation
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -126,7 +125,7 @@ export function DashboardSidebar() {
                     <SidebarMenuButton 
                       asChild 
                       isActive={isActive(item.url)}
-                      className="text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 data-[active=true]:bg-gradient-to-r data-[active=true]:from-purple-100 data-[active=true]:to-pink-100 data-[active=true]:text-purple-700 data-[active=true]:shadow-sm rounded-xl transition-all duration-200"
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent data-[active=true]:bg-accent data-[active=true]:text-foreground rounded-xl transition-all duration-200"
                     >
                       <Link to={item.url} className="flex items-center space-x-3">
                         <item.icon className="w-5 h-5" />
@@ -140,7 +139,7 @@ export function DashboardSidebar() {
           </SidebarGroup>
 
           <SidebarGroup>
-            <SidebarGroupLabel className={`text-slate-500 text-xs font-semibold uppercase tracking-wider transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+            <SidebarGroupLabel className={`text-muted-foreground text-xs font-semibold uppercase tracking-wider transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
               Quick Actions
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -148,7 +147,7 @@ export function DashboardSidebar() {
                 <SidebarMenuItem>
                   <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
                     <DialogTrigger asChild>
-                      <SidebarMenuButton className="text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 rounded-xl transition-all duration-200">
+                      <SidebarMenuButton className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl transition-all duration-200">
                         <div className="flex items-center space-x-3">
                           <Plus className="w-5 h-5" />
                           {!isCollapsed && <span className="font-medium">Create Task</span>}
@@ -169,7 +168,7 @@ export function DashboardSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton 
                       asChild
-                      className="text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 rounded-xl transition-all duration-200"
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl transition-all duration-200"
                     >
                       <Link to={item.url} className="flex items-center space-x-3">
                         <item.icon className="w-5 h-5" />
@@ -186,39 +185,12 @@ export function DashboardSidebar() {
         <SidebarFooter className="p-3">
           <SidebarMenu>
             <SidebarMenuItem>
-              <Dialog open={isSettingsModalOpen} onOpenChange={setIsSettingsModalOpen}>
-                <DialogTrigger asChild>
-                  <SidebarMenuButton className="text-slate-700 hover:text-slate-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 rounded-xl transition-all duration-200">
-                    <div className="flex items-center space-x-3">
-                      <Settings className="w-5 h-5" />
-                      {!isCollapsed && <span className="font-medium">Settings</span>}
-                    </div>
-                  </SidebarMenuButton>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                  <div className="p-6">
-                    <h2 className="text-2xl font-bold text-slate-800 mb-6">Settings</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">Profile Settings</h3>
-                        <p className="text-slate-600 text-sm">Manage your account and personal information</p>
-                      </div>
-                      <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">Notifications</h3>
-                        <p className="text-slate-600 text-sm">Configure how you receive updates and alerts</p>
-                      </div>
-                      <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">Appearance</h3>
-                        <p className="text-slate-600 text-sm">Customize the look and feel of your dashboard</p>
-                      </div>
-                      <div className="p-6 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 border border-orange-100">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">Privacy & Security</h3>
-                        <p className="text-slate-600 text-sm">Control your privacy and security settings</p>
-                      </div>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <SidebarMenuButton asChild className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-xl transition-all duration-200">
+                <Link to="/canvas" className="flex items-center space-x-3">
+                  <Settings className="w-5 h-5" />
+                  {!isCollapsed && <span className="font-medium">Settings</span>}
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
@@ -228,10 +200,10 @@ export function DashboardSidebar() {
       <div className="fixed bottom-6 right-6 z-50">
         <Button
           asChild
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300 hover:scale-110"
+          className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
         >
           <Link to="/canvas">
-            <PenTool className="w-6 h-6 text-white" />
+            <PenTool className="w-6 h-6 text-primary-foreground" />
           </Link>
         </Button>
       </div>
