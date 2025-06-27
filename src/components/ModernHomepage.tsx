@@ -106,7 +106,7 @@ const ModernHomepage = () => {
             <CardContent className="p-0">
               <div className="relative">
                 <img 
-                  src="/canvas-demo.png" 
+                  src="/Ticko-Canvas.png" 
                   alt="Ticko Canvas Demo" 
                   className="w-full h-auto object-cover rounded-lg shadow-lg" 
                 />
