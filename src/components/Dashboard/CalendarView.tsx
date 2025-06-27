@@ -143,22 +143,6 @@ export function CalendarView() {
               modifiers={{
                 hasTasks: datesWithTasks,
               }}
-              modifiersStyles={{
-                hasTasks: {
-                  position: 'relative',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: '2px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '6px',
-                    height: '6px',
-                    backgroundColor: '#8B5CF6',
-                    borderRadius: '50%',
-                  },
-                },
-              }}
             />
           </CardContent>
         </Card>

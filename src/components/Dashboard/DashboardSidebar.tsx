@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { TaskForm } from '@/components/TaskForm';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useTasks } from '@/hooks/useTasks';
 
 const navigationItems = [
   {
@@ -68,6 +69,7 @@ export function DashboardSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const { addTask } = useTasks();
   const currentPath = location.pathname + location.search;
   const isCollapsed = state === 'collapsed';
 
@@ -76,6 +78,11 @@ export function DashboardSidebar() {
       return currentPath === '/dashboard' || currentPath === '/dashboard?view=overview';
     }
     return currentPath === url;
+  };
+
+  const handleTaskSave = (taskData: any) => {
+    addTask(taskData);
+    setIsTaskModalOpen(false);
   };
 
   return (
@@ -149,7 +156,11 @@ export function DashboardSidebar() {
                       </SidebarMenuButton>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
-                      <TaskForm onClose={() => setIsTaskModalOpen(false)} />
+                      <TaskForm 
+                        isOpen={isTaskModalOpen}
+                        onClose={() => setIsTaskModalOpen(false)}
+                        onSave={handleTaskSave}
+                      />
                     </DialogContent>
                   </Dialog>
                 </SidebarMenuItem>
