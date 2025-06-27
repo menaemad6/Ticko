@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Calendar, 
@@ -90,9 +89,7 @@ export function DashboardSidebar() {
         <SidebarHeader className="p-4">
           <div className="flex items-center justify-between">
             <div className={`flex items-center space-x-3 transition-opacity duration-200 ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                <div className="w-5 h-5 bg-primary-foreground rounded-md opacity-90"></div>
-              </div>
+              <img src="/Ticko-Logo.png" alt="Ticko Logo" className="w-10 h-10 rounded-lg shadow-lg" />
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-foreground">
                   Dashboard

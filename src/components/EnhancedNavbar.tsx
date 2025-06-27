@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,12 +19,7 @@ const EnhancedNavbar = () => {
     <nav className="relative z-50 flex items-center justify-between px-8 py-4 border-b border-gray-800/30 backdrop-blur-xl bg-gray-900/10">
       {/* Logo section */}
       <div className="flex items-center space-x-3">
-        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/25 relative">
-          <div className="w-4 h-4 bg-white rounded-sm"></div>
-        </div>
-        <span className="text-xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-          Ticko
-        </span>
+        <img src="/Ticko-Logo.png" alt="Ticko Logo" className="w-12 h-12 rounded-lg shadow-lg" />
         <Badge variant="outline" className="text-xs bg-gray-800/50 border-gray-600 text-gray-300">®</Badge>
       </div>
       

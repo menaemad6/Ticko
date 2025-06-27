@@ -365,9 +365,7 @@ export function TaskSidebar({ onQuickAction, onTemplateSelect, isActionInProgres
         <SidebarHeader className="p-4 border-b bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20 backdrop-blur-xl relative">
           <div className="flex items-center gap-3 mb-4">
             {/* Logo */}
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">T</span>
-            </div>
+            <img src="/Ticko-Logo.png" alt="Ticko Logo" className="w-14 h-14" />
             {/* Clickable Title */}
             <Link to="/" className="flex-1">
               <h2 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent drop-shadow-sm select-none hover:opacity-80 transition-opacity">
