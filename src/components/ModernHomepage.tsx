@@ -36,7 +36,16 @@ const ModernHomepage = () => {
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse block">  
               REVOLUTIONIZE YOUR WORKFLOW  
             </span>  
-            <span className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-gray-300 mt-2 block">with <span className="text-purple-400">Ticko</span></span>  
+            <span className="text-xl sm:text-2xl md:text-3xl lg:text-5xl text-gray-300 mt-2 block">
+              with{' '}
+              <span className="relative inline-block">
+                <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
+                  Ticko
+                </span>
+                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-purple-500/20 to-pink-500/20 blur-xl animate-pulse"></div>
+                <div className="absolute -inset-2 bg-gradient-to-r from-cyan-400/10 via-purple-500/10 to-pink-500/10 blur-2xl animate-pulse delay-300"></div>
+              </span>
+            </span>  
           </h1>
           
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed animate-fade-in delay-200">
@@ -61,44 +70,6 @@ const ModernHomepage = () => {
             </p>
           </div>
         </div>
-
-        {/* Enhanced Tags with animations */}
-        {/* <div className="flex justify-center mt-8 sm:mt-12 animate-fade-in delay-800">  
-          <div className="w-full max-w-xl px-2 sm:px-0">  
-            <div className="rounded-3xl bg-white/10 border border-white/10 p-4 sm:p-6 shadow-lg backdrop-blur-md w-full">  
-              <Tabs defaultValue="features" className="w-full">  
-                <TabsList className="w-full grid grid-cols-2 md:flex md:flex-row rounded-2xl bg-white/5 border border-white/10 p-1 mb-4 gap-2">  
-                  <TabsTrigger value="features" className="rounded-xl text-sm sm:text-base font-semibold text-white py-2 sm:py-3 px-1 sm:px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:via-pink-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Features</TabsTrigger>  
-                  <TabsTrigger value="templates" className="rounded-xl text-sm sm:text-base font-semibold text-white py-2 sm:py-3 px-1 sm:px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:via-cyan-400 data-[state=active]:to-purple-500 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Templates</TabsTrigger>  
-                  <TabsTrigger value="analytics" className="rounded-xl text-sm sm:text-base font-semibold text-white py-2 sm:py-3 px-1 sm:px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-700 data-[state=active]:via-pink-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Analytics</TabsTrigger>  
-                  <TabsTrigger value="customization" className="rounded-xl text-sm sm:text-base font-semibold text-white py-2 sm:py-3 px-1 sm:px-2 transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-800 data-[state=active]:via-gray-700 data-[state=active]:to-purple-800 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:scale-105">Customization</TabsTrigger>  
-                </TabsList>
-                <TabsContent value="features">
-                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
-                    <strong>Visual Task Canvas:</strong> Drag-and-drop tasks, milestones, and notes. <br />
-                    <strong>Bulk Actions:</strong> Create, archive, and manage tasks at scale. <br />
-                    <strong>AI-Powered Insights:</strong> Predictive analytics and smart suggestions.
-                  </div>
-                </TabsContent>
-                <TabsContent value="templates">
-                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
-                    <strong>Workflow Templates:</strong> Sprint Planning, Project Roadmap, Bug Tracking, Feature Development, and more.
-                  </div>
-                </TabsContent>
-                <TabsContent value="analytics">
-                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
-                    <strong>Project Analytics:</strong> Real-time dashboards, performance metrics, and reporting.
-                  </div>
-                </TabsContent>
-                <TabsContent value="customization">
-                  <div className="rounded-2xl bg-white/5 p-5 sm:p-7 text-center text-base text-white border border-white/10">
-                    <strong>Infinite Customization:</strong> Personalize your workspace, automate with AI, and integrate your brand.
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </div> */}
 
         {/* Canvas Demo Image */}
         <div className="mt-16 relative animate-fade-in delay-1000">
