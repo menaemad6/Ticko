@@ -91,15 +91,13 @@ const Auth = () => {
       {/* Auth card container */}
       <div className="flex-1 flex items-center justify-center w-full px-2 sm:px-4 md:px-0 py-8 relative z-10">
         <Card className="w-full max-w-md bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-purple-900/80 border border-white/10 shadow-2xl shadow-purple-900/30 backdrop-blur-2xl rounded-3xl px-3 py-6 sm:px-6 sm:py-8 md:px-10 md:py-12 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/30 animate-fade-in group">
-          {/* Updated logo section */}
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 shadow-lg flex items-center justify-center p-2">
-              <img 
-                src="/Ticko-Logo.png" 
-                alt="Ticko Logo" 
-                className="w-10 h-10 object-contain"
-              />
-            </div>
+          {/* Updated logo section - removed background, made bigger */}
+          <div className="flex justify-center mb-6">
+            <img 
+              src="/Ticko-Logo.png" 
+              alt="Ticko Logo" 
+              className="w-20 h-20 object-contain drop-shadow-lg"
+            />
           </div>
           <CardHeader className="space-y-1 text-center p-0 mb-4 sm:mb-6">
             <CardTitle className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent animate-pulse">{tab === 'signin' ? 'Sign In' : 'Create Account'}</CardTitle>

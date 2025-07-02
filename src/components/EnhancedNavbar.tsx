@@ -1,10 +1,12 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Home, Layout, User, LogOut, BarChart3 } from 'lucide-react';
+import { Home, Layout, BarChart3 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import ProfileCard from './ProfileCard';
 
 const EnhancedNavbar = () => {
   const { user, loading, signOut } = useAuth();
@@ -52,19 +54,13 @@ const EnhancedNavbar = () => {
       {/* Right section */}
       <div className="flex items-center space-x-4">
         {user ? (
-          <div className="relative group">
-            <Button variant="ghost" size="icon" className="rounded-full p-0">
+          <ProfileCard user={user} onSignOut={handleSignOut}>
+            <Button variant="ghost" size="icon" className="rounded-full p-0 hover:bg-gray-800/50 transition-all duration-300">
               <Avatar>
                 <AvatarFallback>{user.email ? user.email[0].toUpperCase() : 'U'}</AvatarFallback>
               </Avatar>
             </Button>
-            <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-50">
-              <div className="px-4 py-2 text-sm text-gray-200 border-b border-gray-800">{user.email}</div>
-              <button onClick={handleSignOut} className="w-full flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 transition-all">
-                <LogOut className="w-4 h-4 mr-2" /> Sign Out
-              </button>
-            </div>
-          </div>
+          </ProfileCard>
         ) : (
           <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105" asChild>
             <Link to="/auth">Join Now</Link>

@@ -102,12 +102,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto mx-auto">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="text-lg sm:text-xl">
             {task ? 'Edit Task' : 'Create New Task'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-muted-foreground">
             {formData.nodeType === 'milestone' 
               ? 'Milestone nodes represent major project checkpoints' 
               : formData.nodeType === 'note' 
@@ -118,37 +118,39 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title" className="text-sm font-medium">Title *</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="Enter task title..."
               required
+              className="w-full"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-sm font-medium">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Enter task description..."
               rows={3}
+              className="w-full resize-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Node Type</Label>
+              <Label className="text-sm font-medium">Node Type</Label>
               <Select
                 value={formData.nodeType}
                 onValueChange={(value: 'task' | 'milestone' | 'note') => 
                   setFormData(prev => ({ ...prev, nodeType: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -160,14 +162,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label className="text-sm font-medium">Status</Label>
               <Select
                 value={formData.status}
                 onValueChange={(value: Task['status']) => 
                   setFormData(prev => ({ ...prev, status: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -179,16 +181,16 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Priority</Label>
+              <Label className="text-sm font-medium">Priority</Label>
               <Select
                 value={formData.priority}
                 onValueChange={(value: Task['priority']) => 
                   setFormData(prev => ({ ...prev, priority: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -200,18 +202,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="dueDate">Due Date</Label>
+              <Label htmlFor="dueDate" className="text-sm font-medium">Due Date</Label>
               <Input
                 id="dueDate"
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                className="w-full"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Tags</Label>
+            <Label className="text-sm font-medium">Tags</Label>
             <div className="flex gap-2">
               <Input
                 value={newTag}
@@ -220,7 +223,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 placeholder="Add a tag..."
                 className="flex-1"
               />
-              <Button type="button" onClick={addTag} size="sm">
+              <Button type="button" onClick={addTag} size="sm" className="shrink-0">
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
@@ -231,7 +234,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                    className="px-2 py-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 text-xs"
                     onClick={() => removeTag(tag)}
                   >
                     {tag}
@@ -242,11 +245,11 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             )}
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto order-2 sm:order-1">
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="w-full sm:w-auto order-1 sm:order-2 mb-2 sm:mb-0">
               {task ? 'Update Task' : 'Create Task'}
             </Button>
           </DialogFooter>
