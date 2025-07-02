@@ -26,26 +26,26 @@ export function WeeklyCalendarView() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'done':
-        return 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400';
+        return 'bg-primary/10 border-primary/20 text-primary';
       case 'in-progress':
-        return 'bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400';
+        return 'bg-primary/20 border-primary/30 text-primary';
       case 'todo':
-        return 'bg-orange-500/10 border-orange-500/20 text-orange-600 dark:text-orange-400';
+        return 'bg-destructive/10 border-destructive/20 text-destructive';
       default:
-        return 'bg-gray-500/10 border-gray-500/20 text-gray-600 dark:text-gray-400';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   const getPriorityLeftBorder = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'border-l-red-500';
+        return 'border-l-destructive';
       case 'medium':
-        return 'border-l-orange-500';
+        return 'border-l-primary';
       case 'low':
-        return 'border-l-green-500';
+        return 'border-l-primary/50';
       default:
-        return 'border-l-gray-500';
+        return 'border-l-border';
     }
   };
 
@@ -91,15 +91,15 @@ export function WeeklyCalendarView() {
       </div>
 
       {/* Calendar Grid */}
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden bg-card border-border">
         <CardContent className="p-0">
           {/* Week Header */}
-          <div className="grid grid-cols-8 border-b">
-            <div className="p-4 text-sm font-medium text-muted-foreground bg-muted/50">
+          <div className="grid grid-cols-8 border-b border-border">
+            <div className="p-4 text-sm font-medium text-muted-foreground bg-muted">
               Time
             </div>
             {weekDays.map((day) => (
-              <div key={day.toISOString()} className="p-4 text-center border-l">
+              <div key={day.toISOString()} className="p-4 text-center border-l border-border">
                 <div className="text-sm font-medium">
                   {format(day, 'EEE')}
                 </div>
@@ -117,14 +117,14 @@ export function WeeklyCalendarView() {
           {/* Time Slots */}
           <div className="max-h-96 overflow-y-auto">
             {timeSlots.map((time) => (
-              <div key={time} className="grid grid-cols-8 border-b min-h-[80px]">
-                <div className="p-3 text-sm text-muted-foreground bg-muted/30 border-r flex items-start">
+              <div key={time} className="grid grid-cols-8 border-b border-border min-h-[80px]">
+                <div className="p-3 text-sm text-muted-foreground bg-muted border-r border-border flex items-start">
                   {time}
                 </div>
                 {weekDays.map((day) => {
                   const dayTasks = getTasksForDay(day);
                   return (
-                    <div key={`${day.toISOString()}-${time}`} className="p-2 border-l relative min-h-[80px]">
+                    <div key={`${day.toISOString()}-${time}`} className="p-2 border-l border-border relative min-h-[80px]">
                       {/* Show tasks on the first time slot only */}
                       {time === '07:00' && dayTasks.map((task, index) => (
                         <div
@@ -168,7 +168,7 @@ export function WeeklyCalendarView() {
       </Card>
 
       {/* Legend */}
-      <Card>
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-lg flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
@@ -178,19 +178,19 @@ export function WeeklyCalendarView() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-green-500/20 border border-green-500/30 rounded"></div>
+              <div className="w-4 h-4 bg-primary/20 border border-primary/30 rounded"></div>
               <span className="text-sm">Completed</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-blue-500/20 border border-blue-500/30 rounded"></div>
+              <div className="w-4 h-4 bg-primary/10 border border-primary/20 rounded"></div>
               <span className="text-sm">In Progress</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-orange-500/20 border border-orange-500/30 rounded"></div>
+              <div className="w-4 h-4 bg-destructive/10 border border-destructive/20 rounded"></div>
               <span className="text-sm">To Do</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 border-l-4 border-l-red-500 bg-muted rounded"></div>
+              <div className="w-4 h-4 border-l-4 border-l-destructive bg-muted rounded"></div>
               <span className="text-sm">High Priority</span>
             </div>
           </div>

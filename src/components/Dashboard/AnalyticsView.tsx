@@ -43,14 +43,14 @@ export function AnalyticsView() {
   };
 
   const StatCard = ({ icon: Icon, title, value, description, color, trend }: any) => (
-    <Card className="bg-card border-border shadow-lg hover:shadow-xl transition-all duration-300 group">
+    <Card className="bg-card border-border hover:shadow-xl transition-all duration-300 group">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
               <p className="text-muted-foreground text-sm font-medium">{title}</p>
               {trend && (
-                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
                   {trend}
                 </Badge>
               )}
@@ -61,7 +61,7 @@ export function AnalyticsView() {
             <p className="text-muted-foreground text-xs mt-1">{description}</p>
           </div>
           <div className={`p-3 rounded-lg ${color} group-hover:scale-110 transition-transform duration-200`}>
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-6 h-6 text-primary-foreground" />
           </div>
         </div>
       </CardContent>
@@ -69,7 +69,7 @@ export function AnalyticsView() {
   );
 
   const PriorityCard = ({ priority, count, color, bgColor }: any) => (
-    <Card className={`${bgColor} border-border shadow-lg`}>
+    <Card className={`${bgColor} border-border`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
@@ -104,7 +104,7 @@ export function AnalyticsView() {
           icon={Target}
           title="Completion Rate"
           value={`${analytics.completionRate}%`}
-          color="bg-gradient-to-r from-green-500 to-emerald-600"
+          color="bg-primary"
           description="Tasks completed"
           trend={analytics.completionRate > 70 ? "Excellent" : analytics.completionRate > 50 ? "Good" : "Needs Improvement"}
         />
@@ -112,21 +112,21 @@ export function AnalyticsView() {
           icon={BarChart3}
           title="Total Tasks"
           value={analytics.totalTasks}
-          color="bg-gradient-to-r from-blue-500 to-cyan-600"
+          color="bg-primary"
           description="All time tasks"
         />
         <StatCard
           icon={Calendar}
           title="This Week"
           value={analytics.completedThisWeek}
-          color="bg-gradient-to-r from-purple-500 to-pink-600"
+          color="bg-primary"
           description="Tasks completed"
         />
         <StatCard
           icon={Clock}
           title="Overdue"
           value={analytics.overdueTasks}
-          color="bg-gradient-to-r from-red-500 to-orange-600"
+          color="bg-destructive"
           description="Need attention"
         />
       </div>
@@ -137,28 +137,28 @@ export function AnalyticsView() {
           icon={Zap}
           title="Daily Average"
           value={analytics.averageTasksPerDay}
-          color="bg-gradient-to-r from-indigo-500 to-purple-600"
+          color="bg-primary"
           description="Tasks per day"
         />
         <StatCard
           icon={CheckCircle2}
           title="With Due Dates"
           value={analytics.tasksWithDueDate}
-          color="bg-gradient-to-r from-teal-500 to-green-600"
+          color="bg-primary"
           description="Scheduled tasks"
         />
         <StatCard
           icon={AlertTriangle}
           title="Active Tasks"
           value={analytics.inProgressTasks + analytics.todoTasks}
-          color="bg-gradient-to-r from-orange-500 to-red-600"
+          color="bg-primary"
           description="In progress + Todo"
         />
       </div>
 
       {/* Priority Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-card border-border shadow-lg">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center space-x-2">
               <PieChart className="w-5 h-5 text-primary" />
@@ -170,26 +170,26 @@ export function AnalyticsView() {
               <PriorityCard
                 priority="high"
                 count={analytics.highPriorityTasks}
-                color="bg-red-500"
-                bgColor="bg-red-50/50 dark:bg-red-900/10"
+                color="bg-destructive"
+                bgColor="bg-destructive/10"
               />
               <PriorityCard
                 priority="medium"
                 count={analytics.mediumPriorityTasks}
-                color="bg-orange-500"
-                bgColor="bg-orange-50/50 dark:bg-orange-900/10"
+                color="bg-primary"
+                bgColor="bg-primary/10"
               />
               <PriorityCard
                 priority="low"
                 count={analytics.lowPriorityTasks}
-                color="bg-green-500"
-                bgColor="bg-green-50/50 dark:bg-green-900/10"
+                color="bg-primary"
+                bgColor="bg-primary/20"
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-lg">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-foreground flex items-center space-x-2">
               <TrendingUp className="w-5 h-5 text-primary" />
@@ -205,7 +205,7 @@ export function AnalyticsView() {
                 </div>
                 <div className="w-full bg-secondary rounded-full h-3">
                   <div 
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500 ease-out"
+                    className="bg-primary h-3 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${analytics.completionRate}%` }}
                   />
                 </div>
@@ -213,20 +213,20 @@ export function AnalyticsView() {
               
               {analytics.totalTasks > 0 && (
                 <div className="grid grid-cols-3 gap-4 pt-4">
-                  <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className="text-center p-3 rounded-lg bg-primary/10">
+                    <p className="text-2xl font-bold text-primary">
                       {analytics.completedTasks}
                     </p>
                     <p className="text-muted-foreground text-sm">Completed</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-orange-50 dark:bg-orange-900/20">
-                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  <div className="text-center p-3 rounded-lg bg-primary/10">
+                    <p className="text-2xl font-bold text-primary">
                       {analytics.inProgressTasks}
                     </p>
                     <p className="text-muted-foreground text-sm">In Progress</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  <div className="text-center p-3 rounded-lg bg-destructive/10">
+                    <p className="text-2xl font-bold text-destructive">
                       {analytics.todoTasks}
                     </p>
                     <p className="text-muted-foreground text-sm">To Do</p>
@@ -239,7 +239,7 @@ export function AnalyticsView() {
       </div>
 
       {/* Productivity Insights */}
-      <Card className="bg-card border-border shadow-lg">
+      <Card className="bg-card border-border">
         <CardHeader>
           <CardTitle className="text-foreground flex items-center space-x-2">
             <Activity className="w-5 h-5 text-primary" />
@@ -271,19 +271,19 @@ export function AnalyticsView() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">On Time:</span>
-                  <span className="text-green-600 dark:text-green-400 font-medium">
+                  <span className="text-primary font-medium">
                     {analytics.totalTasks - analytics.overdueTasks}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Overdue:</span>
-                  <span className="text-red-600 dark:text-red-400 font-medium">
+                  <span className="text-destructive font-medium">
                     {analytics.overdueTasks}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Scheduled:</span>
-                  <span className="text-blue-600 dark:text-blue-400 font-medium">
+                  <span className="text-primary font-medium">
                     {analytics.tasksWithDueDate}
                   </span>
                 </div>
@@ -315,15 +315,15 @@ export function AnalyticsView() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">High Priority:</span>
-                  <span className="text-red-600 dark:text-red-400 font-medium">{analytics.highPriorityTasks}</span>
+                  <span className="text-destructive font-medium">{analytics.highPriorityTasks}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Medium Priority:</span>
-                  <span className="text-orange-600 dark:text-orange-400 font-medium">{analytics.mediumPriorityTasks}</span>
+                  <span className="text-primary font-medium">{analytics.mediumPriorityTasks}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Low Priority:</span>
-                  <span className="text-green-600 dark:text-green-400 font-medium">{analytics.lowPriorityTasks}</span>
+                  <span className="text-primary font-medium">{analytics.lowPriorityTasks}</span>
                 </div>
               </div>
             </div>
