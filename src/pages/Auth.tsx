@@ -91,10 +91,14 @@ const Auth = () => {
       {/* Auth card container */}
       <div className="flex-1 flex items-center justify-center w-full px-2 sm:px-4 md:px-0 py-8 relative z-10">
         <Card className="w-full max-w-md bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-purple-900/80 border border-white/10 shadow-2xl shadow-purple-900/30 backdrop-blur-2xl rounded-3xl px-3 py-6 sm:px-6 sm:py-8 md:px-10 md:py-12 transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/30 animate-fade-in group">
-          {/* Animated accent icon */}
+          {/* Updated logo section */}
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 shadow-lg flex items-center justify-center animate-blob">
-              <svg className="w-8 h-8 text-white opacity-80 animate-spin-slow" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" opacity="0.2"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-500 shadow-lg flex items-center justify-center p-2">
+              <img 
+                src="/Ticko-Logo.png" 
+                alt="Ticko Logo" 
+                className="w-10 h-10 object-contain"
+              />
             </div>
           </div>
           <CardHeader className="space-y-1 text-center p-0 mb-4 sm:mb-6">
