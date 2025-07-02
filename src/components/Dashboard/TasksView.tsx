@@ -21,38 +21,38 @@ export function TasksView() {
       status: 'todo' as const,
       title: 'To Do',
       icon: AlertCircle,
-      color: 'border-border bg-card',
-      badgeColor: 'bg-destructive/10 text-destructive border-destructive/20',
-      headerColor: 'bg-muted',
+      color: 'border-red-200/50 bg-red-50/50 dark:border-red-800/50 dark:bg-red-900/10',
+      badgeColor: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
+      headerColor: 'bg-red-50/50 dark:bg-red-900/20',
     },
     {
       status: 'in-progress' as const,
       title: 'In Progress',
       icon: Clock,
-      color: 'border-border bg-card',
-      badgeColor: 'bg-primary/10 text-primary border-primary/20',
-      headerColor: 'bg-muted',
+      color: 'border-orange-200/50 bg-orange-50/50 dark:border-orange-800/50 dark:bg-orange-900/10',
+      badgeColor: 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800',
+      headerColor: 'bg-orange-50/50 dark:bg-orange-900/20',
     },
     {
       status: 'done' as const,
       title: 'Done',
       icon: CheckCircle,
-      color: 'border-border bg-card',
-      badgeColor: 'bg-primary/20 text-primary border-primary/30',
-      headerColor: 'bg-muted',
+      color: 'border-green-200/50 bg-green-50/50 dark:border-green-800/50 dark:bg-green-900/10',
+      badgeColor: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
+      headerColor: 'bg-green-50/50 dark:bg-green-900/20',
     },
   ];
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-destructive/10 text-destructive border-destructive/20';
+        return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
       case 'medium':
-        return 'bg-primary/10 text-primary border-primary/20';
+        return 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
       case 'low':
-        return 'bg-primary/20 text-primary border-primary/30';
+        return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
       default:
-        return 'bg-muted text-muted-foreground border-border';
+        return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
     }
   };
 
@@ -102,7 +102,7 @@ export function TasksView() {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </Button>
-          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg">
             <Link to="/canvas">
               <Plus className="w-4 h-4 mr-2" />
               New Task
@@ -118,7 +118,7 @@ export function TasksView() {
           const Icon = column.icon;
           
           return (
-            <Card key={column.status} className={`bg-card border-border ${column.color}`}>
+            <Card key={column.status} className={`bg-card border-border shadow-lg ${column.color}`}>
               <CardHeader className={`${column.headerColor} border-b border-border`}>
                 <CardTitle className="text-foreground flex items-center justify-between">
                   <div className="flex items-center space-x-3">

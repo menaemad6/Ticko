@@ -39,8 +39,9 @@ export function OverviewView() {
     .slice(0, 3);
 
   const StatCard = ({ icon: Icon, title, value, color, description, trend }: any) => (
-    <Card className="bg-card border-border hover:shadow-lg transition-all duration-200">
-      <CardContent className="p-6">
+    <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-200 border-border/50">
+      <div className={`absolute inset-0 bg-gradient-to-r opacity-5 ${color}`}></div>
+      <CardContent className="p-6 relative">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
@@ -48,12 +49,12 @@ export function OverviewView() {
             <p className="text-xs text-muted-foreground">{description}</p>
             {trend && (
               <div className="flex items-center space-x-1">
-                <TrendingUp className="h-3 w-3 text-primary" />
-                <span className="text-xs text-primary font-medium">{trend}</span>
+                <TrendingUp className="h-3 w-3 text-green-500" />
+                <span className="text-xs text-green-500 font-medium">{trend}</span>
               </div>
             )}
           </div>
-          <div className={`p-4 rounded-xl ${color} transition-transform duration-200 hover:scale-110`}>
+          <div className={`p-4 rounded-xl ${color} group-hover:scale-110 transition-transform duration-200`}>
             <Icon className="w-6 h-6 text-white" />
           </div>
         </div>
@@ -64,7 +65,7 @@ export function OverviewView() {
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-primary p-8 text-primary-foreground">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10">
           <div className="flex items-center justify-between">
@@ -73,17 +74,17 @@ export function OverviewView() {
                 <Trophy className="h-8 w-8" />
                 <h2 className="text-3xl font-bold">Welcome back!</h2>
               </div>
-              <p className="text-primary-foreground/80 text-lg max-w-md">
+              <p className="text-blue-100 text-lg max-w-md">
                 You're doing great! {completionRate}% of your tasks are completed.
               </p>
               <div className="flex space-x-4">
-                <Button asChild size="lg" className="bg-background text-foreground hover:bg-background/90">
+                <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
                   <Link to="/canvas">
                     <Plus className="w-5 h-5 mr-2" />
                     Create Task
                   </Link>
                 </Button>
-                <Button variant="outline" asChild size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+                <Button variant="outline" asChild size="lg" className="border-white/30 text-white hover:bg-white/10">
                   <Link to="/dashboard?view=calendar">
                     <Calendar className="w-5 h-5 mr-2" />
                     View Calendar
@@ -94,7 +95,7 @@ export function OverviewView() {
             <div className="hidden md:block">
               <div className="text-right space-y-2">
                 <div className="text-4xl font-bold">{completionRate}%</div>
-                <div className="text-primary-foreground/80">Completion Rate</div>
+                <div className="text-blue-200">Completion Rate</div>
               </div>
             </div>
           </div>
@@ -107,7 +108,7 @@ export function OverviewView() {
           icon={Trophy}
           title="Completed"
           value={stats.completed}
-          color="bg-primary"
+          color="bg-gradient-to-r from-green-500 to-emerald-500"
           description="Tasks finished"
           trend="+12% this week"
         />
@@ -115,7 +116,7 @@ export function OverviewView() {
           icon={Zap}
           title="In Progress"
           value={stats.inProgress}
-          color="bg-primary"
+          color="bg-gradient-to-r from-blue-500 to-cyan-500"
           description="Active tasks"
           trend="+5% this week"
         />
@@ -123,14 +124,14 @@ export function OverviewView() {
           icon={Target}
           title="Pending"
           value={stats.pending}
-          color="bg-primary"
+          color="bg-gradient-to-r from-orange-500 to-red-500"
           description="To be started"
         />
         <StatCard
           icon={TrendingUp}
           title="Total"
           value={stats.total}
-          color="bg-primary"
+          color="bg-gradient-to-r from-purple-500 to-indigo-500"
           description="All tasks"
           trend="+18% this month"
         />
@@ -139,7 +140,7 @@ export function OverviewView() {
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity */}
-        <Card className="lg:col-span-2 bg-card border-border">
+        <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-primary" />
@@ -160,10 +161,10 @@ export function OverviewView() {
               </div>
             ) : (
               recentTasks.map((task) => (
-                <div key={task.id} className="flex items-center space-x-4 p-4 rounded-xl bg-muted hover:bg-accent transition-colors">
+                <div key={task.id} className="flex items-center space-x-4 p-4 rounded-xl bg-muted/50 hover:bg-muted/70 transition-colors">
                   <div className={`w-3 h-3 rounded-full ${
-                    task.status === 'done' ? 'bg-primary' :
-                    task.status === 'in-progress' ? 'bg-primary/70' : 'bg-primary/50'
+                    task.status === 'done' ? 'bg-green-500' :
+                    task.status === 'in-progress' ? 'bg-blue-500' : 'bg-orange-500'
                   }`}></div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-foreground truncate">{task.title}</h4>
@@ -172,7 +173,11 @@ export function OverviewView() {
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge variant="outline" className="border-border text-foreground">
+                    <Badge variant="outline" className={
+                      task.priority === 'high' ? 'border-red-200 text-red-700 bg-red-50 dark:border-red-800 dark:text-red-400 dark:bg-red-900/20' :
+                      task.priority === 'medium' ? 'border-orange-200 text-orange-700 bg-orange-50 dark:border-orange-800 dark:text-orange-400 dark:bg-orange-900/20' :
+                      'border-green-200 text-green-700 bg-green-50 dark:border-green-800 dark:text-green-400 dark:bg-green-900/20'
+                    }>
                       {task.priority}
                     </Badge>
                     <Badge variant={task.status === 'done' ? 'default' : 'secondary'}>
@@ -188,10 +193,10 @@ export function OverviewView() {
         {/* Urgent Tasks & Quick Actions */}
         <div className="space-y-6">
           {/* Urgent Tasks */}
-          <Card className="bg-card border-border">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <AlertCircle className="h-5 w-5 text-destructive" />
+              <CardTitle className="flex items-center space-x-2 text-red-600 dark:text-red-400">
+                <AlertCircle className="h-5 w-5" />
                 <span>Urgent Tasks</span>
               </CardTitle>
             </CardHeader>
@@ -203,10 +208,10 @@ export function OverviewView() {
                 </div>
               ) : (
                 urgentTasks.map((task) => (
-                  <div key={task.id} className="p-3 rounded-lg border-l-4 border-l-destructive bg-destructive/10">
+                  <div key={task.id} className="p-3 rounded-lg border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-900/10">
                     <h4 className="font-medium text-foreground text-sm">{task.title}</h4>
                     {task.dueDate && (
-                      <p className="text-xs text-destructive mt-1">
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                         Due: {new Date(task.dueDate).toLocaleDateString()}
                       </p>
                     )}
@@ -217,7 +222,7 @@ export function OverviewView() {
           </Card>
 
           {/* Quick Actions */}
-          <Card className="bg-card border-border">
+          <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
