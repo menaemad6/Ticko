@@ -137,8 +137,8 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`w-[95vw] max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[98vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-xl sm:rounded-2xl md:rounded-3xl border-0 p-0 m-1 sm:m-4 ${getStatusBg(localTask.status)}`}>
-        <div className="flex flex-col h-full max-h-[98vh] sm:max-h-[90vh]">
+      <DialogContent className={`w-[95vw] max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[90vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-xl sm:rounded-2xl md:rounded-3xl border-0 p-0 m-1 sm:m-4 ${getStatusBg(localTask.status)}`}>
+        <div className="flex flex-col h-full max-h-[90vh] sm:max-h-[90vh]">
           {/* Mobile-friendly header with close button */}
           <DialogHeader className="space-y-3 sm:space-y-4 md:space-y-6 pt-3 sm:pt-6 md:pt-8 px-3 sm:px-6 md:px-8 flex-shrink-0 relative">
             {/* Close button for mobile */}
