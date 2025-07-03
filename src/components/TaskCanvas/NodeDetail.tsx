@@ -137,7 +137,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`w-[95vw] max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[98vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-xl sm:rounded-2xl md:rounded-3xl border-0 p-0 m-1 sm:m-4 bg-background`}>
+      <DialogContent className={`w-[95vw] max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-3xl max-h-[98vh] sm:max-h-[90vh] overflow-hidden backdrop-blur-xl shadow-2xl rounded-xl sm:rounded-2xl md:rounded-3xl border-0 p-0 m-1 sm:m-4 ${getStatusBg(localTask.status)}`}>
         <div className="flex flex-col h-full max-h-[98vh] sm:max-h-[90vh]">
           {/* Mobile-friendly header with close button */}
           <DialogHeader className="space-y-3 sm:space-y-4 md:space-y-6 pt-3 sm:pt-6 md:pt-8 px-3 sm:px-6 md:px-8 flex-shrink-0 relative">
@@ -187,29 +187,29 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
                   </div>
                 </div>
               </div>
-              
-              {/* Action buttons - stacked on mobile */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleEdit}
-                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border w-full sm:w-auto"
-                >
-                  <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  <span className="text-xs sm:text-sm">Edit</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border w-full sm:w-auto"
-                >
-                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  <span className="text-xs sm:text-sm">{isDeleting ? 'Deleting...' : 'Delete'}</span>
-                </Button>
-              </div>
+            </div>
+            
+            {/* Action buttons - 50% width each on all screen sizes */}
+            <div className="flex flex-row gap-2 sm:gap-3 w-full">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEdit}
+                className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border w-1/2"
+              >
+                <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Edit</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive shadow-lg rounded-lg sm:rounded-xl backdrop-blur-sm bg-sidebar-background border-sidebar-border w-1/2"
+              >
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="text-xs sm:text-sm">{isDeleting ? 'Deleting...' : 'Delete'}</span>
+              </Button>
             </div>
 
             {/* Modern Finish Button - Only show if task is not done */}
@@ -266,7 +266,7 @@ export default function NodeDetail({ isOpen, onClose, task, onEdit, onGetAIHelp 
             )}
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 sm:space-y-6 md:space-y-8 px-3 sm:px-6 md:px-8 pb-3 sm:pb-6 md:pb-8">
+          <div className="flex-1 mt-6 overflow-y-auto custom-scrollbar space-y-4 sm:space-y-6 md:space-y-8 px-3 sm:px-6 md:px-8 pb-3 sm:pb-6 md:pb-8">
             {/* Enhanced AI Help Section */}
             <div className="relative overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl bg-gradient-to-br from-sidebar-primary/5 via-blue-500/5 to-purple-500/5 dark:from-sidebar-primary/10 dark:via-blue-500/10 dark:to-purple-500/10 border border-sidebar-border shadow-2xl backdrop-blur-sm">
               {/* Animated background gradient */}
