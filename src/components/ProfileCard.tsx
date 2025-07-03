@@ -42,26 +42,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, onSignOut, children }) 
             
             <Separator className="my-3" />
             
-            <div className="space-y-1">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start h-9 px-2 text-sm"
-                size="sm"
-              >
-                <User className="w-4 h-4 mr-3" />
-                View Profile
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start h-9 px-2 text-sm"
-                size="sm"
-              >
-                <Settings className="w-4 h-4 mr-3" />
-                Settings
-              </Button>
-            </div>
             
-            <Separator className="my-3" />
             
             <Button 
               variant="ghost" 
